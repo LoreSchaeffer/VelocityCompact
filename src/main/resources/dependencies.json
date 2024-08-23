@@ -1,0 +1,42 @@
+[
+  {
+    "groupId": "org.hibernate.orm",
+    "artifactId": "hibernate-core",
+    "version": "6.6.0.Final"
+  },
+  {
+    "groupId": "com.mysql",
+    "artifactId": "mysql-connector-j",
+    "version": "9.0.0"
+  },
+  {
+    "groupId": "org.xerial",
+    "artifactId": "sqlite-jdbc",
+    "version": "3.46.1.0"
+  },
+  {
+    "groupId": "com.h2database",
+    "artifactId": "h2",
+    "version": "2.3.232"
+  },
+  {
+    "groupId": "org.mariadb.jdbc",
+    "artifactId": "mariadb-java-client",
+    "version": "3.4.1"
+  },
+  {
+    "groupId": "org.postgresql",
+    "artifactId": "postgresql",
+    "version": "42.7.3"
+  },
+  {
+    "groupId": "com.zaxxer",
+    "artifactId": "HikariCP",
+    "version": "5.1.0"
+  },
+  {
+    "groupId": "org.reflections",
+    "artifactId": "reflections",
+    "version": "0.10.2"
+  }
+]

@@ -1,0 +1,177 @@
+# In this section you can enable/disable each module of the plugin.
+modules:
+  broadcast: true
+  commandspy: true
+  command-blocker: true
+  command-warning: true
+  globalchat: true
+  help: true
+  hub: true
+  ip-limiter: true
+  moderation: true
+  messages: true
+  nickname-blocker: true
+  socialspy: true
+  staffchat: true
+  word-censure: true
+  log-commands: true
+  log-chat: true
+
+
+# Storage settings
+# Storage options:
+# => Remote databases
+# ==> MySQL
+# ==> MariaDB (preferred over MySQL)
+# ==> PostgreSQL
+# => Flatfile/local databases
+# ==> H2
+# ==> SQLite
+storage-type: H2
+
+# MySQL/MariaDB/PostgreSQL settings
+# Modify the values below only if you are using a remote database.
+data:
+  # Define the address and port for the database.
+  # If not defined, the default port will be used.
+  # (MySQL/MariaDB: 3306, PostgreSQL: 5432)
+  # Format: host:port
+  address: localhost
+
+  # The name of the database to use.
+  database: minecraft
+
+  # Credentials
+  username: minecraft
+  password: password
+
+  # The prefix of all VelocityCompact tables.
+  table-prefix: 'vc_'
+
+  # The settings below apply to the MySQL/MariaDB connection pool.
+  # The default values will be suitable for most servers.
+  # Do not change these values unless you know what you are doing.
+  pool:
+    # Enable or disable the connection pool.
+    enabled: true
+    # The maximum number of connections that can be created in the pool.
+    maximum-pool-size: 10
+    # The minimum number of idle connections that the pool will try to maintain.
+    minimum-idle: 10
+    # The maximum lifetime of a connection in the pool.
+    maximum-lifetime: 1800000 # 30 minutes
+    # The maximum time that a connection is allowed to sit idle in the pool.
+    keepalive-time: 0
+    # The maximum time that the pool will wait for a connection to be returned before throwing an exception.
+    connection-timeout: 5000 # 5 seconds
+
+# Commandspy settings
+commandspy:
+  # Depending on the value of 'list-is-whitelist', the 'server-list' will be either a whitelist or a blacklist.
+  # If 'list-is-whitelist' is set to 'true', only the servers in the list will be considered for commandspy.
+  # If 'list-is-whitelist' is set to 'false', the servers in the list will be ignored for commandspy.
+  server-list: [ ]
+  list-is-whitelist: false
+  # Player in this list will be ignored by commandspy.
+  player-bypass: [ ]
+  # Commands in this list will be ignored by commandspy.
+  ignored-commands: [ ]
+
+# The commands in this list will be blocked and not forwarded to the server.
+blocked-commands:
+  - "op"
+  - "plugin"
+  - "plugins"
+  - "pl"
+  - "bukkit:plugin"
+  - "bukkit:plugins"
+  - "bukkit:pl"
+  - "minecraft:me"
+  - "bukkit:?"
+  - "icanhasbukkit"
+
+# The commands in this list will trigger a warning message when executed.
+# Commands in the 'blocked-commands' list will already trigger a warning message.
+command-warning: [ ]
+
+# Globalchat settings
+globalchat:
+  # Depending on the value of 'list-is-whitelist', the 'server-list' will be either a whitelist or a blacklist.
+  # If 'list-is-whitelist' is set to 'true', only the servers in the list will be considered for globalchat.
+  # If 'list-is-whitelist' is set to 'false', the servers in the list will be ignored for globalchat.
+  server-list: [ ]
+  list-is-whitelist: false
+
+# Using the command /hub or /lobby you will be sent to the server defined below.
+hub: "hub"
+
+# The maximum number of players that can join from the same IP address.
+limit-player-per-ip: 5
+
+# Moderation settings
+moderation:
+  # Should staff members provide a reason when punishing a player?
+  punishment-needs-reason: true
+  # Should staff members provide a reason when revoking a punishment?
+  revoke-needs-reason: false
+
+# Players whose nickname is in this list will not be able to join the server.
+blocked-nicknames: [ ]
+
+# Socialspy settings
+socialspy:
+  # Depending on the value of 'list-is-whitelist', the 'server-list' will be either a whitelist or a blacklist.
+  # If 'list-is-whitelist' is set to 'true', only the servers in the list will be considered for socialspy.
+  # If 'list-is-whitelist' is set to 'false', the servers in the list will be ignored for socialspy.
+  server-list: [ ]
+  list-is-whitelist: false
+  # Player in this list will be ignored by socialspy.
+  player-bypass: [ ]
+
+# Word in this list will be censored.
+censored-words: [ ]
+
+# Command aliases
+command-aliases:
+  ban: [ ]
+  banip: [ ]
+  broadcast: [ "bcast" ]
+  commandspy: [ "cspy" ]
+  gban: [ ]
+  gbanip: [ ]
+  gbroadcast: [ "gbcast" ]
+  gkick: [ ]
+  gkickip: [ ]
+  globalchat: [ "gchat", "gc" ]
+  gmute: [ ]
+  gmuteip: [ ]
+  gtempban: [ ]
+  gtempbanip: [ ]
+  gunban: [ ]
+  gunbanip: [ ]
+  gunmute: [ ]
+  gunmuteip: [ ]
+  kick: [ ]
+  kickip: [ ]
+  lookup: [ "playerinfo", "playeri" ]
+  help: [ "h", "?" ]
+  hub: [ "lobby" ]
+  message: [ "msg", "m", "whisper", "w" "tell" ]
+  mute: [ ]
+  muteip: [ ]
+  reply: [ "r" ]
+  socialspy: [ "sspy" ]
+  staffchat: [ "schat" ]
+  tempban: [ ]
+  tempbanip: [ ]
+  tempmute: [ ]
+  tempmuteip: [ ]
+  unban: [ ]
+  unbanip: [ ]
+  unmute: [ ]
+  unmuteip: [ ]
+  velocitycompactreload: [ "vcreload" ]
+  warn: [ ]
+
+# Do not change this value. It is used to check if the config file is up to date.
+file-version: 1
