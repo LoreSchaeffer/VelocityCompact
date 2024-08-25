@@ -26,8 +26,7 @@ import network.multicore.vc.persistence.HibernateHbm2DdlAutoMode;
 import network.multicore.vc.persistence.PrefixNamingStrategy;
 import network.multicore.vc.persistence.datasource.DataSourceProvider;
 import network.multicore.vc.persistence.entity.entities.StaticEntities;
-import network.multicore.vc.utils.json.GsonHelper;
-import network.multicore.vc.messages.Messages;
+import network.multicore.vc.utils.Messages;
 import network.multicore.vc.utils.Text;
 import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.reflections.Reflections;
@@ -37,6 +36,7 @@ import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.HashSet;
@@ -56,13 +56,11 @@ public class VelocityCompact {
     public static final String PLUGIN_ID = "velocitycompact";
 
     private static VelocityCompact instance;
-    private static final GsonHelper GSON = new GsonHelper();
     private final Logger logger;
     private final ProxyServer proxy;
     private final File pluginDir;
     private final Set<AbstractCommand> commands = new HashSet<>();
     private YamlDocument config;
-    private Messages messages;
     private Database db;
     private UserRepository userRepository;
     private BanRepository banRepository;
@@ -175,10 +173,6 @@ public class VelocityCompact {
         return config;
     }
 
-    public Messages messages() {
-        return messages;
-    }
-
     public UserRepository userRepository() {
         return userRepository;
     }
@@ -207,27 +201,29 @@ public class VelocityCompact {
     private void loadConfig() throws IOException {
         File configFile = new File(pluginDir, "config.yml");
 
-        config = YamlDocument.create(
-                configFile,
-                Objects.requireNonNull(getClass().getResourceAsStream("/config.yml")),
-                GeneralSettings.DEFAULT,
-                LoaderSettings.builder()
-                        .setAutoUpdate(true)
-                        .setCreateFileIfAbsent(true)
-                        .build(),
-                DumperSettings.DEFAULT,
-                UpdaterSettings.builder()
-                        .setVersioning(new BasicVersioning("file-version"))
-                        .setOptionSorting(UpdaterSettings.OptionSorting.SORT_BY_DEFAULTS)
-                        .build()
-        );
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream("config.yml")) {
+            config = YamlDocument.create(
+                    configFile,
+                    Objects.requireNonNull(is),
+                    GeneralSettings.DEFAULT,
+                    LoaderSettings.builder()
+                            .setAutoUpdate(true)
+                            .setCreateFileIfAbsent(true)
+                            .build(),
+                    DumperSettings.DEFAULT,
+                    UpdaterSettings.builder()
+                            .setVersioning(new BasicVersioning("file-version"))
+                            .setOptionSorting(UpdaterSettings.OptionSorting.SORT_BY_DEFAULTS)
+                            .build()
+            );
 
-        config.update();
-        config.save();
+            config.update();
+            config.save();
+        }
     }
 
     private void loadMessages() throws IOException {
-        messages = GSON.autoload(new File(pluginDir, "network.multicore.vc.messages.json"), new Messages().init(), Messages.class);
+        Messages.init(new File(pluginDir, "messages.yml"));
     }
 
     private void initStorage() throws IllegalArgumentException, IOException {

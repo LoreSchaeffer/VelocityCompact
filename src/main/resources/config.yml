@@ -156,7 +156,7 @@ command-aliases:
   lookup: [ "playerinfo", "playeri" ]
   help: [ "h", "?" ]
   hub: [ "lobby" ]
-  message: [ "msg", "m", "whisper", "w" "tell" ]
+  message: [ "msg", "m", "whisper", "w", "tell" ]
   mute: [ ]
   muteip: [ ]
   reply: [ "r" ]

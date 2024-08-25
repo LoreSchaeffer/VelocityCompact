@@ -404,7 +404,7 @@ public class Text {
     public static String toMiniMessage(String text) {
         if (text == null) return null;
         text = text.replace("§", "&");
-        return miniMessage.serialize(legacySerializer.deserialize(text));
+        return miniMessage.serialize(legacySerializer.deserialize(text)).replace("\\<", "<");
     }
 
     /**

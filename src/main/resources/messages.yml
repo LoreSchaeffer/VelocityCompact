@@ -1,0 +1,25 @@
+console: CONSOLE
+
+common:
+  internal-exception: '<dark_red>Internal plugin exception: {message}'
+
+commands:
+  generic:
+    not-connected-self: '<red>You must be connected to a server to use this command!'
+    not-player: '<red>You must be a player to use this command!'
+    player-not-found: '<red>Player not found!'
+  hub:
+    already-connected-self: '<red>You are already connected to hub!'
+    already-connected-player: '<red>This player is already connected to hub!'
+    already-connected-players: '<red>Those players are already connected to hub!'
+    invalid-hub: '<red>The hub server is not set or is invalid in the configuration file!'
+    no-player-to-send: '<red>There is no player to send to hub!'
+    sent-to-hub-target: '<gold>You have been sent to hub by <yellow>{player}'
+    sent-to-hub-player: '<gold>You have sent <yellow>{player}<gold> to hub'
+    sent-to-hub-players: '<gold>You have sent <yellow>{amount}<gold> players to hub'
+    sent-to-hub-partial-players: '<gold>You have sent <yellow>{amount}<gold>/<yellow>{total}<gold> players to hub'
+    not-sent-to-hub-player: '<red>The player cannot be sent to hub!'
+    not-sent-to-hub-players: '<red>The players cannot be sent to hub!'
+
+# Do not change this value. It is used to check if the config file is up to date.
+file-version: 1

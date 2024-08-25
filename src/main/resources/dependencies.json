@@ -33,10 +33,5 @@
     "groupId": "com.zaxxer",
     "artifactId": "HikariCP",
     "version": "5.1.0"
-  },
-  {
-    "groupId": "org.reflections",
-    "artifactId": "reflections",
-    "version": "0.10.2"
   }
 ]
