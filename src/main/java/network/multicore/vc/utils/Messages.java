@@ -87,4 +87,8 @@ public class Messages {
     public String getAndReplace(String route, String target1, Object replacement1, String target2, Object replacement2, String target3, Object replacement3, String target4, Object replacement4) {
         return getAndReplace(route, new String[]{target1, target2, target3, target4}, new Object[]{replacement1, replacement2, replacement3, replacement4});
     }
+
+    public String getAndReplace(String route, String target1, Object replacement1, String target2, Object replacement2, String target3, Object replacement3, String target4, Object replacement4, String target5, Object replacement5) {
+        return getAndReplace(route, new String[]{target1, target2, target3, target4, target5}, new Object[]{replacement1, replacement2, replacement3, replacement4, replacement5});
+    }
 }

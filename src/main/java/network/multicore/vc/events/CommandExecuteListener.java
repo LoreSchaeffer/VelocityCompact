@@ -10,6 +10,7 @@ import network.multicore.vc.utils.Text;
 import org.slf4j.Logger;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -69,7 +70,7 @@ public class CommandExecuteListener extends Listener {
             Text.send("common.command-blocked", src);
 
             String server = player.getCurrentServer().map(s -> s.getServerInfo().getName()).orElse(messages.get("unknown"));
-            Text.broadcast(messages.getAndReplace("common.command-blocked-broadcast", new String[]{"server", "player", "command"}, new Object[]{server, player, command}), Permission.COMMAND_WARNING_BYPASS.get());
+            Text.broadcast(messages.getAndReplace("common.command-blocked-broadcast", "server", server, "player", player, "command", command), Permission.COMMAND_WARNING_BYPASS.get());
             logger.info("{}:{} tried to use the command: {}", server, player.getUsername(), command);
             return;
         }
@@ -79,7 +80,7 @@ public class CommandExecuteListener extends Listener {
             Text.send("common.command-warning", src);
 
             String server = player.getCurrentServer().map(s -> s.getServerInfo().getName()).orElse(messages.get("unknown"));
-            Text.broadcast(messages.getAndReplace("common.command-warning-broadcast", new String[]{"server", "player", "command"}, new Object[]{server, player, command}), Permission.COMMAND_WARNING_RECEIVE.get());
+            Text.broadcast(messages.getAndReplace("common.command-warning-broadcast", "server", server, "player", player, "command", command), Permission.COMMAND_WARNING_RECEIVE.get());
             logger.info("{}:{} used the command: {}", server, player.getUsername(), command);
         }
 
@@ -107,7 +108,18 @@ public class CommandExecuteListener extends Listener {
         if (csIsWhitelist && !csServerList.contains(server)) return;
         else if (!csIsWhitelist && csServerList.contains(server)) return;
 
-        //TODO Change this to look for online staff with commandspy enabled instead of checking for permission
-        Text.broadcast(messages.getAndReplace("common.commandspy-broadcast", new String[]{"server", "player", "command"}, new Object[]{server, player, command}), Permission.COMMANDSPY_RECEIVE.get());
+        new Thread(() -> {
+            List<Player> receivers = proxy.getAllPlayers()
+                    .stream()
+                    .filter(p -> plugin.userRepository().findById(p.getUniqueId())
+                            .map(user -> user.getSettings().hasCommandspy())
+                            .orElse(false))
+                    .toList();
+
+            if (receivers.isEmpty()) return;
+
+            String broadcast = messages.getAndReplace("common.commandspy-broadcast", "server", server, "player", player, "command", command);
+            Text.send(broadcast, receivers);
+        }).start();
     }
 }

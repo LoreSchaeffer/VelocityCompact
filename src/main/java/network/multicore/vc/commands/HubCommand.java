@@ -35,7 +35,7 @@ public class HubCommand extends AbstractCommand {
         LiteralArgumentBuilder<CommandSource> hubRootNode = BrigadierCommand
                 .literalArgumentBuilder(command)
                 .requires(src -> src.hasPermission(Permission.HUB.get()))
-                .executes((ctx) -> execute(ctx.getSource(), null));
+                .executes(ctx -> execute(ctx.getSource(), null));
 
         RequiredArgumentBuilder<CommandSource, String> playerNode = BrigadierCommand
                 .requiredArgumentBuilder(PLAYER_ARG, StringArgumentType.word())
@@ -54,7 +54,7 @@ public class HubCommand extends AbstractCommand {
 
                     return builder.buildFuture();
                 })
-                .executes((ctx) -> execute(ctx.getSource(), ctx.getArgument(PLAYER_ARG, String.class)));
+                .executes(ctx -> execute(ctx.getSource(), ctx.getArgument(PLAYER_ARG, String.class)));
 
         hubRootNode.then(playerNode);
 
@@ -210,7 +210,7 @@ public class HubCommand extends AbstractCommand {
                     return;
                 }
 
-                Text.send(messages.getAndReplace("commands.hub.sent-to-hub-partial-players", new String[]{"amount", "total"}, new Object[]{successCount.get(), successCount.get() + failureCount.get()}), src);
+                Text.send(messages.getAndReplace("commands.hub.sent-to-hub-partial-players", "amount", successCount.get(), "total", successCount.get() + failureCount.get()), src);
             });
         }
 

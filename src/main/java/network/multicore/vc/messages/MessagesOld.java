@@ -182,10 +182,7 @@ public class MessagesOld {
 
         public Formats init() {
             if (broadcast == null) broadcast = "<dark_red><b>BROADCAST <dark_aqua>● <yellow>{message}";
-            if (globalchat == null) globalchat = "<gold>{server}<red>:<gold><b>{player} <dark_aqua>● <reset>{message}";
-            if (msg == null) msg = "<aqua>{sender_server}<red>:<yellow><b>{sender} <red>> <aqua>{receiver_server}<red>:<yellow><b>{receiver} <dark_aqua>● <reset>{message}";
-            if (socialspy == null)
-                socialspy = "<dark_blue><b>SSPY <blue>{sender_server}<gold>:<blue><b>{sender} <red>> <blue>{receiver_server}<gold>:<blue><b>{receiver} <dark_aqua>● <reset>{message}";
+            if (globalchat == null) globalchat = "<gold>{server}<red>:<gold><b>{player} <dark_aqua>● <reset>{message}";";
             if (staffchat == null) staffchat = "<gold><b>STAFF <aqua>{server}<red>:<yellow><b>{player} <dark_aqua>● <reset>{message}";
             if (mutedMsg == null) mutedMsg = "<red>MUTED <blue>{server}<gold>:<blue><b>{player} <dark_aqua>● <gray>{message}";
 

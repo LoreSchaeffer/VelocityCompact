@@ -9,6 +9,7 @@ import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.zaxxer.hikari.HikariConfig;
 import dev.dejvokep.boostedyaml.YamlDocument;
@@ -39,10 +40,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Plugin(
         id = VelocityCompact.PLUGIN_ID,
@@ -67,6 +65,7 @@ public class VelocityCompact {
     private KickRepository kickRepository;
     private MuteRepository muteRepository;
     private WarnRepository warnRepository;
+    private final Map<Player, Player> messengers = new HashMap<>();
 
     @Inject
     private VelocityCompact(ProxyServer proxy, @DataDirectory Path dataDirectory, Logger logger) {
@@ -192,6 +191,15 @@ public class VelocityCompact {
 
     public WarnRepository warnRepository() {
         return warnRepository;
+    }
+
+    public void setMessenger(Player sender, Player receiver) {
+        messengers.put(sender, receiver);
+        messengers.put(receiver, sender);
+    }
+
+    public Optional<Player> getMessenger(Player player) {
+        return Optional.ofNullable(messengers.get(player));
     }
 
     public void shutdown() {

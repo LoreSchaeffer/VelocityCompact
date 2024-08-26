@@ -112,6 +112,8 @@ moderation:
   punishment-needs-reason: true
   # Should staff members provide a reason when revoking a punishment?
   revoke-needs-reason: false
+  # If this is set to true and a player is muted, they can't send private messages to other players.
+  mute-prevent-messages: true
 
 # Players whose nickname is in this list will not be able to join the server.
 # You can use regular expressions to block multiple nicknames.

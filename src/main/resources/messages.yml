@@ -9,6 +9,7 @@ common:
   command-blocked-broadcast: '<dark_aqua><b>WARN<blue> {server}<gold>:<blue><b>{player}<dark_aqua> ●<aqua> tried to use the command<yellow> {command}'
   command-warning-broadcast: '<dark_aqua><b>WARN<blue> {server}<gold>:<blue><b>{player}<dark_aqua> ●<aqua> used the command<yellow> {command}'
   commandspy-broadcast: '<dark_blue><b>CSPY<blue> {server}<gold>:<blue><b>{player}<dark_aqua> ●<reset> {command}'
+  socialspy-broadcast: '<dark_blue><b>SSPY<blue> {sender_server}<gold>:<blue><b>{sender}<red> »<blue> {receiver_server}<gold>:<blue><b>{receiver}<dark_aqua> ●<reset> {message}'
   nickname-not-allowed: '<red>Your nickname is not allowed on this server!'
   too-many-connections: '<red>There are too many connections to the server with your IP address!'
   join-attempt-failed-broadcast: '<dark_aqua><b>JOIN ATTEMPT<blue> {player}<dark_aqua> ●<aqua> tried to join the proxy but was denied:<yellow> {reason}'
@@ -18,6 +19,16 @@ commands:
     not-connected-self: '<red>You must be connected to a server to use this command!'
     not-player: '<red>You must be a player to use this command!'
     player-not-found: '<red>Player not found!'
+  commandspy:
+    enabled-self: '<dark_green><b>COMMANDSPY<green> enabled!'
+    disabled-self: '<dark_red><b>COMMANDSPY<red> disabled!'
+    enabled-player: '<dark_green><b>COMMANDSPY<green> enabled for <yellow>{player}'
+    disabled-player: '<dark_red><b>COMMANDSPY<red> disabled for <yellow>{player}'
+  socialspy:
+    enabled-self: '<dark_green><b>SOCIALSPY<green> enabled!'
+    disabled-self: '<dark_red><b>SOCIALSPY<red> disabled!'
+    enabled-player: '<dark_green><b>SOCIALSPY<green> enabled for <yellow>{player}'
+    disabled-player: '<dark_red><b>SOCIALSPY<red> disabled for <yellow>{player}'
   hub:
     already-connected-self: '<red>You are already connected to hub!'
     already-connected-player: '<red>This player is already connected to hub!'
@@ -30,6 +41,11 @@ commands:
     sent-to-hub-partial-players: '<gold>You have sent <yellow>{amount}<gold>/<yellow>{total}<gold> players to hub'
     not-sent-to-hub-player: '<red>The player cannot be sent to hub!'
     not-sent-to-hub-players: '<red>The players cannot be sent to hub!'
+  message:
+    message-yourself: '<red>You cannot send a message to yourself!'
+    no-receiver: '<red>You don''t have a receiver to send a message to! Use<yellow> /message <player> <message>'
+    receiver-not-online: '<red>The player you are trying to message is not online!'
+    message-format: '<aqua>{sender_server}<red>:<yellow><b>{sender}<red> »<aqua> {receiver_server}<red>:<yellow><b>{receiver}<dark_aqua> ●<reset> {message}'
 
 # Do not change this value. It is used to check if the config file is up to date.
 file-version: 1
