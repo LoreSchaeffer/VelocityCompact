@@ -1,7 +1,17 @@
 console: CONSOLE
+unknown: unknown
+blocked-nickname: 'blocked nickname'
+too-many-connections: 'too many connections'
 
 common:
   internal-exception: '<dark_red>Internal plugin exception: {message}'
+  command-blocked: '<red>This command is blocked on this server!'
+  command-blocked-broadcast: '<dark_aqua><b>WARN<blue> {server}<gold>:<blue><b>{player}<dark_aqua> ●<aqua> tried to use the command<yellow> {command}'
+  command-warning-broadcast: '<dark_aqua><b>WARN<blue> {server}<gold>:<blue><b>{player}<dark_aqua> ●<aqua> used the command<yellow> {command}'
+  commandspy-broadcast: '<dark_blue><b>CSPY<blue> {server}<gold>:<blue><b>{player}<dark_aqua> ●<reset> {command}'
+  nickname-not-allowed: '<red>Your nickname is not allowed on this server!'
+  too-many-connections: '<red>There are too many connections to the server with your IP address!'
+  join-attempt-failed-broadcast: '<dark_aqua><b>JOIN ATTEMPT<blue> {player}<dark_aqua> ●<aqua> tried to join the proxy but was denied:<yellow> {reason}'
 
 commands:
   generic:

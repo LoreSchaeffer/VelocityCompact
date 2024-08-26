@@ -14,9 +14,6 @@ modules:
   socialspy: true
   staffchat: true
   word-censure: true
-  log-commands: true
-  log-chat: true
-
 
 # Storage settings
 # Storage options:
@@ -75,6 +72,7 @@ commandspy:
   # Player in this list will be ignored by commandspy.
   player-bypass: [ ]
   # Commands in this list will be ignored by commandspy.
+  # Socialspy monitored commands are already ignored if socialspy is enabled.
   ignored-commands: [ ]
 
 # The commands in this list will be blocked and not forwarded to the server.
@@ -106,7 +104,7 @@ globalchat:
 hub: "hub"
 
 # The maximum number of players that can join from the same IP address.
-limit-player-per-ip: 5
+limit-players-per-ip: 5
 
 # Moderation settings
 moderation:
@@ -116,6 +114,7 @@ moderation:
   revoke-needs-reason: false
 
 # Players whose nickname is in this list will not be able to join the server.
+# You can use regular expressions to block multiple nicknames.
 blocked-nicknames: [ ]
 
 # Socialspy settings

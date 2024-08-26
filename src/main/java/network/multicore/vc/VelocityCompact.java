@@ -118,11 +118,12 @@ public class VelocityCompact {
             shutdown();
         }
 
-        proxy.getEventManager().register(this, new PlayerChatListener(this));
-        proxy.getEventManager().register(this, new PlayerConnectToServerListener(this));
-        proxy.getEventManager().register(this, new PlayerDisconnectListener(this));
-        proxy.getEventManager().register(this, new PlayerPostLoginListener(this));
-        proxy.getEventManager().register(this, new PlayerPreLoginListener(this));
+        proxy.getEventManager().register(this, new CommandExecuteListener());
+        proxy.getEventManager().register(this, new PlayerChatListener());
+        proxy.getEventManager().register(this, new PlayerConnectToServerListener());
+        proxy.getEventManager().register(this, new PlayerDisconnectListener());
+        proxy.getEventManager().register(this, new PlayerPostLoginListener());
+        proxy.getEventManager().register(this, new PlayerPreLoginListener());
 
         registerCommands();
     }
@@ -345,7 +346,7 @@ public class VelocityCompact {
 
         reflections.getSubTypesOf(AbstractCommand.class).forEach(clazz -> {
             try {
-                AbstractCommand cmd = clazz.getDeclaredConstructor(ProxyServer.class, VelocityCompact.class).newInstance(proxy, this);
+                AbstractCommand cmd = clazz.getDeclaredConstructor().newInstance();
                 cmd.register();
                 commands.add(cmd);
             } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {

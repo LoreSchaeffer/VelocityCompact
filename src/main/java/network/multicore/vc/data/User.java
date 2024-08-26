@@ -2,12 +2,12 @@ package network.multicore.vc.data;
 
 import com.google.common.base.Preconditions;
 import com.velocitypowered.api.proxy.Player;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -23,6 +23,14 @@ public class User {
     private String ip;
     @Column(name = "protocol_version")
     private int protocolVersion;
+    @Column(name = "client_brand")
+    private String clientBrand;
+    @ElementCollection
+    @CollectionTable(name = "username_history", joinColumns = @JoinColumn(name = "user_uuid"))
+    @Column(name = "username_history")
+    private List<String> usernameHistory;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private UserSettings settings;
 
     public User(@NotNull Player player) {
         Preconditions.checkNotNull(player, "player");
@@ -31,8 +39,9 @@ public class User {
         this.username = player.getUsername();
         this.firstLogin = new Date();
         this.lastLogin = this.firstLogin;
-        this.ip = player.getRemoteAddress().getAddress().getHostAddress();
+        this.ip = player.getRemoteAddress().getHostString();
         this.protocolVersion = player.getProtocolVersion().getProtocol();
+        this.clientBrand = player.getClientBrand();
     }
 
     protected User() {
@@ -46,7 +55,10 @@ public class User {
         return username;
     }
 
-    public User setUsername(String username) {
+    public User setUsername(@NotNull String username) {
+        Preconditions.checkNotNull(username, "username");
+
+        usernameHistory.add(this.username);
         this.username = username;
         return this;
     }
@@ -59,7 +71,9 @@ public class User {
         return lastLogin;
     }
 
-    public User setLastLogin(Date lastLogin) {
+    public User setLastLogin(@NotNull Date lastLogin) {
+        Preconditions.checkNotNull(lastLogin, "lastLogin");
+
         this.lastLogin = lastLogin;
         return this;
     }
@@ -68,7 +82,9 @@ public class User {
         return ip;
     }
 
-    public User setIp(String ip) {
+    public User setIp(@NotNull String ip) {
+        Preconditions.checkNotNull(ip, "ip");
+
         this.ip = ip;
         return this;
     }
@@ -79,6 +95,32 @@ public class User {
 
     public User setProtocolVersion(int protocolVersion) {
         this.protocolVersion = protocolVersion;
+        return this;
+    }
+
+    public String getClientBrand() {
+        return clientBrand;
+    }
+
+    public User setClientBrand(String clientBrand) {
+        this.clientBrand = clientBrand != null ? clientBrand : "unknown";
+        return this;
+    }
+
+    public List<String> getUsernameHistory() {
+        return Collections.unmodifiableList(usernameHistory);
+    }
+
+    public UserSettings getSettings() {
+        return settings;
+    }
+
+    public User setSettings(@NotNull UserSettings settings) {
+        Preconditions.checkNotNull(settings, "settings");
+
+        if (settings.getUser().getUniqueId() != this.getUniqueId()) throw new IllegalArgumentException("Settings user UUID does not match user UUID");
+        if (this.settings != null) this.settings.update(settings);
+        else this.settings = settings;
         return this;
     }
 }

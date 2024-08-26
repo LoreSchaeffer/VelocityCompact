@@ -1,15 +1,12 @@
 package network.multicore.vc.messages;
 
 import com.google.gson.annotations.SerializedName;
-import com.velocitypowered.api.command.CommandSource;
-import network.multicore.vc.utils.Text;
-import network.multicore.vc.utils.json.JsonConfig;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class MessagesOld extends JsonConfig {
+public class MessagesOld {
     @SerializedName("already_in_server")
     public String alreadyInServer;
     @SerializedName("already_in_server_other")
@@ -108,7 +105,6 @@ public class MessagesOld extends JsonConfig {
     @SerializedName("usages")
     public Usages USAGES;
 
-    @Override
     public MessagesOld init() {
         if (alreadyInServer == null) alreadyInServer = "<red>You are already connected to this server!";
         if (alreadyInServerOther == null) alreadyInServerOther = "<red>{player} is already connected to this server!";
@@ -131,8 +127,6 @@ public class MessagesOld extends JsonConfig {
         if (ipListKick == null) ipListKick = "<red>You have been disconnected!\n<yellow>There are too many accounts with your IP.";
         if (ipNotFound == null) ipNotFound = "<red>IP not found";
         if (messageYourself == null) messageYourself = "<red>You can not send a message to yourself!";
-        if (nicknameNotAllowed == null) nicknameNotAllowed = "<dark_red>{player} <red>is not allowed as a nickname!";
-        if (nicknameNotAllowedLog == null) nicknameNotAllowedLog = "<red>{player}'s join was blocked due to an invalid nickname.";
         if (noPlayerFound == null) noPlayerFound = "<red>No player found!";
         if (notExistingServer == null) notExistingServer = "<red>This is not a valid server!";
         if (notPlayer == null) notPlayer = "<red>You need to be a player to use this command!";
@@ -175,7 +169,7 @@ public class MessagesOld extends JsonConfig {
         return this;
     }
 
-    public static class Formats extends JsonConfig {
+    public static class Formats {
         public String broadcast;
         public String commandspy;
         public String commandwarn;
@@ -186,11 +180,8 @@ public class MessagesOld extends JsonConfig {
         @SerializedName("muted_msg")
         public String mutedMsg;
 
-        @Override
         public Formats init() {
             if (broadcast == null) broadcast = "<dark_red><b>BROADCAST <dark_aqua>● <yellow>{message}";
-            if (commandspy == null) commandspy = "<dark_blue><b>CSPY <blue>{server}<gold>:<blue><b>{player} <dark_aqua>● <reset>{command}";
-            if (commandwarn == null) commandwarn = "<dark_aqua><b>WARN <blue>{server}<gold>:<blue><b>{player} <dark_aqua>● <aqua>used the command <yellow>{command}";
             if (globalchat == null) globalchat = "<gold>{server}<red>:<gold><b>{player} <dark_aqua>● <reset>{message}";
             if (msg == null) msg = "<aqua>{sender_server}<red>:<yellow><b>{sender} <red>> <aqua>{receiver_server}<red>:<yellow><b>{receiver} <dark_aqua>● <reset>{message}";
             if (socialspy == null)
@@ -202,7 +193,7 @@ public class MessagesOld extends JsonConfig {
         }
     }
 
-    public static class Moderation extends JsonConfig {
+    public static class Moderation {
         public String console;
         @SerializedName("no_reason")
         public String noReason;
@@ -420,7 +411,6 @@ public class MessagesOld extends JsonConfig {
         @SerializedName("warn_reason_suggestions")
         public List<String> warnReasonSuggestions;
 
-        @Override
         public Moderation init() {
             if (console == null) console = "Console";
             if (noReason == null) noReason = "No reason";
@@ -677,7 +667,7 @@ public class MessagesOld extends JsonConfig {
         }
     }
 
-    public static class Usages extends JsonConfig {
+    public static class Usages {
         public List<String> ban;
         public List<String> banip;
         public List<String> broadcast;
@@ -718,7 +708,6 @@ public class MessagesOld extends JsonConfig {
         public List<String> unmuteip;
         public List<String> warn;
 
-        @Override
         public Usages init() {
             if (ban == null) ban = Collections.singletonList("<aqua>/ban <player> <server> [reason] [-s] [-h]");
             if (banip == null) banip = Collections.singletonList("<aqua>/banip <player|ip> <server> [reason] [-s] [-h]");
@@ -779,18 +768,5 @@ public class MessagesOld extends JsonConfig {
 
             return this;
         }
-    }
-
-    public static String replace(String str, String[] target, String[] replacement) {
-        for (int i = 0; i < target.length; i++) {
-            str = str.replace(target[i], replacement[i]);
-        }
-
-        return str;
-    }
-
-    public static void sendIncorrectUsage(String error, List<String> usage, CommandSource target) {
-        Text.send(error, target);
-        Text.send(usage, target);
     }
 }

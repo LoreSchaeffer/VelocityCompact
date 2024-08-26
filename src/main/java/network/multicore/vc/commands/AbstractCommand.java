@@ -13,15 +13,15 @@ public abstract class AbstractCommand {
     public static final int COMMAND_SUCCESS = 1;
     public static final int COMMAND_FAILED = 0;
     protected final String command;
-    protected final ProxyServer proxy;
     protected final VelocityCompact plugin;
+    protected final ProxyServer proxy;
     protected final YamlDocument config;
     protected final Messages messages;
     protected CommandMeta meta;
 
-    public AbstractCommand(ProxyServer proxy, VelocityCompact plugin, String command) {
-        this.proxy = proxy;
-        this.plugin = plugin;
+    public AbstractCommand(String command) {
+        this.plugin = VelocityCompact.getInstance();
+        this.proxy = this.plugin.proxy();
         this.messages = Messages.get();
         this.command = command;
         this.config = plugin.config();

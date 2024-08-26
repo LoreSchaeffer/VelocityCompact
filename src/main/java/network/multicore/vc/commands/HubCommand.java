@@ -7,10 +7,8 @@ import com.velocitypowered.api.command.BrigadierCommand;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.ConnectionRequestBuilder;
 import com.velocitypowered.api.proxy.Player;
-import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import network.multicore.vc.VelocityCompact;
 import network.multicore.vc.utils.Permission;
 import network.multicore.vc.utils.Text;
 
@@ -24,11 +22,10 @@ public class HubCommand extends AbstractCommand {
     private static final String PLAYER_ARG = "player";
 
     /**
-     * Command usage:
      * /hub [player]
      */
-    public HubCommand(ProxyServer proxy, VelocityCompact plugin) {
-        super(proxy, plugin, "hub");
+    public HubCommand() {
+        super("hub");
     }
 
     // TODO Test if permissions are correct
@@ -212,7 +209,7 @@ public class HubCommand extends AbstractCommand {
                     Text.send(messages.getAndReplace("commands.hub-sent-to-hub-players", "amount", successCount.get()), src);
                     return;
                 }
-                
+
                 Text.send(messages.getAndReplace("commands.hub.sent-to-hub-partial-players", new String[]{"amount", "total"}, new Object[]{successCount.get(), successCount.get() + failureCount.get()}), src);
             });
         }
