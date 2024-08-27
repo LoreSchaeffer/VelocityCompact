@@ -9,7 +9,6 @@ import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
-import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.zaxxer.hikari.HikariConfig;
 import dev.dejvokep.boostedyaml.YamlDocument;
@@ -27,6 +26,8 @@ import network.multicore.vc.persistence.HibernateHbm2DdlAutoMode;
 import network.multicore.vc.persistence.PrefixNamingStrategy;
 import network.multicore.vc.persistence.datasource.DataSourceProvider;
 import network.multicore.vc.persistence.entity.entities.StaticEntities;
+import network.multicore.vc.utils.Cache;
+import network.multicore.vc.utils.CensureUtils;
 import network.multicore.vc.utils.Messages;
 import network.multicore.vc.utils.Text;
 import org.eclipse.aether.resolution.DependencyResolutionException;
@@ -40,7 +41,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 
 @Plugin(
         id = VelocityCompact.PLUGIN_ID,
@@ -65,7 +69,6 @@ public class VelocityCompact {
     private KickRepository kickRepository;
     private MuteRepository muteRepository;
     private WarnRepository warnRepository;
-    private final Map<Player, Player> messengers = new HashMap<>();
 
     @Inject
     private VelocityCompact(ProxyServer proxy, @DataDirectory Path dataDirectory, Logger logger) {
@@ -104,7 +107,7 @@ public class VelocityCompact {
         }
 
         try {
-            loadMessages();
+            Messages.init(new File(pluginDir, "messages.yml"));
         } catch (IOException e) {
             logger.error("Failed to load network.multicore.vc.messages", e);
             shutdown();
@@ -117,11 +120,14 @@ public class VelocityCompact {
             shutdown();
         }
 
+        Cache.init(this);
+        CensureUtils.init(config);
+
         proxy.getEventManager().register(this, new CommandExecuteListener());
         proxy.getEventManager().register(this, new PlayerChatListener());
         proxy.getEventManager().register(this, new PlayerConnectToServerListener());
         proxy.getEventManager().register(this, new PlayerDisconnectListener());
-        proxy.getEventManager().register(this, new PlayerPostLoginListener());
+        proxy.getEventManager().register(this, new PlayerLoginListener());
         proxy.getEventManager().register(this, new PlayerPreLoginListener());
 
         registerCommands();
@@ -133,6 +139,11 @@ public class VelocityCompact {
 
         try {
             if (db != null) db.close();
+        } catch (Throwable ignored) {
+        }
+
+        try {
+            Cache.get().clear();
         } catch (Throwable ignored) {
         }
     }
@@ -193,15 +204,6 @@ public class VelocityCompact {
         return warnRepository;
     }
 
-    public void setMessenger(Player sender, Player receiver) {
-        messengers.put(sender, receiver);
-        messengers.put(receiver, sender);
-    }
-
-    public Optional<Player> getMessenger(Player player) {
-        return Optional.ofNullable(messengers.get(player));
-    }
-
     public void shutdown() {
         Optional<PluginContainer> container = proxy.getPluginManager().getPlugin(PLUGIN_ID);
         container.ifPresent(c -> c.getExecutorService().shutdown());
@@ -229,10 +231,6 @@ public class VelocityCompact {
             config.update();
             config.save();
         }
-    }
-
-    private void loadMessages() throws IOException {
-        Messages.init(new File(pluginDir, "messages.yml"));
     }
 
     private void initStorage() throws IllegalArgumentException, IOException {

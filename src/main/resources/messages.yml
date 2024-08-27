@@ -1,7 +1,11 @@
-console: CONSOLE
-unknown: unknown
+console: 'CONSOLE'
+unknown: 'unknown'
+global: 'Global'
+permanent: 'Permanent'
+no-reason: 'No reason specified'
 blocked-nickname: 'blocked nickname'
 too-many-connections: 'too many connections'
+banned: 'banned'
 
 common:
   internal-exception: '<dark_red>Internal plugin exception: {message}'
@@ -10,9 +14,11 @@ common:
   command-warning-broadcast: '<dark_aqua><b>WARN<blue> {server}<gold>:<blue><b>{player}<dark_aqua> ●<aqua> used the command<yellow> {command}'
   commandspy-broadcast: '<dark_blue><b>CSPY<blue> {server}<gold>:<blue><b>{player}<dark_aqua> ●<reset> {command}'
   socialspy-broadcast: '<dark_blue><b>SSPY<blue> {sender_server}<gold>:<blue><b>{sender}<red> »<blue> {receiver_server}<gold>:<blue><b>{receiver}<dark_aqua> ●<reset> {message}'
+  globalchat-broadcast: '<gold>{server}<red>:<gold><b>{player}<dark_aqua> ●<reset> {message}'
   nickname-not-allowed: '<red>Your nickname is not allowed on this server!'
   too-many-connections: '<red>There are too many connections to the server with your IP address!'
   join-attempt-failed-broadcast: '<dark_aqua><b>JOIN ATTEMPT<blue> {player}<dark_aqua> ●<aqua> tried to join the proxy but was denied:<yellow> {reason}'
+  used-censored-words: '<red>Used censored words!'
 
 commands:
   generic:
@@ -29,6 +35,11 @@ commands:
     disabled-self: '<dark_red><b>SOCIALSPY<red> disabled!'
     enabled-player: '<dark_green><b>SOCIALSPY<green> enabled for <yellow>{player}'
     disabled-player: '<dark_red><b>SOCIALSPY<red> disabled for <yellow>{player}'
+  globalchat:
+    enabled-self: '<dark_green><b>GLOBALCHAT<green> enabled!'
+    disabled-self: '<dark_red><b>GLOBALCHAT<red> disabled!'
+    enabled-player: '<dark_green><b>GLOBALCHAT<green> enabled for <yellow>{player}'
+    disabled-player: '<dark_red><b>GLOBALCHAT<red> disabled for <yellow>{player}'
   hub:
     already-connected-self: '<red>You are already connected to hub!'
     already-connected-player: '<red>This player is already connected to hub!'
@@ -46,6 +57,36 @@ commands:
     no-receiver: '<red>You don''t have a receiver to send a message to! Use<yellow> /message <player> <message>'
     receiver-not-online: '<red>The player you are trying to message is not online!'
     message-format: '<aqua>{sender_server}<red>:<yellow><b>{sender}<red> »<aqua> {receiver_server}<red>:<yellow><b>{receiver}<dark_aqua> ●<reset> {message}'
+  help:
+    messages:
+      - '<blue>Contact the staff of the server to get help!'
+
+moderation:
+  disconnect:
+    ban: '<red>You are banned\n\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red>Server <dark_aqua><b>» <gray>{server}\n<red><b>Duration <dark_aqua><b>» <yellow>{duration}\n<red>Reason <dark_aqua><b>» <gray>{reason}'
+    ban-ip: '<red>You are ip-banned\n\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red>Server <dark_aqua><b>» <gray>{server}\n<red><b>Duration <dark_aqua><b>» <yellow>{duration}\n<red>Reason <dark_aqua><b>» <gray>{reason}'
+
+time:
+  year:
+    singular: 'year'
+    plural: 'years'
+    short: 'y'
+  day:
+    singular: 'day'
+    plural: 'days'
+    short: 'd'
+  hour:
+    singular: 'hour'
+    plural: 'hours'
+    short: 'h'
+  minute:
+    singular: 'minute'
+    plural: 'minutes'
+    short: 'm'
+  second:
+    singular: 'second'
+    plural: 'seconds'
+    short: 's'
 
 # Do not change this value. It is used to check if the config file is up to date.
 file-version: 1

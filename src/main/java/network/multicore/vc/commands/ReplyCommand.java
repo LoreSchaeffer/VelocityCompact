@@ -5,17 +5,21 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.velocitypowered.api.command.BrigadierCommand;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
+import network.multicore.vc.utils.Cache;
+import network.multicore.vc.utils.CensureUtils;
 import network.multicore.vc.utils.Permission;
 import network.multicore.vc.utils.Text;
 
 public class ReplyCommand extends AbstractCommand {
     private static final String MESSAGE_ARG = "message";
+    private final CensureUtils censureUtils;
 
     /**
      * /message <message>
      */
     public ReplyCommand() {
         super("reply");
+        this.censureUtils = CensureUtils.get();
     }
 
     @Override
@@ -40,7 +44,7 @@ public class ReplyCommand extends AbstractCommand {
 
         // TODO Check for active mutes if set so in the config
 
-        Player receiver = plugin.getMessenger(sender).orElse(null);
+        Player receiver = Cache.get().getMessenger(sender).orElse(null);
         if (receiver == null) {
             Text.send(messages.get("commands.message.no-receiver"), sender);
             return COMMAND_FAILED;
@@ -49,6 +53,15 @@ public class ReplyCommand extends AbstractCommand {
         if (!receiver.isActive()) {
             Text.send(messages.get("commands.message.receiver-not-online"), sender);
             return COMMAND_FAILED;
+        }
+
+        if (censureUtils.isChatCensorshipEnabled()) {
+            CensureUtils.CensureResult result = censureUtils.censure(sender, message);
+
+            if (result.isCensored()) {
+                if (result.shouldCancelMessage()) return COMMAND_SUCCESS;
+                message = result.getMessage();
+            }
         }
 
         String senderServer = sender.getCurrentServer().map(server -> server.getServerInfo().getName()).orElse(messages.get("unknown"));
@@ -64,9 +77,9 @@ public class ReplyCommand extends AbstractCommand {
 
         Text.send(formattedMessage, sender);
         Text.send(formattedMessage, receiver);
-        MessageCommand.sendSocialspy(senderServer, sender, receiverServer, receiver, message);
+        if (config.getBoolean("modules.socialspy", false)) MessageCommand.sendSocialspy(senderServer, sender, receiverServer, receiver, message);
 
-        plugin.setMessenger(sender, receiver);
+        Cache.get().setMessenger(sender, receiver);
 
         return COMMAND_SUCCESS;
     }

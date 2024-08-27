@@ -12,6 +12,7 @@ import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Objects;
 
 public class Messages {
@@ -43,9 +44,8 @@ public class Messages {
         }
     }
 
-    public static Messages init(File file) throws IOException {
+    public static void init(File file) throws IOException {
         instance = new Messages(file);
-        return instance;
     }
 
     public static Messages get() {
@@ -55,6 +55,10 @@ public class Messages {
 
     public String get(String route) {
         return yaml.getString(route);
+    }
+
+    public List<String> getStringList(String route) {
+        return yaml.getStringList(route);
     }
 
     public String getAndReplace(String route, String[] targets, Object[] replacements) {
@@ -91,4 +95,6 @@ public class Messages {
     public String getAndReplace(String route, String target1, Object replacement1, String target2, Object replacement2, String target3, Object replacement3, String target4, Object replacement4, String target5, Object replacement5) {
         return getAndReplace(route, new String[]{target1, target2, target3, target4, target5}, new Object[]{replacement1, replacement2, replacement3, replacement4, replacement5});
     }
+
+
 }

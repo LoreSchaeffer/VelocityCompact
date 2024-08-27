@@ -10,24 +10,24 @@ import network.multicore.vc.data.User;
 import network.multicore.vc.utils.Permission;
 import network.multicore.vc.utils.Text;
 
-public class SocialspyCommand extends AbstractCommand {
+public class GlobalchatCommand extends AbstractCommand {
     private static final String MODE_ARG = "mode";
     private static final String PLAYER_ARG = "player";
 
     /**
-     * /socialspy <on|off|toggle> [player]
+     * /globalchat <on|off|toggle> [player]
      */
-    public SocialspyCommand() {
-        super("socialspy");
+    public GlobalchatCommand() {
+        super("globalchat");
     }
 
     @Override
     public void register() {
-        if (!config.getBoolean("modules.socialspy", false)) return;
+        if (!config.getBoolean("modules.globalchat", false)) return;
 
-        LiteralArgumentBuilder<CommandSource> socialspyRootNode = BrigadierCommand
+        LiteralArgumentBuilder<CommandSource> globalchatRootNode = BrigadierCommand
                 .literalArgumentBuilder(command)
-                .requires(src -> src.hasPermission(Permission.SOCIALSPY.get()))
+                .requires(src -> src.hasPermission(Permission.GLOBALCHAT.get()))
                 .executes(ctx -> execute(ctx.getSource(), "toggle", null));
 
         RequiredArgumentBuilder<CommandSource, String> modeNode = BrigadierCommand
@@ -46,7 +46,7 @@ public class SocialspyCommand extends AbstractCommand {
 
         RequiredArgumentBuilder<CommandSource, String> playerNode = BrigadierCommand
                 .requiredArgumentBuilder(PLAYER_ARG, StringArgumentType.word())
-                .requires(src -> src.hasPermission(Permission.SOCIALSPY_OTHER.get()))
+                .requires(src -> src.hasPermission(Permission.GLOBALCHAT_OTHER.get()))
                 .suggests((ctx, builder) -> {
                     String argument = ctx.getArguments().containsKey(PLAYER_ARG) ? ctx.getArgument(PLAYER_ARG, String.class) : "";
 
@@ -61,9 +61,9 @@ public class SocialspyCommand extends AbstractCommand {
                 .executes(ctx -> execute(ctx.getSource(), ctx.getArgument(MODE_ARG, String.class), ctx.getArgument(PLAYER_ARG, String.class)));
 
         modeNode.then(playerNode);
-        socialspyRootNode.then(modeNode);
+        globalchatRootNode.then(modeNode);
 
-        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(socialspyRootNode.build()));
+        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(globalchatRootNode.build()));
     }
 
     private int execute(CommandSource src, String mode, String targetName) {
@@ -91,26 +91,26 @@ public class SocialspyCommand extends AbstractCommand {
 
         switch (mode.toLowerCase()) {
             case "on" -> {
-                target.getSettings().setSocialspy(true);
+                target.getSettings().setGlobalchat(true);
 
-                if (targetPlayer != null) Text.send(messages.get("commands.socialspy.enabled"), targetPlayer);
-                if (targetPlayer != src) Text.send(messages.getAndReplace("commands.socialspy.enabled-player", "player", target.getUsername()), src);
+                if (targetPlayer != null) Text.send(messages.get("commands.globalchat.enabled"), targetPlayer);
+                if (targetPlayer != src) Text.send(messages.getAndReplace("commands.globalchat.enabled-player", "player", target.getUsername()), src);
             }
             case "off" -> {
-                target.getSettings().setSocialspy(false);
+                target.getSettings().setGlobalchat(false);
 
-                if (targetPlayer != null) Text.send(messages.get("commands.socialspy.disabled"), targetPlayer);
-                if (targetPlayer != src) Text.send(messages.getAndReplace("commands.socialspy.disabled-player", "player", target.getUsername()), src);
+                if (targetPlayer != null) Text.send(messages.get("commands.globalchat.disabled"), targetPlayer);
+                if (targetPlayer != src) Text.send(messages.getAndReplace("commands.globalchat.disabled-player", "player", target.getUsername()), src);
             }
             case "toggle" -> {
-                target.getSettings().setSocialspy(!target.getSettings().hasSocialspy());
+                target.getSettings().setGlobalchat(!target.getSettings().hasGlobalchat());
 
-                if (target.getSettings().hasSocialspy()) {
-                    if (targetPlayer != null) Text.send(messages.get("commands.socialspy.enabled"), targetPlayer);
-                    if (targetPlayer != src) Text.send(messages.getAndReplace("commands.socialspy.enabled-player", "player", target.getUsername()), src);
+                if (target.getSettings().hasGlobalchat()) {
+                    if (targetPlayer != null) Text.send(messages.get("commands.globalchat.enabled"), targetPlayer);
+                    if (targetPlayer != src) Text.send(messages.getAndReplace("commands.globalchat.enabled-player", "player", target.getUsername()), src);
                 } else {
-                    if (targetPlayer != null) Text.send(messages.get("commands.socialspy.disabled"), targetPlayer);
-                    if (targetPlayer != src) Text.send(messages.getAndReplace("commands.socialspy.disabled-player", "player", target.getUsername()), src);
+                    if (targetPlayer != null) Text.send(messages.get("commands.globalchat.disabled"), targetPlayer);
+                    if (targetPlayer != src) Text.send(messages.getAndReplace("commands.globalchat.disabled-player", "player", target.getUsername()), src);
                 }
             }
         }

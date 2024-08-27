@@ -23,6 +23,8 @@ public class CommandspyCommand extends AbstractCommand {
 
     @Override
     public void register() {
+        if (!config.getBoolean("modules.commandspy", false)) return;
+
         LiteralArgumentBuilder<CommandSource> commandspyRootNode = BrigadierCommand
                 .literalArgumentBuilder(command)
                 .requires(src -> src.hasPermission(Permission.COMMANDSPY.get()))

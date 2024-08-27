@@ -1,6 +1,7 @@
 # In this section you can enable/disable each module of the plugin.
 modules:
   broadcast: true
+  chat-censorship: true
   commandspy: true
   command-blocker: true
   command-warning: true
@@ -13,7 +14,6 @@ modules:
   nickname-blocker: true
   socialspy: true
   staffchat: true
-  word-censure: true
 
 # Storage settings
 # Storage options:
@@ -62,6 +62,28 @@ data:
     # The maximum time that the pool will wait for a connection to be returned before throwing an exception.
     connection-timeout: 5000 # 5 seconds
 
+# Chat censorship settings
+# This includes both chat messages and private messages
+chat-censorship:
+  # The words in this list will be censored.
+  # This list is case-insensitive.
+  censored-words: [ ]
+  # The regular expressions in this list will be censored.
+  censored-regex: [ ]
+  punishment:
+    # Should the player be punished for using a censored word?
+    # Moderation should be enabled for this to work.
+    enabled: true
+    # The punishment type.
+    # Available options: "warn", "mute", "gmute", "kick", "gkick", "ban", "gban"
+    type: "warn"
+    # The punishment duration in seconds.
+    # Only available for "mute" and "ban" punishments.
+    duration: 3600 # 1 hour
+    # Should the punishment be silent?
+    # If the punishment is silent only the player and staff members will be notified.
+    silent: true
+
 # Commandspy settings
 commandspy:
   # Depending on the value of 'list-is-whitelist', the 'server-list' will be either a whitelist or a blacklist.
@@ -103,8 +125,16 @@ globalchat:
 # Using the command /hub or /lobby you will be sent to the server defined below.
 hub: "hub"
 
-# The maximum number of players that can join from the same IP address.
-limit-players-per-ip: 5
+ip-limiter:
+  # The maximum number of connections that can be made from the same IP address.
+  max-connections: 5
+  whitelist:
+    # The IP addresses in this list will be ignored by the IP limiter.
+    # You can use subnets to whitelist multiple IP addresses.
+    # Example: 192.168.0.0/24 will whitelist all IP addresses from 192.168.0.1 to 192.168.0.254.
+    ip-addresses: [ ]
+    # The players in this list will be ignored by the IP limiter.
+    nicknames: [ ]
 
 # Moderation settings
 moderation:
@@ -113,7 +143,7 @@ moderation:
   # Should staff members provide a reason when revoking a punishment?
   revoke-needs-reason: false
   # If this is set to true and a player is muted, they can't send private messages to other players.
-  mute-prevent-messages: true
+  mute-prevent-private-messages: true
 
 # Players whose nickname is in this list will not be able to join the server.
 # You can use regular expressions to block multiple nicknames.
@@ -128,9 +158,6 @@ socialspy:
   list-is-whitelist: false
   # Player in this list will be ignored by socialspy.
   player-bypass: [ ]
-
-# Word in this list will be censored.
-censored-words: [ ]
 
 # Command aliases
 command-aliases:

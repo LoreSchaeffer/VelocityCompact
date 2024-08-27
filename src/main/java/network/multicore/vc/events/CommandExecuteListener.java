@@ -15,6 +15,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CommandExecuteListener extends Listener {
+    private final boolean commandBlockerEnabled;
+    private final boolean commandWarningEnabled;
+    private final boolean commandspyEnabled;
+
     private final Set<String> blockedCommands;
     private final Set<String> commandsWarning;
     private final Set<String> csServerList;
@@ -25,6 +29,10 @@ public class CommandExecuteListener extends Listener {
 
     public CommandExecuteListener() {
         super();
+
+        this.commandBlockerEnabled = config.getBoolean("modules.command-blocker", false);
+        this.commandWarningEnabled = config.getBoolean("modules.command-warning", false);
+        this.commandspyEnabled = config.getBoolean("modules.commandspy", false);
 
         this.blockedCommands = config
                 .getStringList("blocked-commands")
@@ -65,7 +73,7 @@ public class CommandExecuteListener extends Listener {
         CommandSource src = e.getCommandSource();
         String command = e.getCommand().trim();
 
-        if (config.getBoolean("modules.command-blocker", false) && src instanceof Player player && isCommandBlocked(src, command)) {
+        if (commandBlockerEnabled && src instanceof Player player && isCommandBlocked(src, command)) {
             e.setResult(CommandExecuteEvent.CommandResult.denied());
             Text.send("common.command-blocked", src);
 
@@ -75,7 +83,7 @@ public class CommandExecuteListener extends Listener {
             return;
         }
 
-        if (config.getBoolean("modules.command-warning", false) && src instanceof Player player && shouldWarnStaff(src, command)) {
+        if (commandWarningEnabled && src instanceof Player player && shouldWarnStaff(src, command)) {
             e.setResult(CommandExecuteEvent.CommandResult.denied());
             Text.send("common.command-warning", src);
 
@@ -84,7 +92,7 @@ public class CommandExecuteListener extends Listener {
             logger.info("{}:{} used the command: {}", server, player.getUsername(), command);
         }
 
-        if (config.getBoolean("modules.commandspy") && src instanceof Player player) {
+        if (commandspyEnabled && src instanceof Player player) {
             commandspy(player, command);
         }
     }

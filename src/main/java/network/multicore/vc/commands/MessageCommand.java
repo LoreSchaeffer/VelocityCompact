@@ -6,21 +6,24 @@ import com.velocitypowered.api.command.BrigadierCommand;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import network.multicore.vc.VelocityCompact;
-import network.multicore.vc.utils.Messages;
-import network.multicore.vc.utils.Permission;
-import network.multicore.vc.utils.Text;
+import network.multicore.vc.utils.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MessageCommand extends AbstractCommand {
     private static final String PLAYER_ARG = "player";
     private static final String MESSAGE_ARG = "message";
+    private final CensureUtils censureUtils;
 
     /**
      * /message <target> <message>
      */
     public MessageCommand() {
         super("message");
+        this.censureUtils = CensureUtils.get();
     }
 
     @Override
@@ -68,6 +71,15 @@ public class MessageCommand extends AbstractCommand {
             return COMMAND_FAILED;
         }
 
+        if (censureUtils.isChatCensorshipEnabled()) {
+            CensureUtils.CensureResult result = censureUtils.censure(sender, message);
+
+            if (result.isCensored()) {
+                if (result.shouldCancelMessage()) return COMMAND_SUCCESS;
+                message = result.getMessage();
+            }
+        }
+
         String senderServer = sender.getCurrentServer().map(server -> server.getServerInfo().getName()).orElse(messages.get("unknown"));
         String receiverServer = receiver.getCurrentServer().map(server -> server.getServerInfo().getName()).orElse(messages.get("unknown"));
 
@@ -81,15 +93,30 @@ public class MessageCommand extends AbstractCommand {
 
         Text.send(formattedMessage, sender);
         Text.send(formattedMessage, receiver);
-        sendSocialspy(senderServer, sender, receiverServer, receiver, message);
+        if (config.getBoolean("modules.socialspy", false)) sendSocialspy(senderServer, sender, receiverServer, receiver, message);
 
-        plugin.setMessenger(sender, receiver);
+        Cache.get().setMessenger(sender, receiver);
 
         return COMMAND_SUCCESS;
     }
 
     public static void sendSocialspy(String senderServer, Player sender, String receiverServer, Player receiver, String message) {
         VelocityCompact plugin = VelocityCompact.getInstance();
+
+        boolean ssIsWhitelist = plugin.config().getBoolean("socialspy.list-is-whitelist", false);
+        Set<String> ssServerList = plugin.config()
+                .getStringList("commandspy.server-list")
+                .stream()
+                .map(String::toLowerCase)
+                .collect(Collectors.toSet());
+        Set<String> ssPlayerBypassList = new HashSet<>(plugin.config().getStringList("socialspy.player-bypass"));
+
+        if (ssPlayerBypassList.contains(sender.getUsername()) || ssPlayerBypassList.contains(receiver.getUsername())) return;
+
+        if (ssIsWhitelist && !ssServerList.contains(senderServer)) return;
+        if (!ssIsWhitelist && ssServerList.contains(senderServer)) return;
+        if (ssIsWhitelist && !ssServerList.contains(receiverServer)) return;
+        if (!ssIsWhitelist && ssServerList.contains(receiverServer)) return;
 
         new Thread(() -> {
             List<Player> receivers = plugin.proxy().getAllPlayers()
@@ -105,7 +132,8 @@ public class MessageCommand extends AbstractCommand {
                     "sender_server", senderServer,
                     "sender", sender.getUsername(),
                     "receiver_server", receiverServer,
-                    "receiver", receiver.getUsername()
+                    "receiver", receiver.getUsername(),
+                    "message", message
             );
 
             Text.send(broadcast, receivers);

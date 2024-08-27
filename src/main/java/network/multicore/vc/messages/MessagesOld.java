@@ -7,95 +7,23 @@ import java.util.Collections;
 import java.util.List;
 
 public class MessagesOld {
-    @SerializedName("already_in_server")
-    public String alreadyInServer;
-    @SerializedName("already_in_server_other")
-    public String alreadyInServerOther;
-    @SerializedName("command_blocked")
-    public String commandBlocked;
-    @SerializedName("command_disabled")
-    public String commandDisabled;
-    @SerializedName("command_disabled_for")
-    public String commandDisabledFor;
-    @SerializedName("command_enabled")
-    public String commandEnabled;
-    @SerializedName("command_enabled_for")
-    public String commandEnabledFor;
-    @SerializedName("command_mode")
-    public String commandMode;
-    @SerializedName("command_mode_for")
-    public String commandModeFor;
-    @SerializedName("console_chat")
-    public String consoleChat;
     @SerializedName("console_chat_blocked")
     public String consoleChatBlocked;
-    @SerializedName("console_command")
-    public String consoleCommand;
     @SerializedName("console_command_blocked")
     public String consoleCommandBlocked;
-    public String exception;
-    @SerializedName("hub_not_set")
-    public String hubNotSet;
-    @SerializedName("incorrect_usage")
-    public String incorrectUsage;
-    @SerializedName("insufficient_perm")
-    public String insufficientPerm;
-    @SerializedName("internal_error")
-    public String internalError;
     @SerializedName("ip_list_kick")
     public String ipListKick;
     @SerializedName("ip_not_found")
     public String ipNotFound;
-    @SerializedName("message_yourself")
-    public String messageYourself;
-    @SerializedName("nickname_not_allowed")
-    public String nicknameNotAllowed;
-    @SerializedName("nickname_not_allowed_log")
-    public String nicknameNotAllowedLog;
-    @SerializedName("no_player_found")
-    public String noPlayerFound;
-    @SerializedName("not_existing_server")
-    public String notExistingServer;
-    @SerializedName("not_player")
-    public String notPlayer;
-    @SerializedName("not_saved")
-    public String notSaved;
     public String offline;
     public String online;
-    @SerializedName("player_join_proxy")
-    public String playerJoinProxy;
-    @SerializedName("player_join_proxy_first")
-    public String playerJoinProxyFirst;
-    @SerializedName("player_join_server")
-    public String playerJoinServer;
-    @SerializedName("player_not_found")
-    public String playerNotFound;
     @SerializedName("player_quit_proxy")
     public String playerQuitProxy;
-    @SerializedName("player_send_to_receiver")
-    public String playerSendToReceiver;
-    @SerializedName("player_send_to_sender")
-    public String playerSendToSender;
     @SerializedName("plugin_reloaded")
     public String pluginReloaded;
     @SerializedName("players_with_ip")
     public String playersWithIp;
-    @SerializedName("server_filter_add")
-    public String serverFilterAdd;
-    @SerializedName("server_filter_add_for")
-    public String serverFilterAddFor;
-    @SerializedName("server_filter_emptied")
-    public String serverFilterEmptied;
-    @SerializedName("server_filter_emptied_for")
-    public String serverFilterEmptiedFor;
-    @SerializedName("server_filter_list")
-    public String serverFilterList;
-    @SerializedName("server_filter_remove")
-    public String serverFilterRemove;
-    @SerializedName("server_filter_remove_for")
-    public String serverFilterRemoveFor;
 
-    public List<String> help;
     public List<String> ping;
 
     @SerializedName("formats")
@@ -106,55 +34,14 @@ public class MessagesOld {
     public Usages USAGES;
 
     public MessagesOld init() {
-        if (alreadyInServer == null) alreadyInServer = "<red>You are already connected to this server!";
-        if (alreadyInServerOther == null) alreadyInServerOther = "<red>{player} is already connected to this server!";
-        if (commandBlocked == null) commandBlocked = "<red>This command has been blocked!";
-        if (commandDisabled == null) commandDisabled = "<dark_green>{command} <dark_red>disabled<dark_green>!";
-        if (commandDisabledFor == null) commandDisabledFor = "<dark_green>{command} <dark_red>disabled <dark_green>for <yellow>{player}<dark_green>!";
-        if (commandEnabled == null) commandEnabled = "<dark_green>{command} <green>enabled<dark_green>!";
-        if (commandEnabledFor == null) commandEnabledFor = "<dark_green>{command} <green>enabled <dark_green>for <yellow>{player}<dark_green>!";
-        if (commandMode == null) commandMode = "<aqua>{command} <yellow>mode set to <aqua>{mode}<yellow>!";
-        if (commandModeFor == null) commandModeFor = "<aqua>{command} <yellow>mode set to <aqua>{mode} <yellow>for <aqua>{player}<yellow>!";
-        if (consoleChat == null) consoleChat = "<aqua>CHAT: <yellow>{server}:{player} > <reset>{message}";
         if (consoleChatBlocked == null) consoleChatBlocked = "<red>CHAT MUTED: <yellow>{server}:{player} > <reset>{message}";
-        if (consoleCommand == null) consoleCommand = "<aqua>CMD: <yellow>{server}:{player} > <reset>{command}";
         if (consoleCommandBlocked == null) consoleCommandBlocked = "<red>CMD BLOCKED: <yellow>{server}:{player} > <reset>{command}";
-        if (exception == null) exception = "<dark_red>BungeeCompact encountered an exception! <white>{exception}";
-        if (hubNotSet == null) hubNotSet = "<red>Hub server not set!";
-        if (incorrectUsage == null) incorrectUsage = "<red>Incorrect usage!";
-        if (insufficientPerm == null) insufficientPerm = "<red>Insufficient permissions!";
-        if (internalError == null) internalError = "<red>Internal error!";
-        if (ipListKick == null) ipListKick = "<red>You have been disconnected!\n<yellow>There are too many accounts with your IP.";
         if (ipNotFound == null) ipNotFound = "<red>IP not found";
-        if (messageYourself == null) messageYourself = "<red>You can not send a message to yourself!";
-        if (noPlayerFound == null) noPlayerFound = "<red>No player found!";
-        if (notExistingServer == null) notExistingServer = "<red>This is not a valid server!";
-        if (notPlayer == null) notPlayer = "<red>You need to be a player to use this command!";
-        if (notSaved == null) notSaved = "<red>Failed to save to storage!";
         if (offline == null) offline = "<red>OFFLINE";
         if (online == null) online = "<dark_green>ONLINE";
-        if (playerJoinProxy == null) playerJoinProxy = "<green>{player} joined the proxy.";
-        if (playerJoinProxyFirst == null) playerJoinProxyFirst = "<aqua>{player} joined the proxy for the first time.";
-        if (playerJoinServer == null) playerJoinServer = "<yellow>{player} joined the server {server}.";
-        if (playerNotFound == null) playerNotFound = "<red>Player not found!";
         if (playerQuitProxy == null) playerQuitProxy = "<red>{player} left the proxy.";
-        if (playerSendToReceiver == null) playerSendToReceiver = "<dark_green>You were sent to {server} by {player}!";
-        if (playerSendToSender == null) playerSendToSender = "<dark_green>You sent {player} to {server}!";
         if (pluginReloaded == null) pluginReloaded = "<dark_green>BungeeCompact reloaded in {time}ms!";
         if (playersWithIp == null) playersWithIp = "<gold>[<aqua>{players}<gold>] <yellow>have the same ip address.";
-        if (serverFilterAdd == null) serverFilterAdd = "<yellow>Added <aqua>{server} <yellow>to <aqua>{command} {mode}<yellow>!";
-        if (serverFilterAddFor == null) serverFilterAddFor = "<yellow>Added <aqua>{server} <yellow>to <aqua>{command} {mode} <yellow>for <aqua>{player}<yellow>!";
-        if (serverFilterEmptied == null) serverFilterEmptied = "<aqua>{command} {mode} <yellow>emptied!";
-        if (serverFilterEmptiedFor == null) serverFilterEmptiedFor = "<aqua>{command} {mode} <yellow>emptied for <aqua>{player}<yellow>!";
-        if (serverFilterList == null) serverFilterList = "<aqua>{command} {mode} <yellow>servers: <aqua>{list}";
-        if (serverFilterRemove == null) serverFilterRemove = "<yellow>Removed <aqua>{server} <yellow>from <aqua>{command} {mode}<yellow>!";
-        if (serverFilterRemoveFor == null) serverFilterRemoveFor = "<yellow>Removed <aqua>{server} <yellow>from <aqua>{command} {mode} <yellow>for <green>{player}<yellow>!";
-
-        if (help == null) help = Arrays.asList(
-                "<blue>Contact the staff of the server to get help!",
-                "<dark_aqua>This is a sample help message,",
-                "<aqua>edit the language files to change this message!"
-        );
 
         if (ping == null) ping = Arrays.asList(
                 "<aqua><b>Ping of server <yellow>{server}",
@@ -171,18 +58,12 @@ public class MessagesOld {
 
     public static class Formats {
         public String broadcast;
-        public String commandspy;
-        public String commandwarn;
-        public String globalchat;
-        public String msg;
-        public String socialspy;
         public String staffchat;
         @SerializedName("muted_msg")
         public String mutedMsg;
 
         public Formats init() {
             if (broadcast == null) broadcast = "<dark_red><b>BROADCAST <dark_aqua>● <yellow>{message}";
-            if (globalchat == null) globalchat = "<gold>{server}<red>:<gold><b>{player} <dark_aqua>● <reset>{message}";";
             if (staffchat == null) staffchat = "<gold><b>STAFF <aqua>{server}<red>:<yellow><b>{player} <dark_aqua>● <reset>{message}";
             if (mutedMsg == null) mutedMsg = "<red>MUTED <blue>{server}<gold>:<blue><b>{player} <dark_aqua>● <gray>{message}";
 
@@ -247,44 +128,28 @@ public class MessagesOld {
         @SerializedName("lookup_id_header")
         public String lookupIdHeader;
 
-        @SerializedName("ban_disconnect")
-        public String banDisconnect;
         @SerializedName("ban_broadcast")
         public String banBroadcast;
         @SerializedName("ban_broadcast_target")
         public String banBroadcastTarget;
-        @SerializedName("ban_ip_disconnect")
-        public String banipDisconnect;
         @SerializedName("ban_ip_broadcast")
         public String banipBroadcast;
         @SerializedName("ban_ip_broadcast_target")
         public String banipBroadcastTarget;
-        @SerializedName("tempban_disconnect")
-        public String tempbanDisconnect;
         @SerializedName("tempban_broadcast")
         public String tempbanBroadcast;
         @SerializedName("tempban_broadcast_target")
         public String tempbanBroadcastTarget;
-        @SerializedName("tempbanip_disconnect")
-        public String tempbanipDisconnect;
         @SerializedName("tempban_ip_broadcast")
         public String tempbanipBroadcast;
         @SerializedName("tempban_ip_broadcast_target")
         public String tempbanipBroadcastTarget;
-        @SerializedName("gban_disconnect")
-        public String gbanDisconnect;
         @SerializedName("gban_broadcast")
         public String gbanBroadcast;
-        @SerializedName("gbanip_disconnect")
-        public String gbanipDisconnect;
         @SerializedName("gbanip_broadcast")
         public String gbanipBroadcast;
-        @SerializedName("gtempban_disconnect")
-        public String gtempbanDisconnect;
         @SerializedName("gtempban_broadcast")
         public String gtempbanBroadcast;
-        @SerializedName("gtempbanip_disconnect")
-        public String gtempbanipDisconnect;
         @SerializedName("gtempbanip_broadcast")
         public String gtempbanipBroadcast;
         @SerializedName("unban_broadcast")
@@ -443,20 +308,14 @@ public class MessagesOld {
             if (lookupHeader == null) lookupHeader = "<blue><st>---- <gold>Lookup <yellow>{player} <white>- <yellow>{type} <white>- <yellow>Page {page} <blue><st>----";
             if (lookupIdHeader == null) lookupIdHeader = "<blue><st>---- <gold>Lookup <yellow>{id} <white>- <yellow>{type} <blue><st>----";
 
-            if (banDisconnect == null)
-                banDisconnect = "<red>You are banned\n\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red>Server <dark_aqua><b>» <gray>{server}\n<red><b>Duration <dark_aqua><b>» <yellow>{duration}\n<red>Reason <dark_aqua><b>» <gray>{reason}";
             if (banBroadcast == null)
                 banBroadcast = "<gold><b>{player} <gray>has been <yellow><i>banned\n\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Duration <dark_aqua><b>» <yellow>{duration}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}";
             if (banBroadcastTarget == null)
                 banBroadcastTarget = "<red>You are <yellow><i>banned\n\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}";
-            if (banipDisconnect == null)
-                banipDisconnect = "<red>You are ip-banned\n\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red>Server <dark_aqua><b>» <gray>{server}\n<red>Reason <dark_aqua><b>» <gray>{reason}";
             if (banipBroadcast == null)
                 banipBroadcast = "<gold><b>{player} <gray>has been <yellow><i>ip-banned\n\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}";
             if (banipBroadcastTarget == null)
                 banipBroadcastTarget = "<red>You are <yellow><i>ip-banned\n\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}";
-            if (tempbanDisconnect == null)
-                tempbanDisconnect = "<red>You are banned temporary\n\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red>Server <dark_aqua><b>» <gray>{server}\n<red>Duration <dark_aqua><b>» <gray>{duration}\n<red>Reason <dark_aqua><b>» <gray>{reason}";
             if (tempbanBroadcast == null)
                 tempbanBroadcast = "<gold><b>{player} <gray>has been <yellow><i>banned\n\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Duration <dark_aqua><b>» <yellow>{duration}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}";
             if (tempbanBroadcastTarget == null)
