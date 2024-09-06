@@ -42,6 +42,7 @@ public class User {
         this.ip = player.getRemoteAddress().getHostString();
         this.protocolVersion = player.getProtocolVersion().getProtocol();
         this.clientBrand = player.getClientBrand();
+        this.settings = new UserSettings(this);
     }
 
     protected User() {

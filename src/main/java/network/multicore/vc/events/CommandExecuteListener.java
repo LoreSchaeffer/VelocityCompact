@@ -73,6 +73,8 @@ public class CommandExecuteListener extends Listener {
         CommandSource src = e.getCommandSource();
         String command = e.getCommand().trim();
 
+        // TODO Fix: NullPointerException: Cannot invoke "network.multicore.vc.data.UserSettings.hasCommandspy()" because the return value of "network.multicore.vc.data.User.getSettings()" is null
+
         if (commandBlockerEnabled && src instanceof Player player && isCommandBlocked(src, command)) {
             e.setResult(CommandExecuteEvent.CommandResult.denied());
             Text.send("common.command-blocked", src);

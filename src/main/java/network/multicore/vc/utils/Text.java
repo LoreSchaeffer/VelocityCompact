@@ -81,8 +81,8 @@ public class Text {
      */
     public static String stripFormatting(String text, TagResolver tagResolver) {
         if (text == null) return null;
-        if (tagResolver == null) return miniMessage.stripTags(text);
-        return miniMessage.stripTags(text, tagResolver);
+        if (tagResolver == null) return miniMessage.stripTags(stripLegacyFormatting(text));
+        return miniMessage.stripTags(stripLegacyFormatting(text), tagResolver);
     }
 
     /**

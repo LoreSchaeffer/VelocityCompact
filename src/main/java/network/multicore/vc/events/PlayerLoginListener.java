@@ -20,9 +20,11 @@ import java.util.stream.Collectors;
 
 public class PlayerLoginListener extends Listener {
     private final boolean ipLimiterEnabled;
+    private final boolean sameIpBroadcastEnabled;
     private final int maxConnectionsPerIp;
     private final Set<String> whitelistedIps;
     private final Set<String> whitelistedNicknames;
+    private final Set<String> sameIpBroadcastIgnoredPlayers;
     private final UserRepository userRepository;
     private final BanRepository banRepository;
     private final Logger logger;
@@ -31,9 +33,14 @@ public class PlayerLoginListener extends Listener {
         super();
 
         this.ipLimiterEnabled = config.getBoolean("modules.ip-limiter", false);
+        this.sameIpBroadcastEnabled = config.getBoolean("modules.same-ip-broadcast", false);
         this.maxConnectionsPerIp = config.getInt("ip-limiter.max-connections", 5);
         this.whitelistedIps = new HashSet<>(config.getStringList("ip-limiter.whitelist.ip-addresses"));
         this.whitelistedNicknames = config.getStringList("ip-limiter.whitelist.nicknames")
+                .stream()
+                .map(String::toLowerCase)
+                .collect(Collectors.toSet());
+        this.sameIpBroadcastIgnoredPlayers = config.getStringList("same-ip-broadcast.ignored-players")
                 .stream()
                 .map(String::toLowerCase)
                 .collect(Collectors.toSet());
@@ -79,6 +86,7 @@ public class PlayerLoginListener extends Listener {
         }
         cache.addUser(user);
 
+        //TODO Fix this error: Could not resolve attribute 'uuid' of 'network.multicore.vc.data.Ban'
         List<Ban> activeBans = banRepository.findAllActiveByUuid(player.getUniqueId());
         if (!activeBans.isEmpty()) {
             Optional<Ban> banOpt = activeBans.stream()
@@ -93,7 +101,7 @@ public class PlayerLoginListener extends Listener {
                     e.setResult(ResultedEvent.ComponentResult.denied(Text.deserialize(messages.getAndReplace("moderation.disconnect.ban",
                             "staff", ban.getStaff() != null ? ban.getStaff().getUsername() : messages.get("console"),
                             "server", ban.getServer() != null ? ban.getServer() : messages.get("global"),
-                            "duration", ban.getEndDate() != null ? PunishmentUtils.getDurationString(ban.getEndDate(), messages) : messages.get("permanent"),
+                            "duration", ban.getEndDate() != null ? PunishmentUtils.getDurationString(ban.getEndDate()) : messages.get("permanent"),
                             "reason", ban.getReason() != null ? ban.getReason() : messages.get("no-reason")
                     ))));
                     Text.broadcast(messages.getAndReplace("common.join-attempt-failed-broadcast", "player", player.getUsername(), "reason", messages.get("banned")), Permission.JOIN_ATTEMPT_RECEIVE_BAN.get());
@@ -106,7 +114,19 @@ public class PlayerLoginListener extends Listener {
             }
         }
 
-        //TODO Inform staff if a player has the same ip of other players in a separate thread
+        if (sameIpBroadcastEnabled && !player.hasPermission(Permission.SAME_IP_BROADCAST_BYPASS.get())) {
+            new Thread(() -> {
+                List<User> users = userRepository.findAllByIp(player.getRemoteAddress().getHostString());
+                users.removeIf(u -> sameIpBroadcastIgnoredPlayers.contains(u.getUsername().toLowerCase()));
+                if (users.isEmpty()) return;
+
+                Text.broadcast(messages.getAndReplace(
+                        "common.same-ip-broadcast",
+                        "players",
+                        users.stream().map(User::getUsername).collect(Collectors.joining(", "))
+                ), Permission.SAME_IP_BROADCAST.get());
+            }).start();
+        }
     }
 
     private boolean isIpWhitelisted(String ip) {

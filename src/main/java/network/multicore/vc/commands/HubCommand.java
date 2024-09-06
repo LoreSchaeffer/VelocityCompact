@@ -9,8 +9,10 @@ import com.velocitypowered.api.proxy.ConnectionRequestBuilder;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import network.multicore.vc.utils.FallbackConnection;
 import network.multicore.vc.utils.Permission;
 import network.multicore.vc.utils.Text;
+import network.multicore.vc.utils.suggestions.PlayerSuggestionProvider;
 
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +30,6 @@ public class HubCommand extends AbstractCommand {
         super("hub");
     }
 
-    // TODO Test if permissions are correct
     public void register() {
         if (!config.getBoolean("modules.hub", false)) return;
 
@@ -40,20 +41,7 @@ public class HubCommand extends AbstractCommand {
         RequiredArgumentBuilder<CommandSource, String> playerNode = BrigadierCommand
                 .requiredArgumentBuilder(PLAYER_ARG, StringArgumentType.word())
                 .requires(src -> src.hasPermission(Permission.HUB_OTHER.get()))
-                .suggests((ctx, builder) -> {
-                    String argument = ctx.getArguments().containsKey(PLAYER_ARG) ? ctx.getArgument(PLAYER_ARG, String.class) : "";
-
-                    for (Player player : proxy.getAllPlayers()) {
-                        String playerName = player.getUsername();
-
-                        if (playerName.regionMatches(true, 0, argument, 0, argument.length())) builder.suggest(playerName);
-                    }
-
-                    if ("all".regionMatches(true, 0, argument, 0, argument.length())) builder.suggest("all");
-                    if ("current".regionMatches(true, 0, argument, 0, argument.length())) builder.suggest("current");
-
-                    return builder.buildFuture();
-                })
+                .suggests(new PlayerSuggestionProvider<>(proxy, PLAYER_ARG, "all", "current"))
                 .executes(ctx -> execute(ctx.getSource(), ctx.getArgument(PLAYER_ARG, String.class)));
 
         hubRootNode.then(playerNode);
@@ -173,22 +161,17 @@ public class HubCommand extends AbstractCommand {
             AtomicInteger failureCount = new AtomicInteger();
 
             List<CompletableFuture<ConnectionRequestBuilder.Result>> futures = targets.stream()
-                    .map(target -> target.createConnectionRequest(hub)
-                            .connect()
-                            .whenComplete((result, throwable) -> {
-                                if (throwable != null) {
-                                    failureCount.incrementAndGet();
-                                    Text.send(messages.getAndReplace("common.internal-exception", "message", throwable.getMessage()), src);
-                                    return;
-                                }
+                    .map(target -> {
+                        FallbackConnection connection = new FallbackConnection(target);
+                        return connection.connect().whenComplete((result, throwable) -> {
+                            if (throwable != null || !result.isSuccessful()) failureCount.incrementAndGet();
 
-                                if (result.isSuccessful() && !target.equals(src)) {
-                                    successCount.incrementAndGet();
-                                    Text.send(messages.getAndReplace("commands.hub.sent-to-hub-target", "player", src), target);
-                                } else {
-                                    failureCount.incrementAndGet();
-                                }
-                            }))
+                            if (!target.equals(src)) {
+                                successCount.incrementAndGet();
+                                Text.send(messages.getAndReplace("commands.hub.sent-to-hub-target", "player", src), target);
+                            }
+                        });
+                    })
                     .toList();
 
             CompletableFuture<Void> allCompleted = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));

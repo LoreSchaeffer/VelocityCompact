@@ -9,6 +9,8 @@ import com.velocitypowered.api.proxy.Player;
 import network.multicore.vc.data.User;
 import network.multicore.vc.utils.Permission;
 import network.multicore.vc.utils.Text;
+import network.multicore.vc.utils.suggestions.CustomSuggestionProvider;
+import network.multicore.vc.utils.suggestions.PlayerSuggestionProvider;
 
 public class GlobalchatCommand extends AbstractCommand {
     private static final String MODE_ARG = "mode";
@@ -32,32 +34,14 @@ public class GlobalchatCommand extends AbstractCommand {
 
         RequiredArgumentBuilder<CommandSource, String> modeNode = BrigadierCommand
                 .requiredArgumentBuilder(MODE_ARG, StringArgumentType.word())
-                .suggests((ctx, builder) -> {
-                    String argument = ctx.getArguments().containsKey(MODE_ARG) ? ctx.getArgument(MODE_ARG, String.class) : "";
-
-                    if ("on".regionMatches(true, 0, argument, 0, argument.length())) builder.suggest("on");
-                    if ("off".regionMatches(true, 0, argument, 0, argument.length())) builder.suggest("off");
-                    if ("toggle".regionMatches(true, 0, argument, 0, argument.length())) builder.suggest("toggle");
-
-                    return builder.buildFuture();
-                })
+                .suggests(new CustomSuggestionProvider<>(MODE_ARG, "on", "off", "toggle"))
                 .executes(ctx -> execute(ctx.getSource(), ctx.getArgument(MODE_ARG, String.class), null));
 
 
         RequiredArgumentBuilder<CommandSource, String> playerNode = BrigadierCommand
                 .requiredArgumentBuilder(PLAYER_ARG, StringArgumentType.word())
                 .requires(src -> src.hasPermission(Permission.GLOBALCHAT_OTHER.get()))
-                .suggests((ctx, builder) -> {
-                    String argument = ctx.getArguments().containsKey(PLAYER_ARG) ? ctx.getArgument(PLAYER_ARG, String.class) : "";
-
-                    for (Player player : proxy.getAllPlayers()) {
-                        String playerName = player.getUsername();
-
-                        if (playerName.regionMatches(true, 0, argument, 0, argument.length())) builder.suggest(playerName);
-                    }
-
-                    return builder.buildFuture();
-                })
+                .suggests(new PlayerSuggestionProvider<>(proxy, PLAYER_ARG))
                 .executes(ctx -> execute(ctx.getSource(), ctx.getArgument(MODE_ARG, String.class), ctx.getArgument(PLAYER_ARG, String.class)));
 
         modeNode.then(playerNode);

@@ -25,7 +25,7 @@ import network.multicore.vc.persistence.Database;
 import network.multicore.vc.persistence.HibernateHbm2DdlAutoMode;
 import network.multicore.vc.persistence.PrefixNamingStrategy;
 import network.multicore.vc.persistence.datasource.DataSourceProvider;
-import network.multicore.vc.persistence.entity.entities.StaticEntities;
+import network.multicore.vc.persistence.entity.entities.PackageEntities;
 import network.multicore.vc.utils.Cache;
 import network.multicore.vc.utils.CensureUtils;
 import network.multicore.vc.utils.Messages;
@@ -69,6 +69,12 @@ public class VelocityCompact {
     private KickRepository kickRepository;
     private MuteRepository muteRepository;
     private WarnRepository warnRepository;
+
+    // TODO Check if argument exists before passing to execute
+    // TODO Check duration suggestions
+    // TODO The data structure doesn't allow ban of users that never joined the proxy
+    // TODO The data structure doesn't allow ip bans
+    // TODO Remove hub server from config and use velocity config
 
     @Inject
     private VelocityCompact(ProxyServer proxy, @DataDirectory Path dataDirectory, Logger logger) {
@@ -324,7 +330,7 @@ public class VelocityCompact {
         builder.persistenceUnitName(PLUGIN_ID)
                 .hbm2ddlAuto(HibernateHbm2DdlAutoMode.UPDATE)
                 .dataSourceProvider(provider)
-                .entities(new StaticEntities(User.class));
+                .entities(new PackageEntities(User.class.getPackageName()));
 
         if (storageType.equals("MySQL") || storageType.equals("MariaDB") || storageType.equals("PostgreSQL")) {
             String tablePrefix = config.getString("data.table-prefix");

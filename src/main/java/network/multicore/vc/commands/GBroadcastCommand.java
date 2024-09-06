@@ -31,9 +31,9 @@ public class GBroadcastCommand extends AbstractCommand {
     }
 
     private int execute(CommandSource src, String message) {
-        if (!src.hasPermission(Permission.COLORS.get())) message = Text.stripFormatting(Text.stripLegacyFormatting(message));
+        if (!src.hasPermission(Permission.COLORS.get())) message = Text.stripFormatting(message);
 
-        Text.broadcast(message);
+        Text.broadcast(messages.getAndReplace("commands.broadcast.format", "message", message));
 
         return COMMAND_SUCCESS;
     }

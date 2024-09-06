@@ -6,7 +6,10 @@ import com.velocitypowered.api.command.BrigadierCommand;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import network.multicore.vc.VelocityCompact;
+import network.multicore.vc.data.Mute;
+import network.multicore.vc.data.MuteRepository;
 import network.multicore.vc.utils.*;
+import network.multicore.vc.utils.suggestions.PlayerSuggestionProvider;
 
 import java.util.HashSet;
 import java.util.List;
@@ -17,6 +20,8 @@ public class MessageCommand extends AbstractCommand {
     private static final String PLAYER_ARG = "player";
     private static final String MESSAGE_ARG = "message";
     private final CensureUtils censureUtils;
+    private final boolean mutePreventPrivateMessages;
+    private final MuteRepository muteRepository;
 
     /**
      * /message <target> <message>
@@ -24,6 +29,8 @@ public class MessageCommand extends AbstractCommand {
     public MessageCommand() {
         super("message");
         this.censureUtils = CensureUtils.get();
+        this.mutePreventPrivateMessages = config.getBoolean("moderation.mute-prevents-private-messages", false);
+        this.muteRepository = plugin.muteRepository();
     }
 
     @Override
@@ -34,17 +41,7 @@ public class MessageCommand extends AbstractCommand {
                 .literalArgumentBuilder(command)
                 .requires(ctx -> ctx.hasPermission(Permission.MESSAGE.get()))
                 .then(BrigadierCommand.requiredArgumentBuilder(PLAYER_ARG, StringArgumentType.word())
-                        .suggests((ctx, builder) -> {
-                            String argument = ctx.getArguments().containsKey(PLAYER_ARG) ? ctx.getArgument(PLAYER_ARG, String.class) : "";
-
-                            for (Player player : proxy.getAllPlayers()) {
-                                String playerName = player.getUsername();
-
-                                if (playerName.regionMatches(true, 0, argument, 0, argument.length())) builder.suggest(playerName);
-                            }
-
-                            return builder.buildFuture();
-                        })
+                        .suggests(new PlayerSuggestionProvider<>(proxy, PLAYER_ARG))
                         .then(BrigadierCommand.requiredArgumentBuilder(MESSAGE_ARG, StringArgumentType.greedyString())
                                 .executes((ctx) -> execute(ctx.getSource(), ctx.getArgument(PLAYER_ARG, String.class), ctx.getArgument(MESSAGE_ARG, String.class)))
                                 .build()));
@@ -58,7 +55,46 @@ public class MessageCommand extends AbstractCommand {
             return COMMAND_FAILED;
         }
 
-        // TODO Check for active mutes if set so in the config
+        String senderServer = sender.getCurrentServer().map(server -> server.getServerInfo().getName()).orElse(messages.get("unknown"));
+
+        if (mutePreventPrivateMessages) {
+            List<Mute> activeMutes = muteRepository.findAllActiveByUuid(sender.getUniqueId());
+            activeMutes.addAll(muteRepository.findAllActiveByIp(sender.getRemoteAddress().getAddress().getHostAddress()));
+            activeMutes.removeIf(mute -> mute.getServer() != null && !mute.getServer().equalsIgnoreCase(senderServer));
+
+            //TODO To be checked
+            if (!activeMutes.isEmpty()) {
+                Mute mute = null;
+                boolean isMuted = false;
+
+                for (Mute m : activeMutes) {
+                    if (!PunishmentUtils.isExpired(m.getEndDate())) {
+                        isMuted = true;
+
+                        if (mute == null) mute = m;
+                        else if (mute.getServer() == null) mute = m;
+                    } else {
+                        m.setUnmuteDate();
+                        muteRepository.save(m);
+                    }
+                }
+
+                if (isMuted) {
+                    Text.send(messages.getAndReplace("moderation.mute.reminder",
+                            "staff", mute.getStaff() != null ? mute.getStaff().getUsername() : messages.get("console"),
+                            "server", mute.getServer() != null ? mute.getServer() : messages.get("global"),
+                            "duration", mute.getEndDate() != null ? PunishmentUtils.getDurationString(mute.getEndDate()) : messages.get("permanent"),
+                            "reason", mute.getReason() != null ? mute.getReason() : messages.get("no-reason")
+                    ), sender);
+                    Text.broadcast(messages.getAndReplace("moderation.mute.muted-message-broadcast",
+                            "server", senderServer,
+                            "player", sender.getUsername(),
+                            "message", message
+                    ), Permission.MUTED_MESSAGE_RECEIVE.get());
+                    return COMMAND_SUCCESS;
+                }
+            }
+        }
 
         Player receiver = proxy.getPlayer(receiverName).orElse(null);
         if (receiver == null) {
@@ -80,7 +116,6 @@ public class MessageCommand extends AbstractCommand {
             }
         }
 
-        String senderServer = sender.getCurrentServer().map(server -> server.getServerInfo().getName()).orElse(messages.get("unknown"));
         String receiverServer = receiver.getCurrentServer().map(server -> server.getServerInfo().getName()).orElse(messages.get("unknown"));
 
         String formattedMessage = messages.getAndReplace("commands.message.message-format",

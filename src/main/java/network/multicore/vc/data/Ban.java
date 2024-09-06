@@ -1,20 +1,19 @@
 package network.multicore.vc.data;
 
-import com.google.common.base.Preconditions;
 import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Entity
 public class Ban {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @ManyToOne
-    @JoinColumn(name = "uuid", referencedColumnName = "uuid", nullable = false)
-    private User user;
+    private UUID uuid;
+    private String username;
     private String ip;
     @ManyToOne
     @JoinColumn(name = "staff", referencedColumnName = "uuid")
@@ -22,8 +21,8 @@ public class Ban {
     private String reason;
     private String server;
     @Column(nullable = false)
-    private Date begin;
-    private Date end; // TODO date should be nullable
+    private Date beginDate;
+    private Date endDate; // TODO Verify - date should be nullable
     @Column(name = "unban_date")
     private Date unbanDate;
     @ManyToOne
@@ -32,28 +31,23 @@ public class Ban {
     @Column(name = "unban_reason")
     private String unbanReason;
 
-    public Ban(@NotNull User user, User staff, String reason, String server, Date end) {
-        Preconditions.checkNotNull(user, "user");
-
-        this.user = user;
-        this.staff = staff;
-        this.reason = reason;
-        this.server = server;
-        this.begin = new Date();
-        this.end = end;
-    }
-
-    public Ban(@NotNull User user, @NotNull String ip, User staff, String reason, String server, Date end) {
-        Preconditions.checkNotNull(user, "user");
-        Preconditions.checkNotNull(ip, "ip");
-
-        this.user = user;
+    public Ban(UUID uuid, String username, String ip, User staff, String reason, String server, Date endDate) {
+        this.uuid = uuid;
+        this.username = username;
         this.ip = ip;
         this.staff = staff;
         this.reason = reason;
         this.server = server;
-        this.begin = new Date();
-        this.end = end;
+        this.beginDate = new Date();
+        this.endDate = endDate;
+    }
+
+    public Ban(@NotNull User user, User staff, String reason, String server, Date endDate) {
+        this(user.getUniqueId(), user.getUsername(), null, staff, reason, server, endDate);
+    }
+
+    public Ban(@NotNull String ip, User staff, String reason, String server, Date endDate) {
+        this(null, null, ip, staff, reason, server, endDate);
     }
 
     protected Ban() {
@@ -63,8 +57,12 @@ public class Ban {
         return id;
     }
 
-    public User getUser() {
-        return user;
+    public UUID getUniqueId() {
+        return uuid;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     @Nullable
@@ -88,12 +86,12 @@ public class Ban {
     }
 
     public Date getBeginDate() {
-        return begin;
+        return beginDate;
     }
 
     @Nullable
     public Date getEndDate() {
-        return end;
+        return endDate;
     }
 
     @Nullable

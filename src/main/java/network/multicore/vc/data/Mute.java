@@ -6,15 +6,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Entity
 public class Mute {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @ManyToOne
-    @JoinColumn(name = "uuid", referencedColumnName = "uuid", nullable = false)
-    private User user;
+    private UUID uuid;
+    private String username;
     private String ip;
     @ManyToOne
     @JoinColumn(name = "staff", referencedColumnName = "uuid")
@@ -22,8 +22,8 @@ public class Mute {
     private String reason;
     private String server;
     @Column(nullable = false)
-    private Date begin;
-    private Date end; // TODO date should be nullable
+    private Date beginDate;
+    private Date endDate; // TODO date should be nullable
     @Column(name = "unmute_date")
     private Date unmuteDate;
     @ManyToOne
@@ -32,29 +32,25 @@ public class Mute {
     @Column(name = "unmute_reason")
     private String unmuteReason;
 
-    public Mute(@NotNull User user, User staff, String reason, String server, Date end) {
-        Preconditions.checkNotNull(user, "user");
-
-        this.user = user;
-        this.staff = staff;
-        this.reason = reason;
-        this.server = server;
-        this.begin = new Date();
-        this.end = end;
-    }
-
-    public Mute(@NotNull User user, @NotNull String ip, User staff, String reason, String server, Date end) {
-        Preconditions.checkNotNull(user, "user");
-        Preconditions.checkNotNull(ip, "ip");
-
-        this.user = user;
+    public Mute(UUID uuid, String username, String ip, User staff, String reason, String server, Date endDate) {
+        this.uuid = uuid;
+        this.username = username;
         this.ip = ip;
         this.staff = staff;
         this.reason = reason;
         this.server = server;
-        this.begin = new Date();
-        this.end = end;
+        this.beginDate = new Date();
+        this.endDate = endDate;
     }
+
+    public Mute(@NotNull User user, User staff, String reason, String server, Date endDate) {
+        this(user.getUniqueId(), user.getUsername(), null, staff, reason, server, endDate);
+    }
+
+    public Mute(@NotNull String ip, User staff, String reason, String server, Date endDate) {
+        this(null, null, ip, staff, reason, server, endDate);
+    }
+
 
     protected Mute() {
     }
@@ -63,8 +59,12 @@ public class Mute {
         return id;
     }
 
-    public User getUser() {
-        return user;
+    public UUID getUniqueId() {
+        return uuid;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     @Nullable
@@ -88,12 +88,12 @@ public class Mute {
     }
 
     public Date getBeginDate() {
-        return begin;
+        return beginDate;
     }
 
     @Nullable
     public Date getEndDate() {
-        return end;
+        return endDate;
     }
 
     @Nullable

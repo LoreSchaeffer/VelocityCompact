@@ -48,7 +48,7 @@ public class PlayerPreLoginListener extends Listener {
                     e.setResult(PreLoginEvent.PreLoginComponentResult.denied(Text.deserialize(messages.getAndReplace("moderation.disconnect.ban-ip",
                             "staff", ban.getStaff() != null ? ban.getStaff().getUsername() : messages.get("console"),
                             "server", ban.getServer() != null ? ban.getServer() : messages.get("global"),
-                            "duration", ban.getEndDate() != null ? PunishmentUtils.getDurationString(ban.getEndDate(), messages) : messages.get("permanent"),
+                            "duration", ban.getEndDate() != null ? PunishmentUtils.getDurationString(ban.getEndDate()) : messages.get("permanent"),
                             "reason", ban.getReason() != null ? ban.getReason() : messages.get("no-reason")
                     ))));
                     Text.broadcast(messages.getAndReplace("common.join-attempt-failed-broadcast", "player", e.getUsername(), "reason", messages.get("banned")), Permission.JOIN_ATTEMPT_RECEIVE_BAN.get());

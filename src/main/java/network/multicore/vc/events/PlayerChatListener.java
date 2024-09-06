@@ -4,20 +4,29 @@ import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.player.PlayerChatEvent;
 import com.velocitypowered.api.proxy.Player;
+import network.multicore.vc.data.Mute;
+import network.multicore.vc.data.MuteRepository;
 import network.multicore.vc.utils.CensureUtils;
+import network.multicore.vc.utils.Permission;
+import network.multicore.vc.utils.PunishmentUtils;
 import network.multicore.vc.utils.Text;
+import org.slf4j.Logger;
 
 import java.util.List;
 
 public class PlayerChatListener extends Listener {
     private final boolean globalchatEnabled;
     private final CensureUtils censureUtils;
+    private final MuteRepository muteRepository;
+    private final Logger logger;
 
     public PlayerChatListener() {
         super();
 
         this.globalchatEnabled = config.getBoolean("modules.globalchat", false);
         this.censureUtils = CensureUtils.get();
+        this.muteRepository = plugin.muteRepository();
+        this.logger = plugin.logger();
     }
 
     @Subscribe(order = PostOrder.FIRST)
@@ -26,8 +35,46 @@ public class PlayerChatListener extends Listener {
 
         Player player = e.getPlayer();
         String message = e.getMessage();
+        String server = player.getCurrentServer().map(s -> s.getServerInfo().getName()).orElse(null);
 
-        // TODO Check for globalmute and servermute
+        List<Mute> activeMutes = muteRepository.findAllActiveByUuid(player.getUniqueId());
+        activeMutes.addAll(muteRepository.findAllActiveByIp(player.getRemoteAddress().getAddress().getHostAddress()));
+        activeMutes.removeIf(mute -> mute.getServer() != null && !mute.getServer().equalsIgnoreCase(server));
+
+        //TODO To be checked
+        if (!activeMutes.isEmpty()) {
+            Mute mute = null;
+            boolean isMuted = false;
+
+            for (Mute m : activeMutes) {
+                if (!PunishmentUtils.isExpired(m.getEndDate())) {
+                    isMuted = true;
+
+                    if (mute == null) mute = m;
+                    else if (mute.getServer() == null) mute = m;
+                } else {
+                    m.setUnmuteDate();
+                    muteRepository.save(m);
+                }
+            }
+
+            if (isMuted) {
+                e.setResult(PlayerChatEvent.ChatResult.denied());
+                Text.send(messages.getAndReplace("moderation.mute.reminder",
+                        "staff", mute.getStaff() != null ? mute.getStaff().getUsername() : messages.get("console"),
+                        "server", mute.getServer() != null ? mute.getServer() : messages.get("global"),
+                        "duration", mute.getEndDate() != null ? PunishmentUtils.getDurationString(mute.getEndDate()) : messages.get("permanent"),
+                        "reason", mute.getReason() != null ? mute.getReason() : messages.get("no-reason")
+                ), player);
+                Text.broadcast(messages.getAndReplace("moderation.mute.muted-message-broadcast",
+                        "server", server != null ? server : messages.get("unknown"),
+                        "player", player.getUsername(),
+                        "message", message
+                ), Permission.MUTED_MESSAGE_RECEIVE.get());
+                logger.info("{} tried send a message to chat, but is muted. Message: {}", player.getUsername(), message);
+                return;
+            }
+        }
 
         if (censureUtils.isChatCensorshipEnabled()) {
             CensureUtils.CensureResult result = censureUtils.censure(player, message);

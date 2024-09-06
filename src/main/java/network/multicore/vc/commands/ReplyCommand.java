@@ -5,14 +5,17 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.velocitypowered.api.command.BrigadierCommand;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
-import network.multicore.vc.utils.Cache;
-import network.multicore.vc.utils.CensureUtils;
-import network.multicore.vc.utils.Permission;
-import network.multicore.vc.utils.Text;
+import network.multicore.vc.data.Mute;
+import network.multicore.vc.data.MuteRepository;
+import network.multicore.vc.utils.*;
+
+import java.util.List;
 
 public class ReplyCommand extends AbstractCommand {
     private static final String MESSAGE_ARG = "message";
     private final CensureUtils censureUtils;
+    private final boolean mutePreventPrivateMessages;
+    private final MuteRepository muteRepository;
 
     /**
      * /message <message>
@@ -20,6 +23,8 @@ public class ReplyCommand extends AbstractCommand {
     public ReplyCommand() {
         super("reply");
         this.censureUtils = CensureUtils.get();
+        this.mutePreventPrivateMessages = config.getBoolean("moderation.mute-prevents-private-messages", false);
+        this.muteRepository = plugin.muteRepository();
     }
 
     @Override
@@ -42,7 +47,46 @@ public class ReplyCommand extends AbstractCommand {
             return COMMAND_FAILED;
         }
 
-        // TODO Check for active mutes if set so in the config
+        String senderServer = sender.getCurrentServer().map(server -> server.getServerInfo().getName()).orElse(messages.get("unknown"));
+
+        if (mutePreventPrivateMessages) {
+            List<Mute> activeMutes = muteRepository.findAllActiveByUuid(sender.getUniqueId());
+            activeMutes.addAll(muteRepository.findAllActiveByIp(sender.getRemoteAddress().getAddress().getHostAddress()));
+            activeMutes.removeIf(mute -> mute.getServer() != null && !mute.getServer().equalsIgnoreCase(senderServer));
+
+            //TODO To be checked
+            if (!activeMutes.isEmpty()) {
+                Mute mute = null;
+                boolean isMuted = false;
+
+                for (Mute m : activeMutes) {
+                    if (!PunishmentUtils.isExpired(m.getEndDate())) {
+                        isMuted = true;
+
+                        if (mute == null) mute = m;
+                        else if (mute.getServer() == null) mute = m;
+                    } else {
+                        m.setUnmuteDate();
+                        muteRepository.save(m);
+                    }
+                }
+
+                if (isMuted) {
+                    Text.send(messages.getAndReplace("moderation.mute.reminder",
+                            "staff", mute.getStaff() != null ? mute.getStaff().getUsername() : messages.get("console"),
+                            "server", mute.getServer() != null ? mute.getServer() : messages.get("global"),
+                            "duration", mute.getEndDate() != null ? PunishmentUtils.getDurationString(mute.getEndDate()) : messages.get("permanent"),
+                            "reason", mute.getReason() != null ? mute.getReason() : messages.get("no-reason")
+                    ), sender);
+                    Text.broadcast(messages.getAndReplace("moderation.mute.muted-message-broadcast",
+                            "server", senderServer,
+                            "player", sender.getUsername(),
+                            "message", message
+                    ), Permission.MUTED_MESSAGE_RECEIVE.get());
+                    return COMMAND_SUCCESS;
+                }
+            }
+        }
 
         Player receiver = Cache.get().getMessenger(sender).orElse(null);
         if (receiver == null) {
@@ -64,7 +108,6 @@ public class ReplyCommand extends AbstractCommand {
             }
         }
 
-        String senderServer = sender.getCurrentServer().map(server -> server.getServerInfo().getName()).orElse(messages.get("unknown"));
         String receiverServer = receiver.getCurrentServer().map(server -> server.getServerInfo().getName()).orElse(messages.get("unknown"));
 
         String formattedMessage = messages.getAndReplace("commands.message.message-format",
