@@ -24,7 +24,7 @@ public class BroadcastCommand extends AbstractCommand {
     public void register() {
         if (!config.getBoolean("modules.broadcast", false)) return;
 
-        LiteralArgumentBuilder<CommandSource> broadcastRootNode = BrigadierCommand
+        LiteralArgumentBuilder<CommandSource> node = BrigadierCommand
                 .literalArgumentBuilder(command)
                 .requires(src -> src.hasPermission(Permission.BROADCAST.get()))
                 .then(BrigadierCommand.requiredArgumentBuilder(SERVER_ARG, StringArgumentType.word())
@@ -33,7 +33,7 @@ public class BroadcastCommand extends AbstractCommand {
                                 .executes((ctx) -> execute(ctx.getSource(), ctx.getArgument(SERVER_ARG, String.class), ctx.getArgument(MESSAGE_ARG, String.class)))
                                 .build()));
 
-        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(broadcastRootNode.build()));
+        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(node.build()));
     }
 
     private int execute(CommandSource src, String serverName, String message) {

@@ -15,11 +15,11 @@ public class HelpCommand extends AbstractCommand {
     public void register() {
         if (!config.getBoolean("modules.help", false)) return;
 
-        LiteralArgumentBuilder<CommandSource> helpRootNode = BrigadierCommand
+        LiteralArgumentBuilder<CommandSource> node = BrigadierCommand
                 .literalArgumentBuilder(command)
                 .executes(ctx -> execute(ctx.getSource()));
 
-        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(helpRootNode));
+        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(node));
     }
 
     private int execute(CommandSource src) {

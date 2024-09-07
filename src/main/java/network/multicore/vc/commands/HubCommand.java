@@ -33,7 +33,7 @@ public class HubCommand extends AbstractCommand {
     public void register() {
         if (!config.getBoolean("modules.hub", false)) return;
 
-        LiteralArgumentBuilder<CommandSource> hubRootNode = BrigadierCommand
+        LiteralArgumentBuilder<CommandSource> rootNode = BrigadierCommand
                 .literalArgumentBuilder(command)
                 .requires(src -> src.hasPermission(Permission.HUB.get()))
                 .executes(ctx -> execute(ctx.getSource(), null));
@@ -44,9 +44,9 @@ public class HubCommand extends AbstractCommand {
                 .suggests(new PlayerSuggestionProvider<>(proxy, PLAYER_ARG, "all", "current"))
                 .executes(ctx -> execute(ctx.getSource(), ctx.getArgument(PLAYER_ARG, String.class)));
 
-        hubRootNode.then(playerNode);
+        rootNode.then(playerNode);
 
-        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(hubRootNode.build()));
+        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(rootNode.build()));
     }
 
     private int execute(CommandSource src, String targetName) {

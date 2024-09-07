@@ -33,11 +33,51 @@ public class MessageCommand extends AbstractCommand {
         this.muteRepository = plugin.muteRepository();
     }
 
+    public static void sendSocialspy(String senderServer, Player sender, String receiverServer, Player receiver, String message) {
+        VelocityCompact plugin = VelocityCompact.getInstance();
+
+        boolean ssIsWhitelist = plugin.config().getBoolean("socialspy.list-is-whitelist", false);
+        Set<String> ssServerList = plugin.config()
+                .getStringList("commandspy.server-list")
+                .stream()
+                .map(String::toLowerCase)
+                .collect(Collectors.toSet());
+        Set<String> ssPlayerBypassList = new HashSet<>(plugin.config().getStringList("socialspy.player-bypass"));
+
+        if (ssPlayerBypassList.contains(sender.getUsername()) || ssPlayerBypassList.contains(receiver.getUsername())) return;
+
+        if (ssIsWhitelist && !ssServerList.contains(senderServer)) return;
+        if (!ssIsWhitelist && ssServerList.contains(senderServer)) return;
+        if (ssIsWhitelist && !ssServerList.contains(receiverServer)) return;
+        if (!ssIsWhitelist && ssServerList.contains(receiverServer)) return;
+
+        new Thread(() -> {
+            List<Player> receivers = plugin.proxy().getAllPlayers()
+                    .stream()
+                    .filter(p -> plugin.userRepository().findById(p.getUniqueId())
+                            .map(user -> user.getSettings().hasSocialspy())
+                            .orElse(false))
+                    .toList();
+
+            if (receivers.isEmpty()) return;
+
+            String broadcast = Messages.get().getAndReplace("common.socialspy-broadcast",
+                    "sender_server", senderServer,
+                    "sender", sender.getUsername(),
+                    "receiver_server", receiverServer,
+                    "receiver", receiver.getUsername(),
+                    "message", message
+            );
+
+            Text.send(broadcast, receivers);
+        }).start();
+    }
+
     @Override
     public void register() {
         if (!config.getBoolean("modules.messages", false)) return;
 
-        LiteralArgumentBuilder<CommandSource> messageRootNode = BrigadierCommand
+        LiteralArgumentBuilder<CommandSource> node = BrigadierCommand
                 .literalArgumentBuilder(command)
                 .requires(ctx -> ctx.hasPermission(Permission.MESSAGE.get()))
                 .then(BrigadierCommand.requiredArgumentBuilder(PLAYER_ARG, StringArgumentType.word())
@@ -46,7 +86,7 @@ public class MessageCommand extends AbstractCommand {
                                 .executes((ctx) -> execute(ctx.getSource(), ctx.getArgument(PLAYER_ARG, String.class), ctx.getArgument(MESSAGE_ARG, String.class)))
                                 .build()));
 
-        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(messageRootNode.build()));
+        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(node.build()));
     }
 
     private int execute(CommandSource src, String receiverName, String message) {
@@ -133,46 +173,6 @@ public class MessageCommand extends AbstractCommand {
         Cache.get().setMessenger(sender, receiver);
 
         return COMMAND_SUCCESS;
-    }
-
-    public static void sendSocialspy(String senderServer, Player sender, String receiverServer, Player receiver, String message) {
-        VelocityCompact plugin = VelocityCompact.getInstance();
-
-        boolean ssIsWhitelist = plugin.config().getBoolean("socialspy.list-is-whitelist", false);
-        Set<String> ssServerList = plugin.config()
-                .getStringList("commandspy.server-list")
-                .stream()
-                .map(String::toLowerCase)
-                .collect(Collectors.toSet());
-        Set<String> ssPlayerBypassList = new HashSet<>(plugin.config().getStringList("socialspy.player-bypass"));
-
-        if (ssPlayerBypassList.contains(sender.getUsername()) || ssPlayerBypassList.contains(receiver.getUsername())) return;
-
-        if (ssIsWhitelist && !ssServerList.contains(senderServer)) return;
-        if (!ssIsWhitelist && ssServerList.contains(senderServer)) return;
-        if (ssIsWhitelist && !ssServerList.contains(receiverServer)) return;
-        if (!ssIsWhitelist && ssServerList.contains(receiverServer)) return;
-
-        new Thread(() -> {
-            List<Player> receivers = plugin.proxy().getAllPlayers()
-                    .stream()
-                    .filter(p -> plugin.userRepository().findById(p.getUniqueId())
-                            .map(user -> user.getSettings().hasSocialspy())
-                            .orElse(false))
-                    .toList();
-
-            if (receivers.isEmpty()) return;
-
-            String broadcast = Messages.get().getAndReplace("common.socialspy-broadcast",
-                    "sender_server", senderServer,
-                    "sender", sender.getUsername(),
-                    "receiver_server", receiverServer,
-                    "receiver", receiver.getUsername(),
-                    "message", message
-            );
-
-            Text.send(broadcast, receivers);
-        }).start();
     }
 
 }

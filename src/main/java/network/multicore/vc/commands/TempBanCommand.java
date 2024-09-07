@@ -16,7 +16,6 @@ import network.multicore.vc.utils.suggestions.PlayerSuggestionProvider;
 import network.multicore.vc.utils.suggestions.ServerSuggestionProvider;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,7 +36,7 @@ public class TempBanCommand extends AbstractCommand {
     public void register() {
         if (!config.getBoolean("modules.moderation", false)) return;
 
-        LiteralArgumentBuilder<CommandSource> tempbanRootNode = BrigadierCommand
+        LiteralArgumentBuilder<CommandSource> node = BrigadierCommand
                 .literalArgumentBuilder(command)
                 .requires(src -> src.hasPermission(Permission.BAN.get()))
                 .then(BrigadierCommand.requiredArgumentBuilder(PLAYER_ARG, StringArgumentType.word())
@@ -60,7 +59,7 @@ public class TempBanCommand extends AbstractCommand {
                                                         ctx.getArgument(REASON_ARG, String.class)))
                                                 .build()))));
 
-        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(tempbanRootNode.build()));
+        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(node.build()));
     }
 
     private int execute(CommandSource src, String targetName, String serverName, String duration, String reason) {
@@ -107,12 +106,12 @@ public class TempBanCommand extends AbstractCommand {
 
         List<Ban> activeBans = plugin.banRepository().findAllActiveByUsername(targetName);
         if (!activeBans.isEmpty()) ModerationUtils.removeExpiredBans(activeBans);
-        
+
         if (activeBans.stream().anyMatch(b -> server.getServerInfo().getName().equals(b.getServer()))) {
             Text.send(messages.getAndReplace("commands.moderation.already-banned-server", "player", targetName), src);
             return COMMAND_FAILED;
         }
-        
+
         if (activeBans.stream().anyMatch(b -> b.getServer() == null)) {
             Text.send(messages.get("commands.moderation.already-banned-global"), src);
             return COMMAND_FAILED;
@@ -161,7 +160,7 @@ public class TempBanCommand extends AbstractCommand {
             }
         }
 
-        ModerationUtils.broadcast(targetName, src, server, end, reason != null ? reason : messages.get("no-reason"), silent, console, Permission.PUNISHMENT_RECEIVE_BAN, "ban");
+        ModerationUtils.broadcast(targetName, src, server, end, reason, silent, console, Permission.PUNISHMENT_RECEIVE_BAN, "ban");
 
         return COMMAND_SUCCESS;
     }

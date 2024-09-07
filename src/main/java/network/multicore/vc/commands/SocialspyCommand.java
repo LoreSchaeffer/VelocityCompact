@@ -27,7 +27,7 @@ public class SocialspyCommand extends AbstractCommand {
     public void register() {
         if (!config.getBoolean("modules.socialspy", false)) return;
 
-        LiteralArgumentBuilder<CommandSource> socialspyRootNode = BrigadierCommand
+        LiteralArgumentBuilder<CommandSource> rootNode = BrigadierCommand
                 .literalArgumentBuilder(command)
                 .requires(src -> src.hasPermission(Permission.SOCIALSPY.get()))
                 .executes(ctx -> execute(ctx.getSource(), "toggle", null));
@@ -45,9 +45,9 @@ public class SocialspyCommand extends AbstractCommand {
                 .executes(ctx -> execute(ctx.getSource(), ctx.getArgument(MODE_ARG, String.class), ctx.getArgument(PLAYER_ARG, String.class)));
 
         modeNode.then(playerNode);
-        socialspyRootNode.then(modeNode);
+        rootNode.then(modeNode);
 
-        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(socialspyRootNode.build()));
+        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(rootNode.build()));
     }
 
     private int execute(CommandSource src, String mode, String targetName) {

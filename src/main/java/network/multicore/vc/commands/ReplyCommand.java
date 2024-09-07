@@ -31,14 +31,14 @@ public class ReplyCommand extends AbstractCommand {
     public void register() {
         if (!config.getBoolean("modules.messages", false)) return;
 
-        LiteralArgumentBuilder<CommandSource> replyRootNode = BrigadierCommand
+        LiteralArgumentBuilder<CommandSource> node = BrigadierCommand
                 .literalArgumentBuilder(command)
                 .requires(ctx -> ctx.hasPermission(Permission.MESSAGE.get()))
                 .then(BrigadierCommand.requiredArgumentBuilder(MESSAGE_ARG, StringArgumentType.greedyString())
                         .executes((ctx) -> execute(ctx.getSource(), ctx.getArgument(MESSAGE_ARG, String.class)))
                         .build());
 
-        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(replyRootNode.build()));
+        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(node.build()));
     }
 
     private int execute(CommandSource src, String message) {

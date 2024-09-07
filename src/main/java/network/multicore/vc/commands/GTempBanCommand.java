@@ -35,9 +35,9 @@ public class GTempBanCommand extends AbstractCommand {
     public void register() {
         if (!config.getBoolean("modules.moderation", false)) return;
 
-        LiteralArgumentBuilder<CommandSource> gtempbanRootNode = BrigadierCommand
+        LiteralArgumentBuilder<CommandSource> node = BrigadierCommand
                 .literalArgumentBuilder(command)
-                .requires(src -> src.hasPermission(Permission.BAN.get()))
+                .requires(src -> src.hasPermission(Permission.GBAN.get()))
                 .then(BrigadierCommand.requiredArgumentBuilder(PLAYER_ARG, StringArgumentType.word())
                         .suggests(new PlayerSuggestionProvider<>(proxy, PLAYER_ARG))
                         .then(BrigadierCommand.requiredArgumentBuilder(DURATION_ARG, StringArgumentType.word())
@@ -54,7 +54,7 @@ public class GTempBanCommand extends AbstractCommand {
                                                 ctx.getArgument(REASON_ARG, String.class)))
                                         .build())));
 
-        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(gtempbanRootNode.build()));
+        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(node.build()));
     }
 
     private int execute(CommandSource src, String targetName, String duration, String reason) {
@@ -122,7 +122,7 @@ public class GTempBanCommand extends AbstractCommand {
             }
         }
 
-        ModerationUtils.broadcast(targetName, src, null, end, reason != null ? reason : messages.get("no-reason"), silent, console, Permission.PUNISHMENT_RECEIVE_BAN, "ban");
+        ModerationUtils.broadcast(targetName, src, null, end, reason, silent, console, Permission.PUNISHMENT_RECEIVE_BAN, "ban");
 
         return COMMAND_SUCCESS;
     }

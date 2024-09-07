@@ -27,7 +27,7 @@ public class GlobalchatCommand extends AbstractCommand {
     public void register() {
         if (!config.getBoolean("modules.globalchat", false)) return;
 
-        LiteralArgumentBuilder<CommandSource> globalchatRootNode = BrigadierCommand
+        LiteralArgumentBuilder<CommandSource> rootNode = BrigadierCommand
                 .literalArgumentBuilder(command)
                 .requires(src -> src.hasPermission(Permission.GLOBALCHAT.get()))
                 .executes(ctx -> execute(ctx.getSource(), "toggle", null));
@@ -45,9 +45,9 @@ public class GlobalchatCommand extends AbstractCommand {
                 .executes(ctx -> execute(ctx.getSource(), ctx.getArgument(MODE_ARG, String.class), ctx.getArgument(PLAYER_ARG, String.class)));
 
         modeNode.then(playerNode);
-        globalchatRootNode.then(modeNode);
+        rootNode.then(modeNode);
 
-        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(globalchatRootNode.build()));
+        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(rootNode.build()));
     }
 
     private int execute(CommandSource src, String mode, String targetName) {

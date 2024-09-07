@@ -33,9 +33,9 @@ public class GTempBanIpCommand extends AbstractCommand {
     public void register() {
         if (!config.getBoolean("modules.moderation", false)) return;
 
-        LiteralArgumentBuilder<CommandSource> tempbanipRootNode = BrigadierCommand
+        LiteralArgumentBuilder<CommandSource> node = BrigadierCommand
                 .literalArgumentBuilder(command)
-                .requires(src -> src.hasPermission(Permission.BAN.get()))
+                .requires(src -> src.hasPermission(Permission.GBAN_IP.get()))
                 .then(BrigadierCommand.requiredArgumentBuilder(PLAYER_ARG, StringArgumentType.word())
                         .suggests(new PlayerSuggestionProvider<>(proxy, PLAYER_ARG))
                         .then(BrigadierCommand.requiredArgumentBuilder(DURATION_ARG, StringArgumentType.word())
@@ -52,7 +52,7 @@ public class GTempBanIpCommand extends AbstractCommand {
                                                 ctx.getArgument(REASON_ARG, String.class)))
                                         .build())));
 
-        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(tempbanipRootNode.build()));
+        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(node.build()));
     }
 
     private int execute(CommandSource src, String targetNameIp, String duration, String reason) {
@@ -128,7 +128,7 @@ public class GTempBanIpCommand extends AbstractCommand {
                 return COMMAND_FAILED;
             }
 
-            ModerationUtils.broadcast(ip, src, null, end, reason != null ? reason : messages.get("no-reason"), silent, console, Permission.PUNISHMENT_RECEIVE_BAN, "ban-ip");
+            ModerationUtils.broadcast(ip, src, null, end, reason, silent, console, Permission.PUNISHMENT_RECEIVE_BAN, "ban-ip");
         } else {
             for (User target : targets) {
                 List<Ban> activeBans = plugin.banRepository().findAllActiveByUsername(target.getUsername());
@@ -175,7 +175,7 @@ public class GTempBanIpCommand extends AbstractCommand {
                     }
                 }
 
-                ModerationUtils.broadcast(target.getUsername(), src, null, end, reason != null ? reason : messages.get("no-reason"), silent, console, Permission.PUNISHMENT_RECEIVE_BAN, "ban-ip");
+                ModerationUtils.broadcast(target.getUsername(), src, null, end, reason, silent, console, Permission.PUNISHMENT_RECEIVE_BAN, "ban-ip");
             }
         }
 

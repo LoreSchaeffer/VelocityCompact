@@ -27,7 +27,7 @@ public class CommandspyCommand extends AbstractCommand {
     public void register() {
         if (!config.getBoolean("modules.commandspy", false)) return;
 
-        LiteralArgumentBuilder<CommandSource> commandspyRootNode = BrigadierCommand
+        LiteralArgumentBuilder<CommandSource> rootNode = BrigadierCommand
                 .literalArgumentBuilder(command)
                 .requires(src -> src.hasPermission(Permission.COMMANDSPY.get()))
                 .executes(ctx -> execute(ctx.getSource(), "toggle", null));
@@ -45,9 +45,9 @@ public class CommandspyCommand extends AbstractCommand {
                 .executes(ctx -> execute(ctx.getSource(), ctx.getArgument(MODE_ARG, String.class), ctx.getArgument(PLAYER_ARG, String.class)));
 
         modeNode.then(playerNode);
-        commandspyRootNode.then(modeNode);
+        rootNode.then(modeNode);
 
-        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(commandspyRootNode.build()));
+        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(rootNode.build()));
     }
 
     private int execute(CommandSource src, String mode, String targetName) {

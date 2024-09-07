@@ -76,6 +76,8 @@ public class VelocityCompact {
     // TODO Missing check for already banned in all ban commands
     // TODO Remove Utils.isOnline(ProxyServer, String) and use ProxyServer.getPlayer(String) with Optional
     // TODO Use ModerationUtils methods to remove expired bans and mutes inside events
+    // TODO Add annotations in data classes
+    // TODO Optimize moderation commands to reduce duplicates
 
     @Inject
     private VelocityCompact(ProxyServer proxy, @DataDirectory Path dataDirectory, Logger logger) {

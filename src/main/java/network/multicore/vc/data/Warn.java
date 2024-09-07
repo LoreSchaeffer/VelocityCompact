@@ -13,30 +13,18 @@ public class Warn {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private UUID uuid;
-    private String ip;
     @ManyToOne
     @JoinColumn(name = "staff", referencedColumnName = "uuid")
     private User staff;
     private String reason;
-    private String server;
     @Column(nullable = false)
     private Date date;
 
-    public Warn(UUID uuid, String ip, User staff, String reason, String server) {
-        this.uuid = uuid;
-        this.ip = ip;
+    public Warn(@NotNull User user, User staff, String reason) {
+        this.uuid = user.getUniqueId();
         this.staff = staff;
         this.reason = reason;
-        this.server = server;
         this.date = new Date();
-    }
-
-    public Warn(@NotNull User user, User staff, String reason, String server) {
-        this(user.getUniqueId(), null, staff, reason, server);
-    }
-
-    public Warn(@NotNull String ip, User staff, String reason, String server) {
-        this(null, ip, staff, reason, server);
     }
 
     protected Warn() {
@@ -51,11 +39,6 @@ public class Warn {
     }
 
     @Nullable
-    public String getIp() {
-        return ip;
-    }
-
-    @Nullable
     public User getStaff() {
         return staff;
     }
@@ -63,11 +46,6 @@ public class Warn {
     @Nullable
     public String getReason() {
         return reason;
-    }
-
-    @Nullable
-    public String getServer() {
-        return server;
     }
 
     public Date getDate() {

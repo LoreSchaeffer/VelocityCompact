@@ -7,7 +7,7 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import network.multicore.vc.data.Ban;
+import network.multicore.vc.data.Kick;
 import network.multicore.vc.data.User;
 import network.multicore.vc.utils.*;
 import network.multicore.vc.utils.suggestions.CustomSuggestionProvider;
@@ -17,16 +17,16 @@ import network.multicore.vc.utils.suggestions.ServerSuggestionProvider;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class BanIpCommand extends AbstractCommand {
+public class KickIpCommand extends AbstractCommand {
     private static final String PLAYER_ARG = "player";
     private static final String SERVER_ARG = "server";
     private static final String REASON_ARG = "reason";
 
     /**
-     * /banip <player|ip> <server> [reason]
+     * /kickip <player|ip> <server> [reason]
      */
-    public BanIpCommand() {
-        super("banip");
+    public KickIpCommand() {
+        super("kick");
     }
 
     @Override
@@ -35,7 +35,7 @@ public class BanIpCommand extends AbstractCommand {
 
         LiteralArgumentBuilder<CommandSource> node = BrigadierCommand
                 .literalArgumentBuilder(command)
-                .requires(src -> src.hasPermission(Permission.BAN_IP.get()) && src.hasPermission(Permission.BAN_PERMANENT.get()))
+                .requires(src -> src.hasPermission(Permission.KICK.get()))
                 .then(BrigadierCommand.requiredArgumentBuilder(PLAYER_ARG, StringArgumentType.word())
                         .suggests(new PlayerSuggestionProvider<>(proxy, PLAYER_ARG))
                         .then(BrigadierCommand.requiredArgumentBuilder(SERVER_ARG, StringArgumentType.word())
@@ -45,7 +45,7 @@ public class BanIpCommand extends AbstractCommand {
                                         ctx.getArgument(SERVER_ARG, String.class),
                                         null))
                                 .then(BrigadierCommand.requiredArgumentBuilder(REASON_ARG, StringArgumentType.greedyString())
-                                        .suggests(new CustomSuggestionProvider<>(REASON_ARG, config.getStringList("moderation.reason-suggestions.ban")))
+                                        .suggests(new CustomSuggestionProvider<>(REASON_ARG, config.getStringList("moderation.reason-suggestions.kick")))
                                         .executes((ctx) -> execute(ctx.getSource(),
                                                 ctx.getArgument(PLAYER_ARG, String.class),
                                                 ctx.getArgument(SERVER_ARG, String.class),
@@ -96,95 +96,68 @@ public class BanIpCommand extends AbstractCommand {
             }
         }
 
-        List<User> targets = plugin.userRepository().findAllByIp(ip);
+        String finalIp = ip;
+        List<Player> targets = server.getPlayersConnected()
+                .stream()
+                .filter(p -> p.getRemoteAddress().getHostString().equals(finalIp))
+                .toList();
 
-        boolean bypass = targets.stream().anyMatch(u -> config.getStringList("moderation.bypass.ban")
+        boolean bypass = targets.stream().anyMatch(p -> config.getStringList("moderation.bypass.kick")
                 .stream()
                 .map(String::toLowerCase)
                 .collect(Collectors.toSet())
-                .contains(u.getUsername())
+                .contains(p.getUsername())
         );
         if (bypass) {
-            Text.send(messages.get("commands.moderation.ban-ip-not-allowed"), src);
+            Text.send(messages.get("commands.moderation.kick-not-allowed"), src);
             return COMMAND_FAILED;
         }
 
-        if (src instanceof Player player && targets.stream().anyMatch(u -> u.getUniqueId().equals(player.getUniqueId()))) {
+        if (src instanceof Player player && targets.stream().anyMatch(p -> p.getUniqueId().equals(player.getUniqueId()))) {
             Text.send(messages.get("commands.moderation.punish-yourself"), src);
             return COMMAND_FAILED;
         }
 
-        Ban ban = new Ban(ip, staff, reason, server.getServerInfo().getName(), null);
-        plugin.banRepository().save(ban);
-
         if (targets.isEmpty()) {
-            List<Ban> activeBans = plugin.banRepository().findAllActiveByIp(ip);
-            if (!activeBans.isEmpty()) ModerationUtils.removeExpiredBans(activeBans);
+            Text.send(messages.get("commands.moderation.none-to-be-kicked"), src);
+            return COMMAND_FAILED;
+        }
 
-            if (activeBans.stream().anyMatch(b -> server.getServerInfo().getName().equals(b.getServer()))) {
-                Text.send(messages.getAndReplace("commands.moderation.already-banned-server", "player", targetNameIp), src);
-                return COMMAND_FAILED;
-            }
+        for (Player target : targets) {
+            Kick kick = new Kick(target, ip, staff, reason, server.getServerInfo().getName());
+            plugin.kickRepository().save(kick);
 
-            if (activeBans.stream().anyMatch(b -> b.getServer() == null)) {
-                Text.send(messages.get("commands.moderation.already-banned-global"), src);
-                return COMMAND_FAILED;
-            }
-
-            ModerationUtils.broadcast(ip, src, server, null, reason, silent, console, Permission.PUNISHMENT_RECEIVE_BAN, "ban-ip");
-        } else {
-            for (User target : targets) {
-                List<Ban> activeBans = plugin.banRepository().findAllActiveByUsername(target.getUsername());
-                if (!activeBans.isEmpty()) ModerationUtils.removeExpiredBans(activeBans);
-
-                if (activeBans.stream().anyMatch(b -> server.getServerInfo().getName().equals(b.getServer()))) {
-                    Text.send(messages.getAndReplace("commands.moderation.already-banned-server", "player", target.getUsername()), src);
-                    continue;
-                }
-
-                if (activeBans.stream().anyMatch(b -> b.getServer() == null)) {
-                    Text.send(messages.get("commands.moderation.already-banned-global"), src);
-                    continue;
-                }
-
-                if (Utils.isOnline(server, target.getUniqueId())) {
-                    Player player = proxy.getPlayer(target.getUniqueId()).get();
-
-                    if (Utils.isFallbackServer(player.getCurrentServer().map(ServerConnection::getServer).orElse(null))) {
-                        player.disconnect(Text.deserialize(messages.getAndReplace("moderation.disconnect.ban-ip",
+            if (Utils.isFallbackServer(target.getCurrentServer().map(ServerConnection::getServer).orElse(null))) {
+                target.disconnect(Text.deserialize(messages.getAndReplace("moderation.disconnect.kick",
+                        "player", targetNameIp,
+                        "staff", console ? messages.get("console") : src,
+                        "server", server.getServerInfo().getName(),
+                        "duration", messages.get("permanent"),
+                        "reason", kick.getReason() != null ? kick.getReason() : messages.get("no-reason")
+                )));
+            } else {
+                FallbackConnection connection = new FallbackConnection(target);
+                connection.connect().whenComplete((result, throwable) -> {
+                    if (throwable != null || !result.isSuccessful()) {
+                        target.disconnect(Text.deserialize(messages.getAndReplace("moderation.disconnect.kick",
                                 "player", targetNameIp,
-                                "ip", ban.getIp(),
                                 "staff", console ? messages.get("console") : src,
                                 "server", server.getServerInfo().getName(),
                                 "duration", messages.get("permanent"),
-                                "reason", ban.getReason() != null ? ban.getReason() : messages.get("no-reason")
+                                "reason", kick.getReason() != null ? kick.getReason() : messages.get("no-reason")
                         )));
                     } else {
-                        FallbackConnection connection = new FallbackConnection(player);
-                        connection.connect().whenComplete((result, throwable) -> {
-                            if (throwable != null || !result.isSuccessful()) {
-                                player.disconnect(Text.deserialize(messages.getAndReplace("moderation.disconnect.ban-ip",
-                                        "player", targetNameIp,
-                                        "ip", ban.getIp(),
-                                        "staff", console ? messages.get("console") : src,
-                                        "server", server.getServerInfo().getName(),
-                                        "duration", messages.get("permanent"),
-                                        "reason", ban.getReason() != null ? ban.getReason() : messages.get("no-reason")
-                                )));
-                            } else {
-                                Text.send(messages.getAndReplace("moderation.target-message.ban-ip",
-                                        "staff", console ? messages.get("console") : src,
-                                        "server", server.getServerInfo().getName(),
-                                        "duration", messages.get("permanent"),
-                                        "reason", ban.getReason() != null ? ban.getReason() : messages.get("no-reason")
-                                ), player);
-                            }
-                        });
+                        Text.send(messages.getAndReplace("moderation.target-message.kick",
+                                "staff", console ? messages.get("console") : src,
+                                "server", server.getServerInfo().getName(),
+                                "duration", messages.get("permanent"),
+                                "reason", kick.getReason() != null ? kick.getReason() : messages.get("no-reason")
+                        ), target);
                     }
-                }
-
-                ModerationUtils.broadcast(target.getUsername(), src, server, null, reason, silent, console, Permission.PUNISHMENT_RECEIVE_BAN, "ban-ip");
+                });
             }
+
+            ModerationUtils.broadcast(targetNameIp, src, server, null, reason, silent, console, Permission.PUNISHMENT_RECEIVE_KICK, "kick-ip");
         }
 
         return COMMAND_SUCCESS;

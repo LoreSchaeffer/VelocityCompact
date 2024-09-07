@@ -1,5 +1,6 @@
 package network.multicore.vc.data;
 
+import com.velocitypowered.api.proxy.Player;
 import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,6 +14,7 @@ public class Kick {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private UUID uuid;
+    private String username;
     private String ip;
     @ManyToOne
     @JoinColumn(name = "staff", referencedColumnName = "uuid")
@@ -22,8 +24,9 @@ public class Kick {
     @Column(nullable = false)
     private Date date;
 
-    public Kick(UUID uuid, String ip, User staff, String reason, String server) {
+    public Kick(UUID uuid, String username, String ip, User staff, String reason, String server) {
         this.uuid = uuid;
+        this.username = username;
         this.ip = ip;
         this.staff = staff;
         this.reason = reason;
@@ -31,12 +34,12 @@ public class Kick {
         this.date = new Date();
     }
 
-    public Kick(@NotNull User user, User staff, String reason, String server) {
-        this(user.getUniqueId(), null, staff, reason, server);
+    public Kick(@NotNull Player player, User staff, String reason, String server) {
+        this(player.getUniqueId(), player.getUsername(), null, staff, reason, server);
     }
 
-    public Kick(@NotNull String ip, User staff, String reason, String server) {
-        this(null, ip, staff, reason, server);
+    public Kick(@NotNull Player player, String ip, User staff, String reason, String server) {
+        this(player.getUniqueId(), player.getUsername(), ip, staff, reason, server);
     }
 
     protected Kick() {
@@ -48,6 +51,10 @@ public class Kick {
 
     public UUID getUniqueId() {
         return uuid;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     @Nullable

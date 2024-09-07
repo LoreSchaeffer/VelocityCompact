@@ -67,6 +67,7 @@ commands:
   moderation:
     punish-yourself: '<red>You cannot punish yourself!'
     reason-needed: '<red>You must provide a reason for this action!'
+    none-to-be-kicked: '<red>There are no players to be kicked!'
     ban-not-allowed: '<red>You can''t ban this player!'
     ban-ip-not-allowed: '<red>You can''t ban this ip. A player with this ip cannot be banned!'
     kick-not-allowed: '<red>You can''t kick this player!'
