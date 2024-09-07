@@ -24,4 +24,10 @@ public class BanRepository extends EntityRepository<Ban, Long> {
                 .setParameter("uuid", uuid.toString())
                 .getResultList();
     }
+
+    public List<Ban> findAllActiveByUsername(String username) {
+        return entityManager.createQuery("SELECT b FROM Ban b WHERE b.username = :username AND b.unbanDate IS NULL", Ban.class)
+                .setParameter("username", username)
+                .getResultList();
+    }
 }

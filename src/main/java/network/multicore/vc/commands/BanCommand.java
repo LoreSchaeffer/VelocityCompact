@@ -11,70 +11,55 @@ import network.multicore.vc.data.Ban;
 import network.multicore.vc.data.User;
 import network.multicore.vc.utils.*;
 import network.multicore.vc.utils.suggestions.CustomSuggestionProvider;
-import network.multicore.vc.utils.suggestions.DurationSuggestionProvider;
 import network.multicore.vc.utils.suggestions.PlayerSuggestionProvider;
 import network.multicore.vc.utils.suggestions.ServerSuggestionProvider;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TempBanCommand extends AbstractCommand {
+public class BanCommand extends AbstractCommand {
     private static final String PLAYER_ARG = "player";
     private static final String SERVER_ARG = "server";
-    private static final String DURATION_ARG = "duration";
     private static final String REASON_ARG = "reason";
 
     /**
-     * /tempban <player> <server> <duration> [reason]
+     * /ban <player> <server> [reason]
      */
-    public TempBanCommand() {
-        super("tempban");
+    public BanCommand() {
+        super("ban");
     }
 
     @Override
     public void register() {
         if (!config.getBoolean("modules.moderation", false)) return;
 
-        LiteralArgumentBuilder<CommandSource> tempbanRootNode = BrigadierCommand
+        LiteralArgumentBuilder<CommandSource> banRootNode = BrigadierCommand
                 .literalArgumentBuilder(command)
                 .requires(src -> src.hasPermission(Permission.BAN.get()))
                 .then(BrigadierCommand.requiredArgumentBuilder(PLAYER_ARG, StringArgumentType.word())
                         .suggests(new PlayerSuggestionProvider<>(proxy, PLAYER_ARG))
                         .then(BrigadierCommand.requiredArgumentBuilder(SERVER_ARG, StringArgumentType.word())
                                 .suggests(new ServerSuggestionProvider<>(proxy, SERVER_ARG))
-                                .then(BrigadierCommand.requiredArgumentBuilder(DURATION_ARG, StringArgumentType.word())
-                                        .suggests(new DurationSuggestionProvider<>(DURATION_ARG))
+                                .executes((ctx) -> execute(ctx.getSource(),
+                                        ctx.getArgument(PLAYER_ARG, String.class),
+                                        ctx.getArgument(SERVER_ARG, String.class),
+                                        null))
+                                .then(BrigadierCommand.requiredArgumentBuilder(REASON_ARG, StringArgumentType.greedyString())
+                                        .suggests(new CustomSuggestionProvider<>(REASON_ARG, config.getStringList("moderation.reason-suggestions.ban")))
                                         .executes((ctx) -> execute(ctx.getSource(),
                                                 ctx.getArgument(PLAYER_ARG, String.class),
                                                 ctx.getArgument(SERVER_ARG, String.class),
-                                                ctx.getArgument(DURATION_ARG, String.class),
-                                                null))
-                                        .then(BrigadierCommand.requiredArgumentBuilder(REASON_ARG, StringArgumentType.greedyString())
-                                                .suggests(new CustomSuggestionProvider<>(REASON_ARG, config.getStringList("moderation.reason-suggestions.ban")))
-                                                .executes((ctx) -> execute(ctx.getSource(),
-                                                        ctx.getArgument(PLAYER_ARG, String.class),
-                                                        ctx.getArgument(SERVER_ARG, String.class),
-                                                        ctx.getArgument(DURATION_ARG, String.class),
-                                                        ctx.getArgument(REASON_ARG, String.class)))
-                                                .build()))));
+                                                ctx.getArgument(REASON_ARG, String.class)))
+                                        .build())));
 
-        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(tempbanRootNode.build()));
+        proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(banRootNode.build()));
     }
 
-    private int execute(CommandSource src, String targetName, String serverName, String duration, String reason) {
+    private int execute(CommandSource src, String targetName, String serverName, String reason) {
         RegisteredServer server = proxy.getServer(serverName).orElse(null);
         if (server == null) {
             Text.send(messages.get("commands.generic.server-not-found"), src);
-            return COMMAND_FAILED;
-        }
-
-        Date end;
-        try {
-            end = ModerationUtils.parseDurationString(duration);
-        } catch (IllegalArgumentException e) {
-            Text.send(messages.get("commands.generic.invalid-duration"), src);
             return COMMAND_FAILED;
         }
 
@@ -107,12 +92,12 @@ public class TempBanCommand extends AbstractCommand {
 
         List<Ban> activeBans = plugin.banRepository().findAllActiveByUsername(targetName);
         if (!activeBans.isEmpty()) ModerationUtils.removeExpiredBans(activeBans);
-        
+
         if (activeBans.stream().anyMatch(b -> server.getServerInfo().getName().equals(b.getServer()))) {
             Text.send(messages.getAndReplace("commands.moderation.already-banned-server", "player", targetName), src);
             return COMMAND_FAILED;
         }
-        
+
         if (activeBans.stream().anyMatch(b -> b.getServer() == null)) {
             Text.send(messages.get("commands.moderation.already-banned-global"), src);
             return COMMAND_FAILED;
@@ -120,10 +105,10 @@ public class TempBanCommand extends AbstractCommand {
 
         User user = plugin.userRepository().findByUsername(targetName).orElse(null);
         if (user == null) {
-            Ban ban = new Ban(null, targetName, null, staff, reason, server.getServerInfo().getName(), end);
+            Ban ban = new Ban(null, targetName, null, staff, reason, server.getServerInfo().getName(), null);
             plugin.banRepository().save(ban);
         } else {
-            Ban ban = new Ban(user, staff, reason, server.getServerInfo().getName(), end);
+            Ban ban = new Ban(user, staff, reason, server.getServerInfo().getName(), null);
             plugin.banRepository().save(ban);
 
             if (Utils.isOnline(server, user.getUniqueId())) {
@@ -134,7 +119,7 @@ public class TempBanCommand extends AbstractCommand {
                             "player", targetName,
                             "staff", console ? messages.get("console") : src,
                             "server", server.getServerInfo().getName(),
-                            "duration", ModerationUtils.getDurationString(end),
+                            "duration", messages.get("permanent"),
                             "reason", ban.getReason() != null ? ban.getReason() : messages.get("no-reason")
                     )));
                 } else {
@@ -145,14 +130,14 @@ public class TempBanCommand extends AbstractCommand {
                                     "player", targetName,
                                     "staff", console ? messages.get("console") : src,
                                     "server", server.getServerInfo().getName(),
-                                    "duration", ModerationUtils.getDurationString(end),
+                                    "duration", messages.get("permanent"),
                                     "reason", ban.getReason() != null ? ban.getReason() : messages.get("no-reason")
                             )));
                         } else {
                             Text.send(messages.getAndReplace("moderation.target-message.ban",
                                     "staff", console ? messages.get("console") : src,
                                     "server", server.getServerInfo().getName(),
-                                    "duration", ModerationUtils.getDurationString(end),
+                                    "duration", messages.get("permanent"),
                                     "reason", ban.getReason() != null ? ban.getReason() : messages.get("no-reason")
                             ), target);
                         }
@@ -161,7 +146,7 @@ public class TempBanCommand extends AbstractCommand {
             }
         }
 
-        ModerationUtils.broadcast(targetName, src, server, end, reason != null ? reason : messages.get("no-reason"), silent, console, Permission.PUNISHMENT_RECEIVE_BAN, "ban");
+        ModerationUtils.broadcast(targetName, src, server, null, reason != null ? reason : messages.get("no-reason"), silent, console, Permission.PUNISHMENT_RECEIVE_BAN, "ban");
 
         return COMMAND_SUCCESS;
     }

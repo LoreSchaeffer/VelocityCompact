@@ -72,9 +72,10 @@ public class VelocityCompact {
 
     // TODO Check if argument exists before passing to execute
     // TODO Check duration suggestions
-    // TODO The data structure doesn't allow ban of users that never joined the proxy
-    // TODO The data structure doesn't allow ip bans
     // TODO Remove hub server from config and use velocity config
+    // TODO Missing check for already banned in all ban commands
+    // TODO Remove Utils.isOnline(ProxyServer, String) and use ProxyServer.getPlayer(String) with Optional
+    // TODO Use ModerationUtils methods to remove expired bans and mutes inside events
 
     @Inject
     private VelocityCompact(ProxyServer proxy, @DataDirectory Path dataDirectory, Logger logger) {

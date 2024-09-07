@@ -60,7 +60,7 @@ public class ReplyCommand extends AbstractCommand {
                 boolean isMuted = false;
 
                 for (Mute m : activeMutes) {
-                    if (!PunishmentUtils.isExpired(m.getEndDate())) {
+                    if (!ModerationUtils.isExpired(m.getEndDate())) {
                         isMuted = true;
 
                         if (mute == null) mute = m;
@@ -75,7 +75,7 @@ public class ReplyCommand extends AbstractCommand {
                     Text.send(messages.getAndReplace("moderation.mute.reminder",
                             "staff", mute.getStaff() != null ? mute.getStaff().getUsername() : messages.get("console"),
                             "server", mute.getServer() != null ? mute.getServer() : messages.get("global"),
-                            "duration", mute.getEndDate() != null ? PunishmentUtils.getDurationString(mute.getEndDate()) : messages.get("permanent"),
+                            "duration", mute.getEndDate() != null ? ModerationUtils.getDurationString(mute.getEndDate()) : messages.get("permanent"),
                             "reason", mute.getReason() != null ? mute.getReason() : messages.get("no-reason")
                     ), sender);
                     Text.broadcast(messages.getAndReplace("moderation.mute.muted-message-broadcast",
