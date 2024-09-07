@@ -33,7 +33,7 @@ public class GBanIpCommand extends AbstractCommand {
 
         LiteralArgumentBuilder<CommandSource> node = BrigadierCommand
                 .literalArgumentBuilder(command)
-                .requires(src -> src.hasPermission(Permission.GBAN_IP.get()) && src.hasPermission(Permission.BAN_PERMANENT.get()))
+                .requires(src -> src.hasPermission(Permission.GBAN_IP.get()) && src.hasPermission(Permission.GBAN_PERMANENT.get()))
                 .then(BrigadierCommand.requiredArgumentBuilder(PLAYER_ARG, StringArgumentType.word())
                         .suggests(new PlayerSuggestionProvider<>(proxy, PLAYER_ARG))
                         .executes((ctx) -> execute(ctx.getSource(),

@@ -23,4 +23,10 @@ public class MuteRepository extends EntityRepository<Mute, Long> {
                 .setParameter("uuid", uuid.toString())
                 .getResultList();
     }
+
+    public List<Mute> findAllActiveByUsername(String username) {
+        return entityManager.createQuery("SELECT m FROM Mute m WHERE m.username = :username AND m.unmuteDate IS NULL", Mute.class)
+                .setParameter("username", username)
+                .getResultList();
+    }
 }
