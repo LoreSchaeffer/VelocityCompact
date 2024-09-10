@@ -130,7 +130,7 @@ public class UnBanIpCommand extends AbstractCommand {
         targets.forEach(target -> {
             Optional<Player> p = proxy.getPlayer(target.getUniqueId());
             p.ifPresent(player -> {
-                Text.send(messages.getAndReplace("moderation.target-message.unban",
+                Text.send(messages.getAndReplace("moderation.target-message.unban-ip",
                         "staff", console ? messages.get("console") : src,
                         "server", server.getServerInfo().getName(),
                         "reason", ban.getReason() != null ? ban.getReason() : messages.get("no-reason")
@@ -138,7 +138,7 @@ public class UnBanIpCommand extends AbstractCommand {
             });
         });
 
-        ModerationUtils.broadcast(targetNameIp, src, server, null, reason, silent, console, Permission.PUNISHMENT_RECEIVE_UNBAN, "unban");
+        ModerationUtils.broadcast(targetNameIp, src, server, null, reason, silent, console, Permission.PUNISHMENT_RECEIVE_UNBAN, "unban-ip");
 
         return COMMAND_SUCCESS;
     }

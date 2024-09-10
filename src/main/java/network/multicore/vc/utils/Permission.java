@@ -48,6 +48,8 @@ public enum Permission {
     GUNMUTE("gunmute"),
     GUNMUTE_IP("gunmute.ip"),
     WARN("warn"),
+    LOOKUP("lookup"),
+    LOOKUP_IP("lookup.ip"),
     PUNISHMENT_RECEIVE_BAN("punishment.receive.ban"),
     PUNISHMENT_RECEIVE_KICK("punishment.receive.kick"),
     PUNISHMENT_RECEIVE_MUTE("punishment.receive.mute"),

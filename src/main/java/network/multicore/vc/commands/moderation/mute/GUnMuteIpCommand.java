@@ -117,7 +117,7 @@ public class GUnMuteIpCommand extends AbstractCommand {
         targets.forEach(target -> {
             Optional<Player> p = proxy.getPlayer(target.getUniqueId());
             p.ifPresent(player -> {
-                Text.send(messages.getAndReplace("moderation.target-message.unmute",
+                Text.send(messages.getAndReplace("moderation.target-message.unmute-ip",
                         "staff", console ? messages.get("console") : src,
                         "server", messages.get("global"),
                         "reason", mute.getReason() != null ? mute.getReason() : messages.get("no-reason")
@@ -125,7 +125,7 @@ public class GUnMuteIpCommand extends AbstractCommand {
             });
         });
 
-        ModerationUtils.broadcast(targetNameIp, src, null, null, reason, silent, console, Permission.PUNISHMENT_RECEIVE_UNMUTE, "unmute");
+        ModerationUtils.broadcast(targetNameIp, src, null, null, reason, silent, console, Permission.PUNISHMENT_RECEIVE_UNMUTE, "unmute-ip");
 
         return COMMAND_SUCCESS;
     }

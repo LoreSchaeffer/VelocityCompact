@@ -29,4 +29,10 @@ public class MuteRepository extends EntityRepository<Mute, Long> {
                 .setParameter("username", username)
                 .getResultList();
     }
+
+    public List<Mute> findAllByUuid(UUID uuid) {
+        return entityManager.createQuery("SELECT m FROM Mute m WHERE m.uuid = :uuid", Mute.class)
+                .setParameter("uuid", uuid.toString())
+                .getResultList();
+    }
 }

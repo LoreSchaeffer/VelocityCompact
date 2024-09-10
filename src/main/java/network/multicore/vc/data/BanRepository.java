@@ -30,4 +30,10 @@ public class BanRepository extends EntityRepository<Ban, Long> {
                 .setParameter("username", username)
                 .getResultList();
     }
+
+    public List<Ban> findAllByUuid(UUID uuid) {
+        return entityManager.createQuery("SELECT b FROM Ban b WHERE b.uuid = :uuid", Ban.class)
+                .setParameter("uuid", uuid.toString())
+                .getResultList();
+    }
 }

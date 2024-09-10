@@ -13,6 +13,7 @@ public class Warn {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private UUID uuid;
+    private String username;
     @ManyToOne
     @JoinColumn(name = "staff", referencedColumnName = "uuid")
     private User staff;
@@ -22,6 +23,7 @@ public class Warn {
 
     public Warn(@NotNull User user, User staff, String reason) {
         this.uuid = user.getUniqueId();
+        this.username = user.getUsername();
         this.staff = staff;
         this.reason = reason;
         this.date = new Date();
@@ -36,6 +38,10 @@ public class Warn {
 
     public UUID getUniqueId() {
         return uuid;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     @Nullable

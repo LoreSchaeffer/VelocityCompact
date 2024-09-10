@@ -126,8 +126,49 @@ moderation:
     kick: [ ]
     mute: [ ]
     warn: [ ]
+  lookup:
+    header: '<blue><st>----<r> <gold>Lookup <yellow>{player} <blue><st>----'
+    footer: '<blue><st>----<r> <gold>Lookup <yellow>{player} <blue><st>----'
+    status-online: '<dark_green><b>Online<r> <gray>on <yellow>{server}'
+    status-offline: '<red><b>Offline'
+    first-login: '<gray>First login<dark_aqua> ● <yellow>{date}'
+    last-login: '<gray>Last login<dark_aqua> ● <yellow>{date}'
+    last-ip: '<gray>Last ip<dark_aqua> ● <yellow>{ip}'
+    uuid: '<gray>UUID<dark_aqua> ● <yellow>{uuid}'
+    punishment-status:
+      title: '<gray>Punishment status'
+      not-banned: '  <dark_green><b>Not banned'
+      banned-server: '  <red><b>Banned<gray> in server <red>{server}'
+      banned-global: '  <red><b>Banned<gray> globally'
+      not-muted: '  <dark_green><b>Not muted'
+      muted: '  <red><b>Muted'
+      order:
+        - ban
+        - mute
+    history:
+      title: '<gray>History'
+      bans: '  <gray>Bans<dark_aqua> ● <yellow>{amount}'
+      kicks: '  <gray>Kicks<dark_aqua> ● <yellow>{amount}'
+      mutes: '  <gray>Mutes<dark_aqua> ● <yellow>{amount}'
+      warns: '  <gray>Warns<dark_aqua> ● <yellow>{amount}'
+      order:
+        - bans
+        - kicks
+        - mutes
+        - warns
+    order:
+      - header
+      - status
+      - first-login
+      - last-login
+      - last-ip
+      - punishment-status
+      - history-status
+      - uuid
+      - footer
 
 time:
+  date-format: 'dd/MM/yyyy HH:mm:ss'
   year:
     singular: 'year'
     plural: 'years'

@@ -1,4 +1,4 @@
-package network.multicore.vc.commands.moderation.warn;
+package network.multicore.vc.commands.moderation;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;

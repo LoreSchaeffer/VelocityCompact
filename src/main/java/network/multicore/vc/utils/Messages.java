@@ -12,6 +12,8 @@ import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -98,5 +100,16 @@ public class Messages {
 
     public String getAndReplace(String route, String target1, Object replacement1, String target2, Object replacement2, String target3, Object replacement3, String target4, Object replacement4, String target5, Object replacement5, String target6, Object replacement6) {
         return getAndReplace(route, new String[]{target1, target2, target3, target4, target5, target6}, new Object[]{replacement1, replacement2, replacement3, replacement4, replacement5, replacement6});
+    }
+
+    public String formatDate(Date date) {
+        SimpleDateFormat format;
+        try {
+            format = new SimpleDateFormat(yaml.getString("time.date-format"));
+        } catch (Throwable t) {
+            format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        }
+
+        return format.format(date);
     }
 }
