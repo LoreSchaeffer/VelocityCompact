@@ -35,7 +35,7 @@ public class GUnBanIpCommand extends AbstractCommand {
 
         LiteralArgumentBuilder<CommandSource> node = BrigadierCommand
                 .literalArgumentBuilder(command)
-                .requires(src -> src.hasPermission(Permission.GUNBAN.get()))
+                .requires(src -> src.hasPermission(Permission.GUNBAN_IP.get()))
                 .then(BrigadierCommand.requiredArgumentBuilder(PLAYER_ARG, StringArgumentType.word())
                         .suggests(new PlayerSuggestionProvider<>(proxy, PLAYER_ARG))
                         .executes((ctx) -> execute(ctx.getSource(),
