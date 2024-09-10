@@ -1,4 +1,4 @@
-package network.multicore.vc.commands;
+package network.multicore.vc.commands.moderation.kick;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -6,27 +6,26 @@ import com.velocitypowered.api.command.BrigadierCommand;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
-import com.velocitypowered.api.proxy.server.RegisteredServer;
+import network.multicore.vc.commands.AbstractCommand;
 import network.multicore.vc.data.Kick;
 import network.multicore.vc.data.User;
 import network.multicore.vc.utils.*;
 import network.multicore.vc.utils.suggestions.CustomSuggestionProvider;
 import network.multicore.vc.utils.suggestions.PlayerSuggestionProvider;
-import network.multicore.vc.utils.suggestions.ServerSuggestionProvider;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class KickIpCommand extends AbstractCommand {
+public class GKickIpCommand extends AbstractCommand {
     private static final String PLAYER_ARG = "player";
     private static final String SERVER_ARG = "server";
     private static final String REASON_ARG = "reason";
 
     /**
-     * /kickip <player|ip> <server> [reason]
+     * /gkickip <player|ip> <server> [reason]
      */
-    public KickIpCommand() {
-        super("kick");
+    public GKickIpCommand() {
+        super("gkick");
     }
 
     @Override
@@ -35,33 +34,23 @@ public class KickIpCommand extends AbstractCommand {
 
         LiteralArgumentBuilder<CommandSource> node = BrigadierCommand
                 .literalArgumentBuilder(command)
-                .requires(src -> src.hasPermission(Permission.KICK.get()))
+                .requires(src -> src.hasPermission(Permission.GKICK.get()))
                 .then(BrigadierCommand.requiredArgumentBuilder(PLAYER_ARG, StringArgumentType.word())
                         .suggests(new PlayerSuggestionProvider<>(proxy, PLAYER_ARG))
-                        .then(BrigadierCommand.requiredArgumentBuilder(SERVER_ARG, StringArgumentType.word())
-                                .suggests(new ServerSuggestionProvider<>(proxy, SERVER_ARG))
+                        .executes((ctx) -> execute(ctx.getSource(),
+                                ctx.getArgument(PLAYER_ARG, String.class),
+                                null))
+                        .then(BrigadierCommand.requiredArgumentBuilder(REASON_ARG, StringArgumentType.greedyString())
+                                .suggests(new CustomSuggestionProvider<>(REASON_ARG, config.getStringList("moderation.reason-suggestions.kick")))
                                 .executes((ctx) -> execute(ctx.getSource(),
                                         ctx.getArgument(PLAYER_ARG, String.class),
-                                        ctx.getArgument(SERVER_ARG, String.class),
-                                        null))
-                                .then(BrigadierCommand.requiredArgumentBuilder(REASON_ARG, StringArgumentType.greedyString())
-                                        .suggests(new CustomSuggestionProvider<>(REASON_ARG, config.getStringList("moderation.reason-suggestions.kick")))
-                                        .executes((ctx) -> execute(ctx.getSource(),
-                                                ctx.getArgument(PLAYER_ARG, String.class),
-                                                ctx.getArgument(SERVER_ARG, String.class),
-                                                ctx.getArgument(REASON_ARG, String.class)))
-                                        .build())));
+                                        ctx.getArgument(REASON_ARG, String.class)))
+                                .build()));
 
         proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(node.build()));
     }
 
-    private int execute(CommandSource src, String targetNameIp, String serverName, String reason) {
-        RegisteredServer server = proxy.getServer(serverName).orElse(null);
-        if (server == null) {
-            Text.send(messages.get("commands.generic.server-not-found"), src);
-            return COMMAND_FAILED;
-        }
-
+    private int execute(CommandSource src, String targetNameIp, String reason) {
         if ((reason == null || reason.isBlank()) && config.getBoolean("moderation.punishment-needs-reason", false)) {
             Text.send(messages.get("commands.moderation.reason-needed"), src);
             return COMMAND_FAILED;
@@ -97,7 +86,7 @@ public class KickIpCommand extends AbstractCommand {
         }
 
         String finalIp = ip;
-        List<Player> targets = server.getPlayersConnected()
+        List<Player> targets = proxy.getAllPlayers()
                 .stream()
                 .filter(p -> p.getRemoteAddress().getHostString().equals(finalIp))
                 .toList();
@@ -124,14 +113,14 @@ public class KickIpCommand extends AbstractCommand {
         }
 
         for (Player target : targets) {
-            Kick kick = new Kick(target, ip, staff, reason, server.getServerInfo().getName());
+            Kick kick = new Kick(target, ip, staff, reason, null);
             plugin.kickRepository().save(kick);
 
             if (Utils.isFallbackServer(target.getCurrentServer().map(ServerConnection::getServer).orElse(null))) {
                 target.disconnect(Text.deserialize(messages.getAndReplace("moderation.disconnect.kick",
                         "player", targetNameIp,
                         "staff", console ? messages.get("console") : src,
-                        "server", server.getServerInfo().getName(),
+                        "server", messages.get("global"),
                         "duration", messages.get("permanent"),
                         "reason", kick.getReason() != null ? kick.getReason() : messages.get("no-reason")
                 )));
@@ -142,14 +131,14 @@ public class KickIpCommand extends AbstractCommand {
                         target.disconnect(Text.deserialize(messages.getAndReplace("moderation.disconnect.kick",
                                 "player", targetNameIp,
                                 "staff", console ? messages.get("console") : src,
-                                "server", server.getServerInfo().getName(),
+                                "server", messages.get("global"),
                                 "duration", messages.get("permanent"),
                                 "reason", kick.getReason() != null ? kick.getReason() : messages.get("no-reason")
                         )));
                     } else {
                         Text.send(messages.getAndReplace("moderation.target-message.kick",
                                 "staff", console ? messages.get("console") : src,
-                                "server", server.getServerInfo().getName(),
+                                "server", messages.get("global"),
                                 "duration", messages.get("permanent"),
                                 "reason", kick.getReason() != null ? kick.getReason() : messages.get("no-reason")
                         ), target);
@@ -157,7 +146,7 @@ public class KickIpCommand extends AbstractCommand {
                 });
             }
 
-            ModerationUtils.broadcast(targetNameIp, src, server, null, reason, silent, console, Permission.PUNISHMENT_RECEIVE_KICK, "kick-ip");
+            ModerationUtils.broadcast(targetNameIp, src, null, null, reason, silent, console, Permission.PUNISHMENT_RECEIVE_KICK, "kick-ip");
         }
 
         return COMMAND_SUCCESS;

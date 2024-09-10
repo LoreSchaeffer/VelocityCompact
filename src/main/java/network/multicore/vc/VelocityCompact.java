@@ -185,10 +185,6 @@ public class VelocityCompact {
         return proxy;
     }
 
-    public File pluginDir() {
-        return pluginDir;
-    }
-
     public YamlDocument config() {
         return config;
     }
@@ -355,6 +351,7 @@ public class VelocityCompact {
     }
 
     private void registerCommands() {
+        // TODO Test if it's really recursive
         Reflections reflections = new Reflections(new ConfigurationBuilder()
                 .forPackage(AbstractCommand.class.getPackageName())
                 .addScanners(Scanners.SubTypes));

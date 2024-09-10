@@ -52,7 +52,9 @@ public enum Permission {
     PUNISHMENT_RECEIVE_KICK("punishment.receive.kick"),
     PUNISHMENT_RECEIVE_MUTE("punishment.receive.mute"),
     PUNISHMENT_RECEIVE_WARN("punishment.receive.warn"),
-    PUNISHMENT_RECEIVE_SILENT("punishment.receive.silent"),
+    PUNISHMENT_RECEIVE_UNBAN("punishment.receive.unban"),
+    PUNISHMENT_RECEIVE_UNMUTE("punishment.receive.unmute"),
+    PUNISHMENT_RECEIVE_SILENT("punishment.receive.silent")
     ;
 
     private final String permission;

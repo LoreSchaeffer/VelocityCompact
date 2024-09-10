@@ -1,4 +1,4 @@
-package network.multicore.vc.commands;
+package network.multicore.vc.commands.moderation.ban;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -7,6 +7,7 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import network.multicore.vc.commands.AbstractCommand;
 import network.multicore.vc.data.Ban;
 import network.multicore.vc.data.User;
 import network.multicore.vc.utils.*;

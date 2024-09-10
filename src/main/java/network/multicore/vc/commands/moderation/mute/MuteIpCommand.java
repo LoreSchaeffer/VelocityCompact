@@ -1,4 +1,4 @@
-package network.multicore.vc.commands;
+package network.multicore.vc.commands.moderation.mute;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -6,6 +6,7 @@ import com.velocitypowered.api.command.BrigadierCommand;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import network.multicore.vc.commands.AbstractCommand;
 import network.multicore.vc.data.Mute;
 import network.multicore.vc.data.User;
 import network.multicore.vc.utils.ModerationUtils;
@@ -16,7 +17,6 @@ import network.multicore.vc.utils.suggestions.CustomSuggestionProvider;
 import network.multicore.vc.utils.suggestions.PlayerSuggestionProvider;
 import network.multicore.vc.utils.suggestions.ServerSuggestionProvider;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;

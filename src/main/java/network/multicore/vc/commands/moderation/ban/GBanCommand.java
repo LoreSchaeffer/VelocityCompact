@@ -1,10 +1,11 @@
-package network.multicore.vc.commands;
+package network.multicore.vc.commands.moderation.ban;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.velocitypowered.api.command.BrigadierCommand;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
+import network.multicore.vc.commands.AbstractCommand;
 import network.multicore.vc.data.Ban;
 import network.multicore.vc.data.User;
 import network.multicore.vc.utils.ModerationUtils;
@@ -12,23 +13,20 @@ import network.multicore.vc.utils.Permission;
 import network.multicore.vc.utils.Text;
 import network.multicore.vc.utils.Utils;
 import network.multicore.vc.utils.suggestions.CustomSuggestionProvider;
-import network.multicore.vc.utils.suggestions.DurationSuggestionProvider;
 import network.multicore.vc.utils.suggestions.PlayerSuggestionProvider;
 
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class GTempBanCommand extends AbstractCommand {
+public class GBanCommand extends AbstractCommand {
     private static final String PLAYER_ARG = "player";
-    private static final String DURATION_ARG = "duration";
     private static final String REASON_ARG = "reason";
 
     /**
-     * /gtempban <player> <duration> [reason]
+     * /gban <player> [reason]
      */
-    public GTempBanCommand() {
-        super("gtempban");
+    public GBanCommand() {
+        super("gban");
     }
 
     @Override
@@ -37,35 +35,23 @@ public class GTempBanCommand extends AbstractCommand {
 
         LiteralArgumentBuilder<CommandSource> node = BrigadierCommand
                 .literalArgumentBuilder(command)
-                .requires(src -> src.hasPermission(Permission.GBAN.get()))
+                .requires(src -> src.hasPermission(Permission.GBAN.get()) && src.hasPermission(Permission.GBAN_PERMANENT.get()))
                 .then(BrigadierCommand.requiredArgumentBuilder(PLAYER_ARG, StringArgumentType.word())
                         .suggests(new PlayerSuggestionProvider<>(proxy, PLAYER_ARG))
-                        .then(BrigadierCommand.requiredArgumentBuilder(DURATION_ARG, StringArgumentType.word())
-                                .suggests(new DurationSuggestionProvider<>(DURATION_ARG))
+                        .executes((ctx) -> execute(ctx.getSource(),
+                                ctx.getArgument(PLAYER_ARG, String.class),
+                                null))
+                        .then(BrigadierCommand.requiredArgumentBuilder(REASON_ARG, StringArgumentType.greedyString())
+                                .suggests(new CustomSuggestionProvider<>(REASON_ARG, config.getStringList("moderation.reason-suggestions.ban")))
                                 .executes((ctx) -> execute(ctx.getSource(),
                                         ctx.getArgument(PLAYER_ARG, String.class),
-                                        ctx.getArgument(DURATION_ARG, String.class),
-                                        null))
-                                .then(BrigadierCommand.requiredArgumentBuilder(REASON_ARG, StringArgumentType.greedyString())
-                                        .suggests(new CustomSuggestionProvider<>(REASON_ARG, config.getStringList("moderation.reason-suggestions.ban")))
-                                        .executes((ctx) -> execute(ctx.getSource(),
-                                                ctx.getArgument(PLAYER_ARG, String.class),
-                                                ctx.getArgument(DURATION_ARG, String.class),
-                                                ctx.getArgument(REASON_ARG, String.class)))
-                                        .build())));
+                                        ctx.getArgument(REASON_ARG, String.class)))
+                                .build()));
 
         proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(node.build()));
     }
 
-    private int execute(CommandSource src, String targetName, String duration, String reason) {
-        Date end;
-        try {
-            end = ModerationUtils.parseDurationString(duration);
-        } catch (IllegalArgumentException e) {
-            Text.send(messages.get("commands.generic.invalid-duration"), src);
-            return COMMAND_FAILED;
-        }
-
+    private int execute(CommandSource src, String targetName, String reason) {
         if ((reason == null || reason.isBlank()) && config.getBoolean("moderation.punishment-needs-reason", false)) {
             Text.send(messages.get("commands.moderation.reason-needed"), src);
             return COMMAND_FAILED;
@@ -103,10 +89,10 @@ public class GTempBanCommand extends AbstractCommand {
 
         User user = plugin.userRepository().findByUsername(targetName).orElse(null);
         if (user == null) {
-            Ban ban = new Ban(null, targetName, null, staff, reason, null, end);
+            Ban ban = new Ban(null, targetName, null, staff, reason, null, null);
             plugin.banRepository().save(ban);
         } else {
-            Ban ban = new Ban(user, staff, reason, null, end);
+            Ban ban = new Ban(user, staff, reason, null, null);
             plugin.banRepository().save(ban);
 
             if (Utils.isOnline(proxy, user.getUniqueId())) {
@@ -116,13 +102,13 @@ public class GTempBanCommand extends AbstractCommand {
                         "player", targetName,
                         "staff", console ? messages.get("console") : src,
                         "server", messages.get("global"),
-                        "duration", ModerationUtils.getDurationString(end),
+                        "duration", messages.get("permanent"),
                         "reason", ban.getReason() != null ? ban.getReason() : messages.get("no-reason")
                 )));
             }
         }
 
-        ModerationUtils.broadcast(targetName, src, null, end, reason, silent, console, Permission.PUNISHMENT_RECEIVE_BAN, "ban");
+        ModerationUtils.broadcast(targetName, src, null, null, reason, silent, console, Permission.PUNISHMENT_RECEIVE_BAN, "ban");
 
         return COMMAND_SUCCESS;
     }
