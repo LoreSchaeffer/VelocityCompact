@@ -11,10 +11,10 @@ import network.multicore.vc.data.Warn;
 import network.multicore.vc.utils.ModerationUtils;
 import network.multicore.vc.utils.Permission;
 import network.multicore.vc.utils.Text;
-import network.multicore.vc.utils.Utils;
 import network.multicore.vc.utils.suggestions.CustomSuggestionProvider;
 import network.multicore.vc.utils.suggestions.PlayerSuggestionProvider;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class WarnCommand extends AbstractCommand {
@@ -79,14 +79,11 @@ public class WarnCommand extends AbstractCommand {
         Warn warn = new Warn(user, staff, reason);
         plugin.warnRepository().save(warn);
 
-        if (Utils.isOnline(proxy, user.getUniqueId())) {
-            Player target = proxy.getPlayer(user.getUniqueId()).get();
-
-            Text.send(messages.getAndReplace("moderation.target-message.warn",
-                    "staff", console ? messages.get("console") : src,
-                    "reason", warn.getReason() != null ? warn.getReason() : messages.get("no-reason")
-            ), target);
-        }
+        Optional<Player> playerOpt = proxy.getPlayer(user.getUniqueId());
+        playerOpt.ifPresent(player -> Text.send(messages.getAndReplace("moderation.target-message.warn",
+                "staff", console ? messages.get("console") : src,
+                "reason", warn.getReason() != null ? warn.getReason() : messages.get("no-reason")
+        ), player));
 
         ModerationUtils.broadcast(targetName, src, null, null, reason, silent, console, Permission.PUNISHMENT_RECEIVE_WARN, "warn");
 

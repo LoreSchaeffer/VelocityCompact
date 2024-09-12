@@ -111,6 +111,8 @@ public class GUnMuteIpCommand extends AbstractCommand {
         }
 
         mute.setUnmuteDate();
+        mute.setUnmuteStaff(staff);
+        mute.setUnmuteReason(reason);
         plugin.muteRepository().save(mute);
 
         List<User> targets = plugin.userRepository().findAllByIp(ip);

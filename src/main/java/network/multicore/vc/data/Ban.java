@@ -22,7 +22,7 @@ public class Ban {
     private String server;
     @Column(nullable = false)
     private Date beginDate;
-    private Date endDate; // TODO Verify - date should be nullable
+    private Date endDate;
     @Column(name = "unban_date")
     private Date unbanDate;
     @ManyToOne
@@ -57,10 +57,12 @@ public class Ban {
         return id;
     }
 
+    @Nullable
     public UUID getUniqueId() {
         return uuid;
     }
 
+    @Nullable
     public String getUsername() {
         return username;
     }

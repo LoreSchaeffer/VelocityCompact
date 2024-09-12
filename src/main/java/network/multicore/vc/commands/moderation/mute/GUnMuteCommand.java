@@ -92,6 +92,8 @@ public class GUnMuteCommand extends AbstractCommand {
         }
 
         mute.setUnmuteDate();
+        mute.setUnmuteStaff(staff);
+        mute.setUnmuteReason(reason);
         plugin.muteRepository().save(mute);
 
         Optional<Player> target = proxy.getPlayer(mute.getUniqueId());

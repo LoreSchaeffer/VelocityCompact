@@ -58,11 +58,6 @@
 
         <!-- Shaded dependencies -->
         <dependency>
-            <groupId>commons-net</groupId>
-            <artifactId>commons-net</artifactId>
-            <version>3.11.1</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-resolver-provider</artifactId>
             <version>3.9.6</version>
@@ -77,18 +72,25 @@
             <artifactId>maven-resolver-transport-http</artifactId>
             <version>1.9.18</version>
         </dependency>
+        <!-- End of shaded dependencies -->
+        <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+            <version>3.11.1</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>dev.dejvokep</groupId>
             <artifactId>boosted-yaml</artifactId>
             <version>1.3.7</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
             <version>0.10.2</version>
+            <scope>provided</scope>
         </dependency>
-        <!-- End of shaded dependencies -->
-
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
@@ -159,18 +161,6 @@
                                 <relocation>
                                     <pattern>org.apache.maven</pattern>
                                     <shadedPattern>network.multicore.vc.maven</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>dev.dejvokep</pattern>
-                                    <shadedPattern>network.multicore.dejvokep</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.reflections</pattern>
-                                    <shadedPattern>network.multicore.reflections</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>commons-net</pattern>
-                                    <shadedPattern>network.multicore.commons-net</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>

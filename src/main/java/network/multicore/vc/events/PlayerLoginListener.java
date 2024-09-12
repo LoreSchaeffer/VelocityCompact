@@ -9,8 +9,8 @@ import network.multicore.vc.data.Ban;
 import network.multicore.vc.data.BanRepository;
 import network.multicore.vc.data.User;
 import network.multicore.vc.data.UserRepository;
-import network.multicore.vc.utils.Permission;
 import network.multicore.vc.utils.ModerationUtils;
+import network.multicore.vc.utils.Permission;
 import network.multicore.vc.utils.Text;
 import org.apache.commons.net.util.SubnetUtils;
 import org.slf4j.Logger;
@@ -21,10 +21,13 @@ import java.util.stream.Collectors;
 public class PlayerLoginListener extends Listener {
     private final boolean ipLimiterEnabled;
     private final boolean sameIpBroadcastEnabled;
+    private final boolean moderationEnabled;
+
     private final int maxConnectionsPerIp;
     private final Set<String> whitelistedIps;
     private final Set<String> whitelistedNicknames;
     private final Set<String> sameIpBroadcastIgnoredPlayers;
+
     private final UserRepository userRepository;
     private final BanRepository banRepository;
     private final Logger logger;
@@ -34,6 +37,8 @@ public class PlayerLoginListener extends Listener {
 
         this.ipLimiterEnabled = config.getBoolean("modules.ip-limiter", false);
         this.sameIpBroadcastEnabled = config.getBoolean("modules.same-ip-broadcast", false);
+        this.moderationEnabled = config.getBoolean("modules.moderation", false);
+
         this.maxConnectionsPerIp = config.getInt("ip-limiter.max-connections", 5);
         this.whitelistedIps = new HashSet<>(config.getStringList("ip-limiter.whitelist.ip-addresses"));
         this.whitelistedNicknames = config.getStringList("ip-limiter.whitelist.nicknames")
@@ -73,7 +78,7 @@ public class PlayerLoginListener extends Listener {
 
         User user = userRepository.findById(e.getPlayer().getUniqueId()).orElse(null);
         if (user == null) {
-            user = userRepository.save(new User(player));
+            userRepository.save(new User(player));
         } else {
             if (!Objects.equals(user.getUsername(), player.getUsername())) user.setUsername(player.getUsername());
 
@@ -84,20 +89,19 @@ public class PlayerLoginListener extends Listener {
 
             userRepository.save(user);
         }
-        cache.addUser(user);
 
-        //TODO Fix this error: Could not resolve attribute 'uuid' of 'network.multicore.vc.data.Ban'
-        List<Ban> activeBans = banRepository.findAllActiveByUuid(player.getUniqueId());
-        if (!activeBans.isEmpty()) {
-            Optional<Ban> banOpt = activeBans.stream()
-                    .filter(ban -> ban.getServer() == null)
-                    .findAny();
+        if (moderationEnabled) {
+            List<Ban> activeBans = banRepository.findAllActiveByUuid(player.getUniqueId());
+            activeBans.addAll(banRepository.findAllActiveByIp(player.getRemoteAddress().getHostString()));
+            ModerationUtils.removeExpiredBans(activeBans);
 
-            if (banOpt.isPresent()) {
-                Ban ban = banOpt.get();
-                boolean isExpired = ModerationUtils.isExpired(ban.getEndDate());
+            if (!activeBans.isEmpty()) {
+                Ban ban = activeBans.stream()
+                        .filter(b -> b.getServer() == null)
+                        .findAny()
+                        .orElse(null);
 
-                if (!isExpired) {
+                if (ban != null) {
                     e.setResult(ResultedEvent.ComponentResult.denied(Text.deserialize(messages.getAndReplace("moderation.disconnect.ban",
                             "staff", ban.getStaff() != null ? ban.getStaff().getUsername() : messages.get("console"),
                             "server", ban.getServer() != null ? ban.getServer() : messages.get("global"),
@@ -107,9 +111,6 @@ public class PlayerLoginListener extends Listener {
                     Text.broadcast(messages.getAndReplace("common.join-attempt-failed-broadcast", "player", player.getUsername(), "reason", messages.get("banned")), Permission.JOIN_ATTEMPT_RECEIVE_BAN.get());
                     logger.info("{} tried to join, but is banned", player.getUsername());
                     return;
-                } else {
-                    ban.setUnbanDate();
-                    banRepository.save(ban);
                 }
             }
         }

@@ -39,41 +39,28 @@ public class PlayerChatListener extends Listener {
 
         List<Mute> activeMutes = muteRepository.findAllActiveByUuid(player.getUniqueId());
         activeMutes.addAll(muteRepository.findAllActiveByIp(player.getRemoteAddress().getAddress().getHostAddress()));
-        activeMutes.removeIf(mute -> mute.getServer() != null && !mute.getServer().equalsIgnoreCase(server));
+        ModerationUtils.removeExpiredMutes(activeMutes);
 
-        //TODO To be checked
         if (!activeMutes.isEmpty()) {
-            Mute mute = null;
-            boolean isMuted = false;
+            Mute mute = activeMutes.stream()
+                    .filter(m -> m.getServer() == null)
+                    .findAny()
+                    .orElse(activeMutes.getFirst());
 
-            for (Mute m : activeMutes) {
-                if (!ModerationUtils.isExpired(m.getEndDate())) {
-                    isMuted = true;
-
-                    if (mute == null) mute = m;
-                    else if (mute.getServer() == null) mute = m;
-                } else {
-                    m.setUnmuteDate();
-                    muteRepository.save(m);
-                }
-            }
-
-            if (isMuted) {
-                e.setResult(PlayerChatEvent.ChatResult.denied());
-                Text.send(messages.getAndReplace("moderation.mute.reminder",
-                        "staff", mute.getStaff() != null ? mute.getStaff().getUsername() : messages.get("console"),
-                        "server", mute.getServer() != null ? mute.getServer() : messages.get("global"),
-                        "duration", mute.getEndDate() != null ? ModerationUtils.getDurationString(mute.getEndDate()) : messages.get("permanent"),
-                        "reason", mute.getReason() != null ? mute.getReason() : messages.get("no-reason")
-                ), player);
-                Text.broadcast(messages.getAndReplace("moderation.mute.muted-message-broadcast",
-                        "server", server != null ? server : messages.get("unknown"),
-                        "player", player.getUsername(),
-                        "message", message
-                ), Permission.MUTED_MESSAGE_RECEIVE.get());
-                logger.info("{} tried send a message to chat, but is muted. Message: {}", player.getUsername(), message);
-                return;
-            }
+            e.setResult(PlayerChatEvent.ChatResult.denied());
+            Text.send(messages.getAndReplace("moderation.mute.reminder",
+                    "staff", mute.getStaff() != null ? mute.getStaff().getUsername() : messages.get("console"),
+                    "server", mute.getServer() != null ? mute.getServer() : messages.get("global"),
+                    "duration", mute.getEndDate() != null ? ModerationUtils.getDurationString(mute.getEndDate()) : messages.get("permanent"),
+                    "reason", mute.getReason() != null ? mute.getReason() : messages.get("no-reason")
+            ), player);
+            Text.broadcast(messages.getAndReplace("moderation.mute.muted-message-broadcast",
+                    "server", server != null ? server : messages.get("unknown"),
+                    "player", player.getUsername(),
+                    "message", message
+            ), Permission.MUTED_MESSAGE_RECEIVE.get());
+            logger.info("{} tried send a message to chat, but is muted. Message: {}", player.getUsername(), message);
+            return;
         }
 
         if (censureUtils.isChatCensorshipEnabled()) {

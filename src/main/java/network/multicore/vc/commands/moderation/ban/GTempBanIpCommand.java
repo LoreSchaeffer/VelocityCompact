@@ -16,6 +16,7 @@ import network.multicore.vc.utils.suggestions.PlayerSuggestionProvider;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class GTempBanIpCommand extends AbstractCommand {
@@ -140,9 +141,8 @@ public class GTempBanIpCommand extends AbstractCommand {
                     continue;
                 }
 
-                if (Utils.isOnline(proxy, target.getUniqueId())) {
-                    Player player = proxy.getPlayer(target.getUniqueId()).get();
-
+                Optional<Player> playerOpt = proxy.getPlayer(target.getUniqueId());
+                playerOpt.ifPresent(player -> {
                     if (Utils.isFallbackServer(player.getCurrentServer().map(ServerConnection::getServer).orElse(null))) {
                         player.disconnect(Text.deserialize(messages.getAndReplace("moderation.disconnect.ban-ip",
                                 "player", targetNameIp,
@@ -174,7 +174,7 @@ public class GTempBanIpCommand extends AbstractCommand {
                             }
                         });
                     }
-                }
+                });
 
                 ModerationUtils.broadcast(target.getUsername(), src, null, end, reason, silent, console, Permission.PUNISHMENT_RECEIVE_BAN, "ban-ip");
             }

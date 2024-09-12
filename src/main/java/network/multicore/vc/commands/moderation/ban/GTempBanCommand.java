@@ -11,13 +11,13 @@ import network.multicore.vc.data.User;
 import network.multicore.vc.utils.ModerationUtils;
 import network.multicore.vc.utils.Permission;
 import network.multicore.vc.utils.Text;
-import network.multicore.vc.utils.Utils;
 import network.multicore.vc.utils.suggestions.CustomSuggestionProvider;
 import network.multicore.vc.utils.suggestions.DurationSuggestionProvider;
 import network.multicore.vc.utils.suggestions.PlayerSuggestionProvider;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class GTempBanCommand extends AbstractCommand {
@@ -110,17 +110,14 @@ public class GTempBanCommand extends AbstractCommand {
             Ban ban = new Ban(user, staff, reason, null, end);
             plugin.banRepository().save(ban);
 
-            if (Utils.isOnline(proxy, user.getUniqueId())) {
-                Player target = proxy.getPlayer(user.getUniqueId()).get();
-
-                target.disconnect(Text.deserialize(messages.getAndReplace("moderation.disconnect.ban",
-                        "player", targetName,
-                        "staff", console ? messages.get("console") : src,
-                        "server", messages.get("global"),
-                        "duration", ModerationUtils.getDurationString(end),
-                        "reason", ban.getReason() != null ? ban.getReason() : messages.get("no-reason")
-                )));
-            }
+            Optional<Player> playerOpt = proxy.getPlayer(user.getUniqueId());
+            playerOpt.ifPresent(player -> player.disconnect(Text.deserialize(messages.getAndReplace("moderation.disconnect.ban",
+                    "player", targetName,
+                    "staff", console ? messages.get("console") : src,
+                    "server", messages.get("global"),
+                    "duration", ModerationUtils.getDurationString(end),
+                    "reason", ban.getReason() != null ? ban.getReason() : messages.get("no-reason")
+            ))));
         }
 
         ModerationUtils.broadcast(targetName, src, null, end, reason, silent, console, Permission.PUNISHMENT_RECEIVE_BAN, "ban");

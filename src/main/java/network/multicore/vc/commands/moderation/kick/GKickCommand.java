@@ -13,6 +13,7 @@ import network.multicore.vc.utils.*;
 import network.multicore.vc.utils.suggestions.CustomSuggestionProvider;
 import network.multicore.vc.utils.suggestions.PlayerSuggestionProvider;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class GKickCommand extends AbstractCommand {
@@ -46,7 +47,8 @@ public class GKickCommand extends AbstractCommand {
     }
 
     private int execute(CommandSource src, String targetName, String reason) {
-        if (!Utils.isOnline(proxy, targetName)) {
+        Optional<Player> targetOpt = proxy.getPlayer(targetName);
+        if (targetOpt.isEmpty()) {
             Text.send(messages.get("commands.generic.player-not-found"), src);
             return COMMAND_FAILED;
         }
@@ -78,7 +80,7 @@ public class GKickCommand extends AbstractCommand {
             return COMMAND_FAILED;
         }
 
-        Player target = proxy.getPlayer(targetName).get();
+        Player target = targetOpt.get();
 
         Kick kick = new Kick(target, staff, reason, null);
         plugin.kickRepository().save(kick);

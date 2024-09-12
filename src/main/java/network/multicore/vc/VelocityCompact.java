@@ -70,14 +70,9 @@ public class VelocityCompact {
     private MuteRepository muteRepository;
     private WarnRepository warnRepository;
 
-    // TODO Check if argument exists before passing to execute
     // TODO Check duration suggestions
-    // TODO Remove hub server from config and use velocity config
-    // TODO Missing check for already banned in all ban commands
-    // TODO Remove Utils.isOnline(ProxyServer, String) and use ProxyServer.getPlayer(String) with Optional
-    // TODO Use ModerationUtils methods to remove expired bans and mutes inside events
-    // TODO Add annotations in data classes
     // TODO Optimize moderation commands to reduce duplicates
+    // TODO Add announcer
 
     @Inject
     private VelocityCompact(ProxyServer proxy, @DataDirectory Path dataDirectory, Logger logger) {
@@ -129,7 +124,7 @@ public class VelocityCompact {
             shutdown();
         }
 
-        Cache.init(this);
+        Cache.get();
         CensureUtils.init(config);
 
         proxy.getEventManager().register(this, new CommandExecuteListener());

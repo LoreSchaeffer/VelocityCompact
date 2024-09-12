@@ -8,15 +8,14 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.ConnectionRequestBuilder;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
-import com.velocitypowered.api.proxy.server.RegisteredServer;
 import network.multicore.vc.utils.FallbackConnection;
 import network.multicore.vc.utils.Permission;
 import network.multicore.vc.utils.Text;
+import network.multicore.vc.utils.Utils;
 import network.multicore.vc.utils.suggestions.PlayerSuggestionProvider;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -50,19 +49,7 @@ public class HubCommand extends AbstractCommand {
     }
 
     private int execute(CommandSource src, String targetName) {
-        String hubName = plugin.config().getString("hub");
-        if (hubName == null || hubName.isEmpty()) {
-            Text.send(messages.get("commands.hub.invalid-hub"), src);
-            return COMMAND_FAILED;
-        }
-
-        RegisteredServer hub = proxy.getServer(hubName).orElse(null);
-        if (hub == null) {
-            Text.send(messages.get("commands.hub.invalid-hub"), src);
-            return COMMAND_FAILED;
-        }
-
-        Set<Player> targets = new HashSet<>();
+        List<Player> targets = new ArrayList<>();
 
         if (targetName == null) {
             if (!(src instanceof Player player)) {
@@ -74,7 +61,7 @@ public class HubCommand extends AbstractCommand {
             if (targetServer == null) {
                 Text.send(messages.get("commands.hub.not-sent-to-hub-player"), src);
                 return COMMAND_FAILED;
-            } else if (targetServer.getServer().equals(hub)) {
+            } else if (Utils.isFallbackServer(targetServer.getServer())) {
                 Text.send(messages.get("commands.hub.already-connected-player"), src);
                 return COMMAND_FAILED;
             }
@@ -86,7 +73,7 @@ public class HubCommand extends AbstractCommand {
                         .stream()
                         .filter(p -> {
                             ServerConnection playerServer = p.getCurrentServer().orElse(null);
-                            return playerServer != null && !playerServer.getServer().equals(hub);
+                            return playerServer != null && !Utils.isFallbackServer(playerServer.getServer());
                         })
                         .toList()
                 );
@@ -105,7 +92,7 @@ public class HubCommand extends AbstractCommand {
                 if (srcServer == null) {
                     Text.send(messages.get("commands.generic.not-connected-self"), src);
                     return COMMAND_FAILED;
-                } else if (srcServer.getServer().equals(hub)) {
+                } else if (Utils.isFallbackServer(srcServer.getServer())) {
                     Text.send(messages.get("commands.hub.already-connected-players"), src);
                     return COMMAND_FAILED;
                 }
@@ -130,7 +117,7 @@ public class HubCommand extends AbstractCommand {
                 if (targetServer == null) {
                     Text.send(messages.get("commands.hub.not-sent-to-hub-player"), src);
                     return COMMAND_FAILED;
-                } else if (targetServer.getServer().equals(hub)) {
+                } else if (Utils.isFallbackServer(targetServer.getServer())) {
                     Text.send(messages.get("commands.hub.already-connected-player"), src);
                     return COMMAND_FAILED;
                 }
@@ -140,22 +127,21 @@ public class HubCommand extends AbstractCommand {
         }
 
         if (targets.size() == 1) {
-            Player target = targets.iterator().next();
-            target.createConnectionRequest(hub)
-                    .connect()
-                    .whenComplete((result, throwable) -> {
-                        if (throwable != null) {
-                            Text.send(messages.getAndReplace("common.internal-exception", "message", throwable.getMessage()), src);
-                            return;
-                        }
+            Player target = targets.getFirst();
+            FallbackConnection connection = new FallbackConnection(target);
+            connection.connect().whenComplete((result, throwable) -> {
+                if (throwable != null) {
+                    Text.send(messages.getAndReplace("common.internal-exception", "message", throwable.getMessage()), src);
+                    return;
+                }
 
-                        if (result.isSuccessful() && !target.equals(src)) {
-                            Text.send(messages.getAndReplace("commands.hub.sent-to-hub-target", "player", src), target);
-                            Text.send(messages.getAndReplace("commands.hub.sent-to-hub-player", "player", target), src);
-                        } else {
-                            Text.send(messages.get("commands.hub.not-sent-to-hub-player"), src);
-                        }
-                    });
+                if (result.isSuccessful() && !target.equals(src)) {
+                    Text.send(messages.getAndReplace("commands.hub.sent-to-hub-target", "player", src), target);
+                    Text.send(messages.getAndReplace("commands.hub.sent-to-hub-player", "player", target), src);
+                } else {
+                    Text.send(messages.get("commands.hub.not-sent-to-hub-player"), src);
+                }
+            });
         } else {
             AtomicInteger successCount = new AtomicInteger();
             AtomicInteger failureCount = new AtomicInteger();

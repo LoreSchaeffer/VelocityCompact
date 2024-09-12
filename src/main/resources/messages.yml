@@ -19,6 +19,7 @@ common:
   nickname-not-allowed: '<red>Your nickname is not allowed on this server!'
   too-many-connections: '<red>There are too many connections to the server with your IP address!'
   join-attempt-failed-broadcast: '<dark_aqua><b>JOIN ATTEMPT<blue> {player}<dark_aqua> ●<aqua> tried to join the proxy but was denied:<yellow> {reason}'
+  join-attempt-failed-broadcast-server: '<dark_aqua><b>JOIN ATTEMPT<blue> {player}<dark_aqua> ●<aqua> tried to join the server {server} but was denied:<yellow> {reason}'
   used-censored-words: '<red>Used censored words!'
 
 commands:
@@ -28,6 +29,7 @@ commands:
     player-not-found: '<red>Player not found!'
     server-not-found: '<red>Server not found!'
     invalid-duration: '<red>The duration you have provided is invalid!'
+    invalid-argument: '<red>Invalid argument! The argument {argument} is invalid!'
   broadcast:
     format: '<dark_red><b>BROADCAST <dark_aqua>● <yellow>{message}'
   commandspy:
@@ -49,7 +51,6 @@ commands:
     already-connected-self: '<red>You are already connected to hub!'
     already-connected-player: '<red>This player is already connected to hub!'
     already-connected-players: '<red>Those players are already connected to hub!'
-    invalid-hub: '<red>The hub server is not set or is invalid in the configuration file!'
     no-player-to-send: '<red>There is no player to send to hub!'
     sent-to-hub-target: '<gold>You have been sent to hub by <yellow>{player}'
     sent-to-hub-player: '<gold>You have sent <yellow>{player}<gold> to hub'
@@ -84,6 +85,13 @@ commands:
     not-banned-server: '<red>This player is not banned on this server!'
     not-muted-global: '<red>This player is not muted globally!'
     not-muted-server: '<red>This player is not muted on this server!'
+  lookup:
+    zero-bans: '<gray>There are no bans for this player.'
+    zero-kicks: '<gray>There are no kicks for this player.'
+    zero-mutes: '<gray>There are no mutes for this player.'
+    zero-warns: '<gray>There are no warns for this player.'
+    invalid-ip: '<red>The ip address you have provided is invalid!'
+    zero-results: '<gray>There are no results for this ip.'
   help:
     messages:
       - '<blue>Contact the staff of the server to get help!'
@@ -165,6 +173,49 @@ moderation:
       - punishment-status
       - history-status
       - uuid
+      - footer
+  punishment-lookup:
+    header: '<blue><st>----<r> <gold>Lookup <yellow>{player}<gold> - <yellow>{punishment} {page}<gold>/<yellow>{total_pages} <blue><st>----'
+    footer: '<blue><st>----<r> <gold>Lookup <yellow>{player}<gold> - <yellow>{punishment} {page}<gold>/<yellow>{total_pages} <blue><st>----'
+    ban-active: '<gray>Date<dark_aqua> ● <yellow>{date} <gray>Staff<dark_aqua> ● <yellow>{staff} <gray>Server<dark_aqua> ● <yellow>{server} <gray>Duration<dark_aqua> ● <yellow>{duration} <gray>Reason<dark_aqua> ● <yellow>{reason}'
+    ban-ended: '<gray>Date<dark_aqua> ● <yellow>{date} <gray>Staff<dark_aqua> ● <yellow>{staff} <gray>Server<dark_aqua> ● <yellow>{server} <gray>Duration<dark_aqua> ● <yellow>{duration} <gray>Reason<dark_aqua> ● <yellow>{reason} <gray>Revoked by<dark_aqua> ● <yellow>{revoked_by} <gray>Revoke date<dark_aqua> ● <yellow>{revoked_date} <gray>Reason<dark_aqua> ● <yellow>{revoked_reason}'
+    kick: '<gray>Date<dark_aqua> ● <yellow>{date} <gray>Staff<dark_aqua> ● <yellow>{staff} <gray>Server<dark_aqua> ● <yellow>{server} <gray>Reason<dark_aqua> ● <yellow>{reason}'
+    mute-active: '<gray>Date<dark_aqua> ● <yellow>{date} <gray>Staff<dark_aqua> ● <yellow>{staff} <gray>Server<dark_aqua> ● <yellow>{server} <gray>Duration<dark_aqua> ● <yellow>{duration} <gray>Reason<dark_aqua> ● <yellow>{reason}'
+    mute-ended: '<gray>Date<dark_aqua> ● <yellow>{date} <gray>Staff<dark_aqua> ● <yellow>{staff} <gray>Server<dark_aqua> ● <yellow>{server} <gray>Duration<dark_aqua> ● <yellow>{duration} <gray>Reason<dark_aqua> ● <yellow>{reason} <gray>Revoked by<dark_aqua> ● <yellow>{revoked_by} <gray>Revoke date<dark_aqua> ● <yellow>{revoked_date} <gray>Reason<dark_aqua> ● <yellow>{revoked_reason}'
+    warn: '<gray>Date<dark_aqua> ● <yellow>{date} <gray>Staff<dark_aqua> ● <yellow>{staff} <gray>Server<dark_aqua> ● <yellow>{server} <gray>Reason<dark_aqua> ● <yellow>{reason}'
+  lookup-ip:
+    header: '<blue><st>----<r> <gold>Lookup <yellow>{ip} <blue><st>----'
+    footer: '<blue><st>----<r> <gold>Lookup <yellow>{ip} <blue><st>----'
+    players-connected: '<gray>Players connected<dark_aqua> ● <gray>[<yellow>{player}<gray>]'
+    players-connected-separator: '<gray>, <yellow>'
+    players-with-this-ip: '<gray>Players with this ip<dark_aqua> ● <gray>[<yellow>{player}<gray>]'
+    players-with-this-ip-separator: '<gray>, <yellow>'
+    punishment-status:
+      title: '<gray>Punishment status'
+      not-banned: '  <dark_green><b>Not banned'
+      banned-server: '  <red><b>Banned<gray> in server <red>{server}'
+      banned-global: '  <red><b>Banned<gray> globally'
+      not-muted: '  <dark_green><b>Not muted'
+      muted: '  <red><b>Muted'
+      order:
+        - ban
+        - mute
+    history:
+      title: '<gray>History'
+      bans: '  <gray>Bans<dark_aqua> ● <yellow>{amount}'
+      kicks: '  <gray>Kicks<dark_aqua> ● <yellow>{amount}'
+      mutes: '  <gray>Mutes<dark_aqua> ● <yellow>{amount}'
+      order:
+        - bans
+        - kicks
+        - mutes
+
+    order:
+      - header
+      - players-connected
+      - players-with-this-ip
+      - punishment-status
+      - history
       - footer
 
 time:

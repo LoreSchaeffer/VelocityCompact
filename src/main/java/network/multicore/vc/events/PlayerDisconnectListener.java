@@ -8,7 +8,6 @@ public class PlayerDisconnectListener extends Listener {
 
     @Subscribe(order = PostOrder.LAST)
     public void onPlayerDisconnect(DisconnectEvent e) {
-
         cache.removeMessenger(e.getPlayer());
     }
 }

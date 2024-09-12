@@ -124,6 +124,8 @@ public class UnBanIpCommand extends AbstractCommand {
         }
 
         ban.setUnbanDate();
+        ban.setUnbanStaff(staff);
+        ban.setUnbanReason(reason);
         plugin.banRepository().save(ban);
 
         List<User> targets = plugin.userRepository().findAllByIp(ip);

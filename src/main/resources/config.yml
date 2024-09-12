@@ -123,9 +123,6 @@ globalchat:
   server-list: [ ]
   list-is-whitelist: false
 
-# Using the command /hub or /lobby you will be sent to the server defined below.
-hub: "hub"
-
 ip-limiter:
   # The maximum number of connections that can be made from the same IP address.
   max-connections: 5

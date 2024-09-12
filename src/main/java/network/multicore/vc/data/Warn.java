@@ -36,10 +36,12 @@ public class Warn {
         return id;
     }
 
+    @Nullable
     public UUID getUniqueId() {
         return uuid;
     }
 
+    @Nullable
     public String getUsername() {
         return username;
     }

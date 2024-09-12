@@ -17,4 +17,10 @@ public class KickRepository extends EntityRepository<Kick, Long> {
                 .setParameter("uuid", uuid)
                 .getResultList();
     }
+
+    public List<Kick> findAllByIp(String ip) {
+        return entityManager.createQuery("SELECT k FROM Kick k WHERE k.ip = :ip", entityClass)
+                .setParameter("ip", ip)
+                .getResultList();
+    }
 }

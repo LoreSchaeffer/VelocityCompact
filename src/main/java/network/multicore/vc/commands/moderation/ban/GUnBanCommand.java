@@ -92,6 +92,8 @@ public class GUnBanCommand extends AbstractCommand {
         }
 
         ban.setUnbanDate();
+        ban.setUnbanStaff(staff);
+        ban.setUnbanReason(reason);
         plugin.banRepository().save(ban);
 
         Optional<Player> target = proxy.getPlayer(ban.getUniqueId());

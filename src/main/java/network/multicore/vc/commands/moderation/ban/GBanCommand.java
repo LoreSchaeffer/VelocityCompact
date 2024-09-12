@@ -11,11 +11,11 @@ import network.multicore.vc.data.User;
 import network.multicore.vc.utils.ModerationUtils;
 import network.multicore.vc.utils.Permission;
 import network.multicore.vc.utils.Text;
-import network.multicore.vc.utils.Utils;
 import network.multicore.vc.utils.suggestions.CustomSuggestionProvider;
 import network.multicore.vc.utils.suggestions.PlayerSuggestionProvider;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class GBanCommand extends AbstractCommand {
@@ -95,17 +95,15 @@ public class GBanCommand extends AbstractCommand {
             Ban ban = new Ban(user, staff, reason, null, null);
             plugin.banRepository().save(ban);
 
-            if (Utils.isOnline(proxy, user.getUniqueId())) {
-                Player target = proxy.getPlayer(user.getUniqueId()).get();
+            Optional<Player> playerOpt = proxy.getPlayer(user.getUniqueId());
+            playerOpt.ifPresent(player -> player.disconnect(Text.deserialize(messages.getAndReplace("moderation.disconnect.ban",
+                    "player", targetName,
+                    "staff", console ? messages.get("console") : src,
+                    "server", messages.get("global"),
+                    "duration", messages.get("permanent"),
+                    "reason", ban.getReason() != null ? ban.getReason() : messages.get("no-reason")
+            ))));
 
-                target.disconnect(Text.deserialize(messages.getAndReplace("moderation.disconnect.ban",
-                        "player", targetName,
-                        "staff", console ? messages.get("console") : src,
-                        "server", messages.get("global"),
-                        "duration", messages.get("permanent"),
-                        "reason", ban.getReason() != null ? ban.getReason() : messages.get("no-reason")
-                )));
-            }
         }
 
         ModerationUtils.broadcast(targetName, src, null, null, reason, silent, console, Permission.PUNISHMENT_RECEIVE_BAN, "ban");
