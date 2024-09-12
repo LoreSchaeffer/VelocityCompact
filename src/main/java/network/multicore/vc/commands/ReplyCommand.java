@@ -12,24 +12,24 @@ import network.multicore.vc.utils.*;
 import java.util.List;
 
 public class ReplyCommand extends AbstractCommand {
-    private static final String MESSAGE_ARG = "message";
+    private static final String MESSAGE_ARG = "lines";
     private final CensureUtils censureUtils;
     private final boolean mutePreventPrivateMessages;
     private final MuteRepository muteRepository;
 
     /**
-     * /message <message>
+     * /lines <lines>
      */
     public ReplyCommand() {
         super("reply");
         this.censureUtils = CensureUtils.get();
-        this.mutePreventPrivateMessages = config.getBoolean("moderation.mute-prevents-private-messages", false) && config.getBoolean("modules.moderation", false);
+        this.mutePreventPrivateMessages = config.getBoolean("moderation.mute-prevents-private-lines", false) && config.getBoolean("modules.moderation", false);
         this.muteRepository = plugin.muteRepository();
     }
 
     @Override
     public void register() {
-        if (!config.getBoolean("modules.messages", false)) return;
+        if (!config.getBoolean("modules.lines", false)) return;
 
         LiteralArgumentBuilder<CommandSource> node = BrigadierCommand
                 .literalArgumentBuilder(command)
@@ -67,10 +67,10 @@ public class ReplyCommand extends AbstractCommand {
                             "duration", mute.getEndDate() != null ? ModerationUtils.getDurationString(mute.getEndDate()) : messages.get("permanent"),
                             "reason", mute.getReason() != null ? mute.getReason() : messages.get("no-reason")
                     ), sender);
-                    Text.broadcast(messages.getAndReplace("moderation.mute.muted-message-broadcast",
+                    Text.broadcast(messages.getAndReplace("moderation.mute.muted-lines-broadcast",
                             "server", senderServer,
                             "player", sender.getUsername(),
-                            "message", message
+                            "lines", message
                     ), Permission.MUTED_MESSAGE_RECEIVE.get());
                     return COMMAND_SUCCESS;
                 }
@@ -79,12 +79,17 @@ public class ReplyCommand extends AbstractCommand {
 
         Player receiver = Cache.get().getMessenger(sender).orElse(null);
         if (receiver == null) {
-            Text.send(messages.get("commands.message.no-receiver"), sender);
+            Text.send(messages.get("commands.lines.no-receiver"), sender);
+            return COMMAND_FAILED;
+        }
+
+        if (Utils.isVanished(src, receiver)) {
+            Text.send(messages.get("commands.generic.no-receiver"), src);
             return COMMAND_FAILED;
         }
 
         if (!receiver.isActive()) {
-            Text.send(messages.get("commands.message.receiver-not-online"), sender);
+            Text.send(messages.get("commands.lines.receiver-not-online"), sender);
             return COMMAND_FAILED;
         }
 
@@ -99,12 +104,12 @@ public class ReplyCommand extends AbstractCommand {
 
         String receiverServer = receiver.getCurrentServer().map(server -> server.getServerInfo().getName()).orElse(messages.get("unknown"));
 
-        String formattedMessage = messages.getAndReplace("commands.message.message-format",
+        String formattedMessage = messages.getAndReplace("commands.lines.lines-format",
                 "sender_server", senderServer,
                 "sender", sender.getUsername(),
                 "receiver_server", receiverServer,
                 "receiver", receiver.getUsername(),
-                "message", message
+                "lines", message
         );
 
         Text.send(formattedMessage, sender);

@@ -58,9 +58,9 @@ public class CommandExecuteListener extends Listener {
                 .collect(Collectors.toSet());
 
         if (config.getBoolean("modules.socialspy", false)) {
-            this.csIgnoredCommands.add("message");
+            this.csIgnoredCommands.add("lines");
             this.csIgnoredCommands.add("reply");
-            this.csIgnoredCommands.addAll(config.getStringList("command-aliases.message"));
+            this.csIgnoredCommands.addAll(config.getStringList("command-aliases.lines"));
             this.csIgnoredCommands.addAll(config.getStringList("command-aliases.reply"));
         }
         this.logger = plugin.logger();

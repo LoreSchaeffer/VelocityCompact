@@ -66,7 +66,7 @@ public class GlobalchatCommand extends AbstractCommand {
         } else {
             target = plugin.userRepository().findById(((Player) src).getUniqueId()).orElse(null);
             if (target == null) {
-                Text.send(messages.getAndReplace("common.internal-exception", "message", "User executing the command not found in the database"), src);
+                Text.send(messages.getAndReplace("common.internal-exception", "lines", "User executing the command not found in the database"), src);
                 return COMMAND_FAILED;
             }
         }

@@ -6,11 +6,16 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyReloadEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
+import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
+import com.velocitypowered.api.scheduler.ScheduledTask;
+import com.velocitypowered.api.scheduler.TaskStatus;
 import com.zaxxer.hikari.HikariConfig;
+import de.myzelyam.api.vanish.VelocityVanishAPI;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.dvs.versioning.BasicVersioning;
 import dev.dejvokep.boostedyaml.settings.dumper.DumperSettings;
@@ -26,10 +31,7 @@ import network.multicore.vc.persistence.HibernateHbm2DdlAutoMode;
 import network.multicore.vc.persistence.PrefixNamingStrategy;
 import network.multicore.vc.persistence.datasource.DataSourceProvider;
 import network.multicore.vc.persistence.entity.entities.PackageEntities;
-import network.multicore.vc.utils.Cache;
-import network.multicore.vc.utils.CensureUtils;
-import network.multicore.vc.utils.Messages;
-import network.multicore.vc.utils.Text;
+import network.multicore.vc.utils.*;
 import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -41,10 +43,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Plugin(
         id = VelocityCompact.PLUGIN_ID,
@@ -52,7 +52,10 @@ import java.util.Set;
         version = VelocityCompact.PLUGIN_VERSION,
         description = "All you need for your velocity server",
         url = "https://github.com/LoreSchaeffer/VelocityCompact",
-        authors = {VelocityCompact.PLUGIN_AUTHOR}
+        authors = {VelocityCompact.PLUGIN_AUTHOR},
+        dependencies = {
+                @Dependency(id = "premiumvanish", optional = true)
+        }
 )
 public class VelocityCompact {
     public static final String PLUGIN_ID = "velocitycompact";
@@ -71,10 +74,11 @@ public class VelocityCompact {
     private KickRepository kickRepository;
     private MuteRepository muteRepository;
     private WarnRepository warnRepository;
+    private boolean premiumVanishSupport;
+    private ScheduledTask announcerTask;
 
     // TODO Check duration suggestions
     // TODO Optimize moderation commands to reduce duplicates
-    // TODO Add announcer
 
     @Inject
     private VelocityCompact(ProxyServer proxy, @DataDirectory Path dataDirectory, Logger logger) {
@@ -115,7 +119,7 @@ public class VelocityCompact {
         try {
             Messages.init(new File(pluginDir, "messages.yml"));
         } catch (IOException e) {
-            logger.error("Failed to load network.multicore.vc.messages", e);
+            logger.error("Failed to load network.multicore.vc.lines", e);
             shutdown();
             return;
         }
@@ -129,6 +133,16 @@ public class VelocityCompact {
         Cache.get();
         CensureUtils.init(config);
 
+        premiumVanishSupport = config.getBoolean("premium-vanish-support", false);
+        if (premiumVanishSupport) {
+            try {
+                VelocityVanishAPI.getInvisiblePlayers();
+            } catch (Throwable t) {
+                premiumVanishSupport = false;
+                logger.error("Failed to load premium vanish support", t);
+            }
+        }
+
         proxy.getEventManager().register(this, new CommandExecuteListener());
         proxy.getEventManager().register(this, new PlayerChatListener());
         proxy.getEventManager().register(this, new PlayerConnectToServerListener());
@@ -137,9 +151,12 @@ public class VelocityCompact {
         proxy.getEventManager().register(this, new PlayerPreLoginListener());
 
         registerCommands();
+
+        if (config.getBoolean("modules.announcer", false)) startAnnouncer();
     }
 
     public void disable() {
+        if (announcerTask != null) stopAnnouncer();
         proxy.getEventManager().unregisterListeners(this);
         unregisterCommands();
 
@@ -188,6 +205,10 @@ public class VelocityCompact {
 
     public File pluginDir() {
         return pluginDir;
+    }
+
+    public boolean hasPremiumVanishSupport() {
+        return premiumVanishSupport;
     }
 
     public UserRepository userRepository() {
@@ -371,5 +392,77 @@ public class VelocityCompact {
     private void unregisterCommands() {
         commands.forEach(AbstractCommand::unregister);
         commands.clear();
+    }
+
+    private void startAnnouncer() {
+        List<AnnouncerMessage> messages = new ArrayList<>();
+
+        config.getSection("announcer.lines").getKeys().forEach(key -> {
+            AnnouncerMessage message = new AnnouncerMessage(
+                    config.getStringList("announcer.lines." + key + ".server-list", List.of()),
+                    config.getBoolean("announcer.lines." + key + ".list-is-whitelist", false),
+                    config.getStringList("announcer.lines." + key + ".lines", List.of())
+            );
+            if (!message.lines().isEmpty()) messages.add(message);
+        });
+
+        if (messages.isEmpty()) {
+            logger.warn("No announcer messages found");
+            return;
+        }
+
+        long interval = config.getLong("announcer.interval", 600L);
+        if (interval <= 0) {
+            logger.warn("Invalid announcer interval");
+            return;
+        }
+
+        announcerTask = proxy.getScheduler()
+                .buildTask(this, new AnnouncerTask(messages))
+                .delay(interval, TimeUnit.SECONDS)
+                .repeat(interval, TimeUnit.SECONDS)
+                .schedule();
+    }
+
+    private void stopAnnouncer() {
+        if (!announcerTask.status().equals(TaskStatus.CANCELLED) || announcerTask.status().equals(TaskStatus.FINISHED)) {
+            announcerTask.cancel();
+            announcerTask = null;
+        }
+    }
+
+    private class AnnouncerTask implements Runnable {
+        private final List<AnnouncerMessage> messages;
+        private final boolean random;
+        private int index = 0;
+
+        public AnnouncerTask(List<AnnouncerMessage> messages) {
+            this.messages = messages;
+            this.random = config.getBoolean("announcer.random", false);
+        }
+
+        @Override
+        public void run() {
+            if (random) {
+                AnnouncerMessage message = messages.get(new Random().nextInt(messages.size()));
+
+                if (message.isWhitelist()) {
+                    message.servers().forEach(serverName -> {
+                        RegisteredServer server = proxy.getServer(serverName).orElse(null);
+                        if (server == null) {
+                            logger.warn("Announcer not sent to server {}. Server not found", serverName);
+                            return;
+                        }
+
+                        Text.broadcast(message.lines(), server);
+                    });
+                } else {
+                    proxy.getAllServers()
+                            .stream()
+                            .filter(server -> !message.servers().contains(server.getServerInfo().getName()))
+                            .forEach(server -> Text.broadcast(message.lines(), server));
+                }
+            }
+        }
     }
 }

@@ -90,7 +90,7 @@ public class KickCommand extends AbstractCommand {
 
         User staff = src instanceof Player player ? plugin.userRepository().findById(player.getUniqueId()).orElse(null) : null;
         if (staff == null && src instanceof Player) {
-            Text.send(messages.getAndReplace("common.internal-exception", "message", "Staff user not found"), src);
+            Text.send(messages.getAndReplace("common.internal-exception", "lines", "Staff user not found"), src);
             return COMMAND_FAILED;
         }
 
@@ -119,7 +119,7 @@ public class KickCommand extends AbstractCommand {
                             "reason", kick.getReason() != null ? kick.getReason() : messages.get("no-reason")
                     )));
                 } else {
-                    Text.send(messages.getAndReplace("moderation.target-message.kick",
+                    Text.send(messages.getAndReplace("moderation.target-lines.kick",
                             "staff", console ? messages.get("console") : src,
                             "server", server.getServerInfo().getName(),
                             "duration", messages.get("permanent"),

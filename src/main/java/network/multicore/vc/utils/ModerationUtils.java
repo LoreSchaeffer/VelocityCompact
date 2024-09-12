@@ -60,7 +60,7 @@ public class ModerationUtils {
         return getDurationString(new Date(), endDate);
     }
 
-    public static Date parseDurationString(@NotNull String time) throws IllegalArgumentException {
+    public static Date parseDurationString(@NotNull String time, boolean before) throws IllegalArgumentException {
         Preconditions.checkNotNull(time, "time");
 
         Messages messages = Messages.get();
@@ -91,12 +91,25 @@ public class ModerationUtils {
 
         long now = new Date().getTime();
 
-        if (timeUnit.equals(validValues.get("s"))) return new Date(now + TimeUnit.MILLISECONDS.convert(number, TimeUnit.SECONDS));
-        if (timeUnit.equals(validValues.get("m"))) return new Date(now + TimeUnit.MILLISECONDS.convert(number, TimeUnit.MINUTES));
-        if (timeUnit.equals(validValues.get("h"))) return new Date(now + TimeUnit.MILLISECONDS.convert(number, TimeUnit.HOURS));
-        if (timeUnit.equals(validValues.get("d"))) return new Date(now + TimeUnit.MILLISECONDS.convert(number, TimeUnit.DAYS));
-        if (timeUnit.equals(validValues.get("y"))) return new Date(now + (365 * TimeUnit.MILLISECONDS.convert(number, TimeUnit.DAYS)));
-        else throw new IllegalStateException("Invalid time unit");
+        if (before) {
+            if (timeUnit.equals(validValues.get("s"))) return new Date(now - TimeUnit.MILLISECONDS.convert(number, TimeUnit.SECONDS));
+            if (timeUnit.equals(validValues.get("m"))) return new Date(now - TimeUnit.MILLISECONDS.convert(number, TimeUnit.MINUTES));
+            if (timeUnit.equals(validValues.get("h"))) return new Date(now - TimeUnit.MILLISECONDS.convert(number, TimeUnit.HOURS));
+            if (timeUnit.equals(validValues.get("d"))) return new Date(now - TimeUnit.MILLISECONDS.convert(number, TimeUnit.DAYS));
+            if (timeUnit.equals(validValues.get("y"))) return new Date(now - (365 * TimeUnit.MILLISECONDS.convert(number, TimeUnit.DAYS)));
+            else throw new IllegalStateException("Invalid time unit");
+        } else {
+            if (timeUnit.equals(validValues.get("s"))) return new Date(now + TimeUnit.MILLISECONDS.convert(number, TimeUnit.SECONDS));
+            if (timeUnit.equals(validValues.get("m"))) return new Date(now + TimeUnit.MILLISECONDS.convert(number, TimeUnit.MINUTES));
+            if (timeUnit.equals(validValues.get("h"))) return new Date(now + TimeUnit.MILLISECONDS.convert(number, TimeUnit.HOURS));
+            if (timeUnit.equals(validValues.get("d"))) return new Date(now + TimeUnit.MILLISECONDS.convert(number, TimeUnit.DAYS));
+            if (timeUnit.equals(validValues.get("y"))) return new Date(now + (365 * TimeUnit.MILLISECONDS.convert(number, TimeUnit.DAYS)));
+            else throw new IllegalStateException("Invalid time unit");
+        }
+    }
+
+    public static Date parseDurationString(@NotNull String time) throws IllegalArgumentException {
+        return parseDurationString(time, false);
     }
 
     public static void removeExpiredBans(List<Ban> activeBans) {

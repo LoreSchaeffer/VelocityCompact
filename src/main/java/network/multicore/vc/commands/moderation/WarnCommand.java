@@ -5,6 +5,8 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.velocitypowered.api.command.BrigadierCommand;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ServerConnection;
+import com.velocitypowered.api.proxy.server.ServerInfo;
 import network.multicore.vc.commands.AbstractCommand;
 import network.multicore.vc.data.User;
 import network.multicore.vc.data.Warn;
@@ -14,12 +16,15 @@ import network.multicore.vc.utils.Text;
 import network.multicore.vc.utils.suggestions.CustomSuggestionProvider;
 import network.multicore.vc.utils.suggestions.PlayerSuggestionProvider;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class WarnCommand extends AbstractCommand {
     private static final String PLAYER_ARG = "player";
     private static final String REASON_ARG = "reason";
+    private static final List<String> PUNISHMENTS = List.of("ban", "kick", "mute");
 
     /**
      * /warn <player> <reason>
@@ -66,7 +71,7 @@ public class WarnCommand extends AbstractCommand {
 
         User staff = src instanceof Player player ? plugin.userRepository().findById(player.getUniqueId()).orElse(null) : null;
         if (staff == null && src instanceof Player) {
-            Text.send(messages.getAndReplace("common.internal-exception", "message", "Staff user not found"), src);
+            Text.send(messages.getAndReplace("common.internal-exception", "lines", "Staff user not found"), src);
             return COMMAND_FAILED;
         }
 
@@ -80,12 +85,74 @@ public class WarnCommand extends AbstractCommand {
         plugin.warnRepository().save(warn);
 
         Optional<Player> playerOpt = proxy.getPlayer(user.getUniqueId());
-        playerOpt.ifPresent(player -> Text.send(messages.getAndReplace("moderation.target-message.warn",
+        playerOpt.ifPresent(player -> Text.send(messages.getAndReplace("moderation.target-lines.warn",
                 "staff", console ? messages.get("console") : src,
                 "reason", warn.getReason() != null ? warn.getReason() : messages.get("no-reason")
         ), player));
 
         ModerationUtils.broadcast(targetName, src, null, null, reason, silent, console, Permission.PUNISHMENT_RECEIVE_WARN, "warn");
+
+        if (config.getBoolean("moderation.warning.punishment-enabled", false)) {
+            int warnAmountToPunish = config.getInt("moderation.warning.punishment-threshold", 3);
+            Date firstDate;
+            try {
+                firstDate = ModerationUtils.parseDurationString(config.getString("moderation.warning.time", ""), true);
+            } catch (IllegalArgumentException e) {
+                plugin.logger().error("Invalid duration string for warning punishment time: {}", config.getString("moderation.warning.time", ""));
+                return COMMAND_SUCCESS;
+            }
+
+            List<Warn> warns = plugin.warnRepository()
+                    .findAllByUuid(user.getUniqueId())
+                    .stream()
+                    .filter(w -> w.getDate().equals(firstDate) || w.getDate().after(firstDate))
+                    .toList();
+
+            if (warns.size() >= warnAmountToPunish) {
+                String punishment = config.getString("moderation.warning.punishment-type", "");
+                if (!PUNISHMENTS.contains(punishment.toLowerCase())) {
+                    plugin.logger().error("Invalid punishment type for warning punishment: {}", punishment);
+                    return COMMAND_SUCCESS;
+                }
+
+                String durationString = config.getString("moderation.warning.punishment-duration", "");
+                Date duration;
+
+                if (durationString.isBlank()) {
+                    duration = null;
+                } else {
+                    try {
+                        duration = ModerationUtils.parseDurationString(durationString, false);
+                    } catch (IllegalArgumentException e) {
+                        plugin.logger().error("Invalid duration string for warning punishment duration: {}", durationString);
+                        return COMMAND_SUCCESS;
+                    }
+                }
+
+                boolean isGlobal = config.getBoolean("moderation.warning.punishment-global", true);
+                boolean isSilent = config.getBoolean("moderation.warning.punishment-silent", false);
+                String punishmentReason = messages.getAndReplace("commands.moderation.warn-auto-punish", "amount", warnAmountToPunish);
+                Player target = proxy.getPlayer(user.getUniqueId()).orElse(null);
+                ServerInfo targetServer = target != null ? target.getCurrentServer().map(ServerConnection::getServerInfo).orElse(null) : null;
+
+                if (targetServer == null && !isGlobal) {
+                    plugin.logger().error("Player {} cannot be punished for reaching {} warns. Target server is null and the punishment is not global", targetName, warnAmountToPunish);
+                    return COMMAND_SUCCESS;
+                }
+
+                //                                                                                 [g][temp]<punish> <player>[ server][ duration][ silent][ reason]
+                proxy.getCommandManager().executeImmediatelyAsync(proxy.getConsoleCommandSource(), String.format("%s%s%s %s%s%s%s%s",
+                        isGlobal ? "g" : "",
+                        duration == null ? "" : "temp",
+                        punishment,
+                        targetName,
+                        !isGlobal ? " " + targetServer.getName() : "",
+                        duration != null ? " " + durationString : "",
+                        isSilent ? " -s" : "",
+                        punishmentReason != null && !punishmentReason.isBlank() ? " " + punishmentReason : ""
+                ));
+            }
+        }
 
         return COMMAND_SUCCESS;
     }

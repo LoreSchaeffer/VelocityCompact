@@ -75,7 +75,7 @@ public class GBanCommand extends AbstractCommand {
 
         User staff = src instanceof Player player ? plugin.userRepository().findById(player.getUniqueId()).orElse(null) : null;
         if (staff == null && src instanceof Player) {
-            Text.send(messages.getAndReplace("common.internal-exception", "message", "Staff user not found"), src);
+            Text.send(messages.getAndReplace("common.internal-exception", "lines", "Staff user not found"), src);
             return COMMAND_FAILED;
         }
 

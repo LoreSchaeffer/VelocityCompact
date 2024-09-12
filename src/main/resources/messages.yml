@@ -8,13 +8,13 @@ too-many-connections: 'too many connections'
 banned: 'banned'
 
 common:
-  internal-exception: '<dark_red>Internal plugin exception: {message}'
+  internal-exception: '<dark_red>Internal plugin exception: {lines}'
   command-blocked: '<red>This command is blocked on this server!'
   command-blocked-broadcast: '<dark_aqua><b>WARN<blue> {server}<gold>:<blue><b>{player}<dark_aqua> ●<aqua> tried to use the command<yellow> {command}'
   command-warning-broadcast: '<dark_aqua><b>WARN<blue> {server}<gold>:<blue><b>{player}<dark_aqua> ●<aqua> used the command<yellow> {command}'
   commandspy-broadcast: '<dark_blue><b>CSPY<blue> {server}<gold>:<blue><b>{player}<dark_aqua> ●<reset> {command}'
-  socialspy-broadcast: '<dark_blue><b>SSPY<blue> {sender_server}<gold>:<blue><b>{sender}<red> »<blue> {receiver_server}<gold>:<blue><b>{receiver}<dark_aqua> ●<reset> {message}'
-  globalchat-broadcast: '<gold>{server}<red>:<gold><b>{player}<dark_aqua> ●<reset> {message}'
+  socialspy-broadcast: '<dark_blue><b>SSPY<blue> {sender_server}<gold>:<blue><b>{sender}<red> »<blue> {receiver_server}<gold>:<blue><b>{receiver}<dark_aqua> ●<reset> {lines}'
+  globalchat-broadcast: '<gold>{server}<red>:<gold><b>{player}<dark_aqua> ●<reset> {lines}'
   same-ip-broadcast: '<gold>[<aqua>{players}<gold>] <yellow>have the same ip address.'
   nickname-not-allowed: '<red>Your nickname is not allowed on this server!'
   too-many-connections: '<red>There are too many connections to the server with your IP address!'
@@ -35,7 +35,7 @@ commands:
     permissions-dumped: '<dark_green><b>Permissions<green> have been dumped to <green>{file}<dark_green>!'
     permissions-dump-failed: '<red>Failed to dump permissions to <yellow>{file}<red>! Check the console for more information.'
   broadcast:
-    format: '<dark_red><b>BROADCAST <dark_aqua>● <yellow>{message}'
+    format: '<dark_red><b>BROADCAST <dark_aqua>● <yellow>{lines}'
   commandspy:
     enabled-self: '<dark_green><b>COMMANDSPY<green> enabled!'
     disabled-self: '<dark_red><b>COMMANDSPY<red> disabled!'
@@ -63,16 +63,16 @@ commands:
     not-sent-to-hub-player: '<red>The player cannot be sent to hub!'
     not-sent-to-hub-players: '<red>The players cannot be sent to hub!'
   message:
-    message-yourself: '<red>You cannot send a message to yourself!'
-    no-receiver: '<red>You don''t have a receiver to send a message to! Use<yellow> /message <player> <message>'
-    receiver-not-online: '<red>The player you are trying to message is not online!'
-    message-format: '<aqua>{sender_server}<red>:<yellow><b>{sender}<red> »<aqua> {receiver_server}<red>:<yellow><b>{receiver}<dark_aqua> ●<reset> {message}'
+    message-yourself: '<red>You cannot send a lines to yourself!'
+    no-receiver: '<red>You don''t have a receiver to send a lines to! Use<yellow> /lines <player> <lines>'
+    receiver-not-online: '<red>The player you are trying to lines is not online!'
+    message-format: '<aqua>{sender_server}<red>:<yellow><b>{sender}<red> »<aqua> {receiver_server}<red>:<yellow><b>{receiver}<dark_aqua> ●<reset> {lines}'
   staffchat:
     enabled-self: '<dark_green><b>STAFFCHAT<green> enabled!'
     disabled-self: '<dark_red><b>STAFFCHAT<red> disabled!'
     enabled-player: '<dark_green><b>STAFFCHAT<green> enabled for <yellow>{player}'
     disabled-player: '<dark_red><b>STAFFCHAT<red> disabled for <yellow>{player}'
-    format: '<gold><b>STAFF <aqua>{server}<red>:<yellow><b>{player} <dark_aqua>● <reset>{message}'
+    format: '<gold><b>STAFF <aqua>{server}<red>:<yellow><b>{player} <dark_aqua>● <reset>{lines}'
   moderation:
     punish-yourself: '<red>You cannot punish yourself!'
     revoke-yourself: '<red>You cannot revoke your own punishment!'
@@ -93,6 +93,7 @@ commands:
     not-banned-server: '<red>This player is not banned on this server!'
     not-muted-global: '<red>This player is not muted globally!'
     not-muted-server: '<red>This player is not muted on this server!'
+    warn-auto-punish: 'You have reached {amount} warns'
   lookup:
     zero-bans: '<gray>There are no bans for this player.'
     zero-kicks: '<gray>There are no kicks for this player.'
@@ -112,7 +113,7 @@ moderation:
     kick-ip: '<red>You have been kicked\n\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red>Server <dark_aqua><b>» <gray>{server}\n<red>Reason <dark_aqua><b>» <gray>{reason}'
   mute:
     reminder: '<red>You are muted!\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red>Server <dark_aqua><b>» <gray>{server}\n<red><b>Duration <dark_aqua><b>» <yellow>{duration}\n<red>Reason <dark_aqua><b>» <gray>{reason}'
-    muted-message-broadcast: '<blue><b>MUTED:<yellow> {server}:{player} > <reset>{message}'
+    muted-message-broadcast: '<blue><b>MUTED:<yellow> {server}:{player} > <reset>{lines}'
   broadcast:
     ban: '<gold><b>{player} <gray>has been <yellow><i>banned\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Duration <dark_aqua><b>» <yellow>{duration}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}'
     ban-ip: '<gold><b>{player} <gray>has been <yellow><i>ip-banned\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Duration <dark_aqua><b>» <yellow>{duration}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}'

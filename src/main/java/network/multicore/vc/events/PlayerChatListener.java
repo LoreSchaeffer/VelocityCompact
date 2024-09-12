@@ -57,12 +57,12 @@ public class PlayerChatListener extends Listener {
                         "duration", mute.getEndDate() != null ? ModerationUtils.getDurationString(mute.getEndDate()) : messages.get("permanent"),
                         "reason", mute.getReason() != null ? mute.getReason() : messages.get("no-reason")
                 ), player);
-                Text.broadcast(messages.getAndReplace("moderation.mute.muted-message-broadcast",
+                Text.broadcast(messages.getAndReplace("moderation.mute.muted-lines-broadcast",
                         "server", server != null ? server : messages.get("unknown"),
                         "player", player.getUsername(),
-                        "message", message
+                        "lines", message
                 ), Permission.MUTED_MESSAGE_RECEIVE.get());
-                logger.info("{} tried send a message to chat, but is muted. Message: {}", player.getUsername(), message);
+                logger.info("{} tried send a lines to chat, but is muted. Message: {}", player.getUsername(), message);
                 return;
             }
         }
@@ -98,7 +98,7 @@ public class PlayerChatListener extends Listener {
 
             if (receivers.isEmpty()) return;
 
-            String broadcast = messages.getAndReplace("common.globalchat-broadcast", "server", server, "player", player, "message", message);
+            String broadcast = messages.getAndReplace("common.globalchat-broadcast", "server", server, "player", player, "lines", message);
             Text.send(broadcast, receivers);
         }).start();
     }

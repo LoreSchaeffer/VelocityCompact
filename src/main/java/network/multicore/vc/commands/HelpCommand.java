@@ -23,7 +23,7 @@ public class HelpCommand extends AbstractCommand {
     }
 
     private int execute(CommandSource src) {
-        Text.send(messages.getStringList("commands.help.messages"), src);
+        Text.send(messages.getStringList("commands.help.lines"), src);
         return COMMAND_SUCCESS;
     }
 }

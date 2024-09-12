@@ -1,6 +1,9 @@
 package network.multicore.vc.utils;
 
+import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import de.myzelyam.api.vanish.VelocityVanishAPI;
 import network.multicore.vc.VelocityCompact;
 
 import java.util.UUID;
@@ -48,5 +51,12 @@ public class Utils {
         }
 
         return true;
+    }
+
+    public static boolean isVanished(CommandSource viewer, Player viewed) {
+        if (!VelocityCompact.getInstance().hasPremiumVanishSupport()) return false;
+        if (!(viewer instanceof Player)) return false;
+
+        return !VelocityVanishAPI.canSee((Player) viewer, viewed);
     }
 }

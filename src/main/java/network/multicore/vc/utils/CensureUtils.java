@@ -58,7 +58,7 @@ public class CensureUtils {
 
     public CensureResult censure(@NotNull Player player, @NotNull String message) {
         Preconditions.checkNotNull(player, "player");
-        Preconditions.checkNotNull(message, "message");
+        Preconditions.checkNotNull(message, "lines");
 
         if (player.hasPermission(Permission.CHAT_CENSORSHIP_BYPASS.get())) return new CensureResult(false, message, false);
 

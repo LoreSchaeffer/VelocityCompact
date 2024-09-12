@@ -12,10 +12,10 @@ import network.multicore.vc.utils.Text;
 import java.util.List;
 
 public class ScCommand extends AbstractCommand {
-    private static final String MESSAGE_ARG = "message";
+    private static final String MESSAGE_ARG = "lines";
 
     /**
-     * /sc <message>
+     * /sc <lines>
      */
     public ScCommand() {
         super("sc");
@@ -40,7 +40,7 @@ public class ScCommand extends AbstractCommand {
         String format = messages.getAndReplace("commands.staffchat.format",
                 "server", src instanceof Player player ? player.getCurrentServer().map(s -> s.getServerInfo().getName()).orElse(messages.get("unknown")) : messages.get("global"),
                 "player", src instanceof Player player ? player.getUsername() : messages.get("console"),
-                "message", message
+                "lines", message
         );
 
         new Thread(() -> {

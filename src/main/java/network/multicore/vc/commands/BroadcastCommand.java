@@ -12,10 +12,10 @@ import network.multicore.vc.utils.suggestions.ServerSuggestionProvider;
 
 public class BroadcastCommand extends AbstractCommand {
     public static final String SERVER_ARG = "server";
-    private static final String MESSAGE_ARG = "message";
+    private static final String MESSAGE_ARG = "lines";
 
     /**
-     * /broadcast <server> <message>
+     * /broadcast <server> <lines>
      */
     public BroadcastCommand() {
         super("broadcast");
@@ -50,7 +50,7 @@ public class BroadcastCommand extends AbstractCommand {
 
         if (!src.hasPermission(Permission.COLORS.get())) message = Text.stripFormatting(message);
 
-        Text.broadcast(messages.getAndReplace("commands.broadcast.format", "message", message), server);
+        Text.broadcast(messages.getAndReplace("commands.broadcast.format", "lines", message), server);
 
         return COMMAND_SUCCESS;
     }

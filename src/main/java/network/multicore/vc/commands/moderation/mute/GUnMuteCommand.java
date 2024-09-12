@@ -69,7 +69,7 @@ public class GUnMuteCommand extends AbstractCommand {
 
         User staff = src instanceof Player player ? plugin.userRepository().findById(player.getUniqueId()).orElse(null) : null;
         if (staff == null && src instanceof Player) {
-            Text.send(messages.getAndReplace("common.internal-exception", "message", "Staff user not found"), src);
+            Text.send(messages.getAndReplace("common.internal-exception", "lines", "Staff user not found"), src);
             return COMMAND_FAILED;
         }
 
@@ -97,7 +97,7 @@ public class GUnMuteCommand extends AbstractCommand {
         plugin.muteRepository().save(mute);
 
         Optional<Player> target = proxy.getPlayer(mute.getUniqueId());
-        target.ifPresent(p -> Text.send(messages.getAndReplace("moderation.target-message.unmute",
+        target.ifPresent(p -> Text.send(messages.getAndReplace("moderation.target-lines.unmute",
                 "staff", console ? messages.get("console") : src,
                 "server", messages.get("global"),
                 "reason", mute.getReason() != null ? mute.getReason() : messages.get("no-reason")

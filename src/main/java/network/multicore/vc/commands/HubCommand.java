@@ -72,6 +72,8 @@ public class HubCommand extends AbstractCommand {
                 targets.addAll(proxy.getAllPlayers()
                         .stream()
                         .filter(p -> {
+                            if (Utils.isVanished(src, p)) return false;
+
                             ServerConnection playerServer = p.getCurrentServer().orElse(null);
                             return playerServer != null && !Utils.isFallbackServer(playerServer.getServer());
                         })
@@ -100,6 +102,8 @@ public class HubCommand extends AbstractCommand {
                 targets.addAll(proxy.getAllPlayers()
                         .stream()
                         .filter(p -> {
+                            if (Utils.isVanished(src, p)) return false;
+
                             ServerConnection playerServer = p.getCurrentServer().orElse(null);
                             return playerServer != null && playerServer.getServer().equals(srcServer);
                         })
@@ -109,6 +113,11 @@ public class HubCommand extends AbstractCommand {
                 Player target = proxy.getPlayer(targetName).orElse(null);
 
                 if (target == null) {
+                    Text.send(messages.get("commands.generic.player-not-found"), src);
+                    return COMMAND_FAILED;
+                }
+
+                if (Utils.isVanished(src, target)) {
                     Text.send(messages.get("commands.generic.player-not-found"), src);
                     return COMMAND_FAILED;
                 }
@@ -131,7 +140,7 @@ public class HubCommand extends AbstractCommand {
             FallbackConnection connection = new FallbackConnection(target);
             connection.connect().whenComplete((result, throwable) -> {
                 if (throwable != null) {
-                    Text.send(messages.getAndReplace("common.internal-exception", "message", throwable.getMessage()), src);
+                    Text.send(messages.getAndReplace("common.internal-exception", "lines", throwable.getMessage()), src);
                     return;
                 }
 
@@ -165,7 +174,7 @@ public class HubCommand extends AbstractCommand {
             //TODO To be tested
             allCompleted.whenComplete((result, throwable) -> {
                 if (throwable != null) {
-                    Text.send(messages.getAndReplace("common.internal-exception", "message", throwable.getMessage()), src);
+                    Text.send(messages.getAndReplace("common.internal-exception", "lines", throwable.getMessage()), src);
                     return;
                 }
 

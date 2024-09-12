@@ -79,7 +79,7 @@ public class MuteIpCommand extends AbstractCommand {
 
         User staff = src instanceof Player player ? plugin.userRepository().findById(player.getUniqueId()).orElse(null) : null;
         if (staff == null && src instanceof Player) {
-            Text.send(messages.getAndReplace("common.internal-exception", "message", "Staff user not found"), src);
+            Text.send(messages.getAndReplace("common.internal-exception", "lines", "Staff user not found"), src);
             return COMMAND_FAILED;
         }
 
@@ -152,7 +152,7 @@ public class MuteIpCommand extends AbstractCommand {
                 }
 
                 Optional<Player> player = proxy.getPlayer(target.getUniqueId());
-                player.ifPresent(p -> Text.send(messages.getAndReplace("moderation.target-message.mute-ip",
+                player.ifPresent(p -> Text.send(messages.getAndReplace("moderation.target-lines.mute-ip",
                         "staff", console ? messages.get("console") : src,
                         "server", server.getServerInfo().getName(),
                         "duration", messages.get("permanent"),
