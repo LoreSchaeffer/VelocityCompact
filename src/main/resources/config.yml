@@ -201,6 +201,7 @@ command-aliases:
   reply: [ "r" ]
   socialspy: [ "sspy" ]
   staffchat: [ "schat" ]
+  sc : [ ]
   tempban: [ ]
   tempbanip: [ ]
   tempmute: [ ]
@@ -209,7 +210,7 @@ command-aliases:
   unbanip: [ ]
   unmute: [ ]
   unmuteip: [ ]
-  velocitycompactreload: [ "vcreload" ]
+  velocitycompact: [ "vcompact", "vc" ]
   warn: [ ]
 
 # Do not change this value. It is used to check if the config file is up to date.

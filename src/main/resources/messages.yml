@@ -30,6 +30,10 @@ commands:
     server-not-found: '<red>Server not found!'
     invalid-duration: '<red>The duration you have provided is invalid!'
     invalid-argument: '<red>Invalid argument! The argument {argument} is invalid!'
+  velocitycompact:
+    reload: '<dark_green><b>VelocityCompact<green> has been reloaded in <green>{time}<dark_green>!'
+    permissions-dumped: '<dark_green><b>Permissions<green> have been dumped to <green>{file}<dark_green>!'
+    permissions-dump-failed: '<red>Failed to dump permissions to <yellow>{file}<red>! Check the console for more information.'
   broadcast:
     format: '<dark_red><b>BROADCAST <dark_aqua>● <yellow>{message}'
   commandspy:
@@ -64,6 +68,10 @@ commands:
     receiver-not-online: '<red>The player you are trying to message is not online!'
     message-format: '<aqua>{sender_server}<red>:<yellow><b>{sender}<red> »<aqua> {receiver_server}<red>:<yellow><b>{receiver}<dark_aqua> ●<reset> {message}'
   staffchat:
+    enabled-self: '<dark_green><b>STAFFCHAT<green> enabled!'
+    disabled-self: '<dark_red><b>STAFFCHAT<red> disabled!'
+    enabled-player: '<dark_green><b>STAFFCHAT<green> enabled for <yellow>{player}'
+    disabled-player: '<dark_red><b>STAFFCHAT<red> disabled for <yellow>{player}'
     format: '<gold><b>STAFF <aqua>{server}<red>:<yellow><b>{player} <dark_aqua>● <reset>{message}'
   moderation:
     punish-yourself: '<red>You cannot punish yourself!'
@@ -143,6 +151,8 @@ moderation:
     last-login: '<gray>Last login<dark_aqua> ● <yellow>{date}'
     last-ip: '<gray>Last ip<dark_aqua> ● <yellow>{ip}'
     uuid: '<gray>UUID<dark_aqua> ● <yellow>{uuid}'
+    nickname-history: '<gray>Nickname history<dark_aqua> ● <gray>[<yellow>{nicknames}<gray>]'
+    nickname-history-separator: '<gray>, <yellow>'
     punishment-status:
       title: '<gray>Punishment status'
       not-banned: '  <dark_green><b>Not banned'
@@ -166,13 +176,14 @@ moderation:
         - warns
     order:
       - header
+      - uuid
       - status
       - first-login
       - last-login
       - last-ip
+      - nickname-history
       - punishment-status
       - history-status
-      - uuid
       - footer
   punishment-lookup:
     header: '<blue><st>----<r> <gold>Lookup <yellow>{player}<gold> - <yellow>{punishment} {page}<gold>/<yellow>{total_pages} <blue><st>----'

@@ -23,7 +23,7 @@ public class Mute {
     private String server;
     @Column(nullable = false)
     private Date beginDate;
-    private Date endDate; // TODO date should be nullable
+    private Date endDate;
     @Column(name = "unmute_date")
     private Date unmuteDate;
     @ManyToOne

@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import java.util.List;
 
 public class PlayerChatListener extends Listener {
+    private final boolean moderationEnabled;
     private final boolean globalchatEnabled;
     private final CensureUtils censureUtils;
     private final MuteRepository muteRepository;
@@ -23,6 +24,7 @@ public class PlayerChatListener extends Listener {
     public PlayerChatListener() {
         super();
 
+        this.moderationEnabled = config.getBoolean("modules.moderation", false);
         this.globalchatEnabled = config.getBoolean("modules.globalchat", false);
         this.censureUtils = CensureUtils.get();
         this.muteRepository = plugin.muteRepository();
@@ -37,30 +39,32 @@ public class PlayerChatListener extends Listener {
         String message = e.getMessage();
         String server = player.getCurrentServer().map(s -> s.getServerInfo().getName()).orElse(null);
 
-        List<Mute> activeMutes = muteRepository.findAllActiveByUuid(player.getUniqueId());
-        activeMutes.addAll(muteRepository.findAllActiveByIp(player.getRemoteAddress().getAddress().getHostAddress()));
-        ModerationUtils.removeExpiredMutes(activeMutes);
+        if (moderationEnabled) {
+            List<Mute> activeMutes = muteRepository.findAllActiveByUuid(player.getUniqueId());
+            activeMutes.addAll(muteRepository.findAllActiveByIp(player.getRemoteAddress().getAddress().getHostAddress()));
+            ModerationUtils.removeExpiredMutes(activeMutes);
 
-        if (!activeMutes.isEmpty()) {
-            Mute mute = activeMutes.stream()
-                    .filter(m -> m.getServer() == null)
-                    .findAny()
-                    .orElse(activeMutes.getFirst());
+            if (!activeMutes.isEmpty()) {
+                Mute mute = activeMutes.stream()
+                        .filter(m -> m.getServer() == null)
+                        .findAny()
+                        .orElse(activeMutes.getFirst());
 
-            e.setResult(PlayerChatEvent.ChatResult.denied());
-            Text.send(messages.getAndReplace("moderation.mute.reminder",
-                    "staff", mute.getStaff() != null ? mute.getStaff().getUsername() : messages.get("console"),
-                    "server", mute.getServer() != null ? mute.getServer() : messages.get("global"),
-                    "duration", mute.getEndDate() != null ? ModerationUtils.getDurationString(mute.getEndDate()) : messages.get("permanent"),
-                    "reason", mute.getReason() != null ? mute.getReason() : messages.get("no-reason")
-            ), player);
-            Text.broadcast(messages.getAndReplace("moderation.mute.muted-message-broadcast",
-                    "server", server != null ? server : messages.get("unknown"),
-                    "player", player.getUsername(),
-                    "message", message
-            ), Permission.MUTED_MESSAGE_RECEIVE.get());
-            logger.info("{} tried send a message to chat, but is muted. Message: {}", player.getUsername(), message);
-            return;
+                e.setResult(PlayerChatEvent.ChatResult.denied());
+                Text.send(messages.getAndReplace("moderation.mute.reminder",
+                        "staff", mute.getStaff() != null ? mute.getStaff().getUsername() : messages.get("console"),
+                        "server", mute.getServer() != null ? mute.getServer() : messages.get("global"),
+                        "duration", mute.getEndDate() != null ? ModerationUtils.getDurationString(mute.getEndDate()) : messages.get("permanent"),
+                        "reason", mute.getReason() != null ? mute.getReason() : messages.get("no-reason")
+                ), player);
+                Text.broadcast(messages.getAndReplace("moderation.mute.muted-message-broadcast",
+                        "server", server != null ? server : messages.get("unknown"),
+                        "player", player.getUsername(),
+                        "message", message
+                ), Permission.MUTED_MESSAGE_RECEIVE.get());
+                logger.info("{} tried send a message to chat, but is muted. Message: {}", player.getUsername(), message);
+                return;
+            }
         }
 
         if (censureUtils.isChatCensorshipEnabled()) {

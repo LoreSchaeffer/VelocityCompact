@@ -23,7 +23,7 @@ public class ReplyCommand extends AbstractCommand {
     public ReplyCommand() {
         super("reply");
         this.censureUtils = CensureUtils.get();
-        this.mutePreventPrivateMessages = config.getBoolean("moderation.mute-prevents-private-messages", false);
+        this.mutePreventPrivateMessages = config.getBoolean("moderation.mute-prevents-private-messages", false) && config.getBoolean("modules.moderation", false);
         this.muteRepository = plugin.muteRepository();
     }
 
@@ -52,26 +52,15 @@ public class ReplyCommand extends AbstractCommand {
         if (mutePreventPrivateMessages) {
             List<Mute> activeMutes = muteRepository.findAllActiveByUuid(sender.getUniqueId());
             activeMutes.addAll(muteRepository.findAllActiveByIp(sender.getRemoteAddress().getAddress().getHostAddress()));
-            activeMutes.removeIf(mute -> mute.getServer() != null && !mute.getServer().equalsIgnoreCase(senderServer));
+            ModerationUtils.removeExpiredMutes(activeMutes);
 
-            //TODO To be checked
             if (!activeMutes.isEmpty()) {
-                Mute mute = null;
-                boolean isMuted = false;
+                Mute mute = activeMutes.stream()
+                        .filter(m -> m.getServer() == null)
+                        .findAny()
+                        .orElse(null);
 
-                for (Mute m : activeMutes) {
-                    if (!ModerationUtils.isExpired(m.getEndDate())) {
-                        isMuted = true;
-
-                        if (mute == null) mute = m;
-                        else if (mute.getServer() == null) mute = m;
-                    } else {
-                        m.setUnmuteDate();
-                        muteRepository.save(m);
-                    }
-                }
-
-                if (isMuted) {
+                if (mute != null) {
                     Text.send(messages.getAndReplace("moderation.mute.reminder",
                             "staff", mute.getStaff() != null ? mute.getStaff().getUsername() : messages.get("console"),
                             "server", mute.getServer() != null ? mute.getServer() : messages.get("global"),

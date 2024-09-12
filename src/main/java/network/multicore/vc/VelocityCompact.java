@@ -49,13 +49,15 @@ import java.util.Set;
 @Plugin(
         id = VelocityCompact.PLUGIN_ID,
         name = "VelocityCompact",
-        version = "1.0.0",
+        version = VelocityCompact.PLUGIN_VERSION,
         description = "All you need for your velocity server",
         url = "https://github.com/LoreSchaeffer/VelocityCompact",
-        authors = {"LoreSchaeffer"}
+        authors = {VelocityCompact.PLUGIN_AUTHOR}
 )
 public class VelocityCompact {
     public static final String PLUGIN_ID = "velocitycompact";
+    public static final String PLUGIN_VERSION = "1.0.0";
+    public static final String PLUGIN_AUTHOR = "LoreSchaeffer";
 
     private static VelocityCompact instance;
     private final Logger logger;
@@ -182,6 +184,10 @@ public class VelocityCompact {
 
     public YamlDocument config() {
         return config;
+    }
+
+    public File pluginDir() {
+        return pluginDir;
     }
 
     public UserRepository userRepository() {

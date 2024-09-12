@@ -86,6 +86,15 @@ public class Lookup extends AbstractCommand {
                         lookup.add(messages.getAndReplace("moderation.lookup.status-online", "server", server));
                     }
                 }
+                case "nickname-history" -> {
+                    StringBuilder nicknames = new StringBuilder();
+                    for (int i = 0; i < user.getUsernameHistory().size(); i++) {
+                        nicknames.append(user.getUsernameHistory().get(i));
+                        if (i < user.getUsernameHistory().size() - 1) nicknames.append(messages.get("moderation.lookup.nickname-history-separator"));
+                    }
+
+                    lookup.add(messages.getAndReplace("moderation.lookup.nickname-history", "nicknames", nicknames.toString()));
+                }
                 case "punishment-status" -> {
                     List<String> statusOrder = messages.getStringList("moderation.lookup.punishment-status.order");
 

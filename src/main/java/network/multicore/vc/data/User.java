@@ -5,10 +5,7 @@ import com.velocitypowered.api.proxy.Player;
 import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 public class User {
@@ -59,6 +56,7 @@ public class User {
     public User setUsername(@NotNull String username) {
         Preconditions.checkNotNull(username, "username");
 
+        if (usernameHistory == null) usernameHistory = new ArrayList<>();
         usernameHistory.add(this.username);
         this.username = username;
         return this;
