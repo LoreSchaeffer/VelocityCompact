@@ -71,7 +71,7 @@ public class WarnCommand extends AbstractCommand {
 
         User staff = src instanceof Player player ? plugin.userRepository().findById(player.getUniqueId()).orElse(null) : null;
         if (staff == null && src instanceof Player) {
-            Text.send(messages.getAndReplace("common.internal-exception", "lines", "Staff user not found"), src);
+            Text.send(messages.getAndReplace("common.internal-exception", "message", "Staff user not found"), src);
             return COMMAND_FAILED;
         }
 
@@ -85,7 +85,7 @@ public class WarnCommand extends AbstractCommand {
         plugin.warnRepository().save(warn);
 
         Optional<Player> playerOpt = proxy.getPlayer(user.getUniqueId());
-        playerOpt.ifPresent(player -> Text.send(messages.getAndReplace("moderation.target-lines.warn",
+        playerOpt.ifPresent(player -> Text.send(messages.getAndReplace("moderation.target-message.warn",
                 "staff", console ? messages.get("console") : src,
                 "reason", warn.getReason() != null ? warn.getReason() : messages.get("no-reason")
         ), player));

@@ -74,7 +74,10 @@ public abstract class EntityRepository<T, ID> {
             return;
         }
 
-        //TODO applyAndBind
+        // TODO This is not in batch
+        while (entities.iterator().hasNext()) {
+            entityManager.remove(entities.iterator().next());
+        }
     }
 
     public void deleteAll() {
@@ -97,7 +100,10 @@ public abstract class EntityRepository<T, ID> {
             return;
         }
 
-        //TODO
+        // TODO This is not in batch
+        while (ids.iterator().hasNext()) {
+            deleteById(ids.iterator().next());
+        }
     }
 
     public void deleteAllInBatch() {

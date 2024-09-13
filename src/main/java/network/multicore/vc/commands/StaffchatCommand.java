@@ -66,7 +66,7 @@ public class StaffchatCommand extends AbstractCommand {
         } else {
             target = plugin.userRepository().findById(((Player) src).getUniqueId()).orElse(null);
             if (target == null) {
-                Text.send(messages.getAndReplace("common.internal-exception", "lines", "User executing the command not found in the database"), src);
+                Text.send(messages.getAndReplace("common.internal-exception", "message", "User executing the command not found in the database"), src);
                 return COMMAND_FAILED;
             }
         }
@@ -77,24 +77,24 @@ public class StaffchatCommand extends AbstractCommand {
             case "on" -> {
                 target.getSettings().setStaffchat(true);
 
-                if (targetPlayer != null) Text.send(messages.get("commands.staffchat.enabled"), targetPlayer);
-                if (targetPlayer != src) Text.send(messages.getAndReplace("commands.staffchat.enabled-player", "player", target.getUsername()), src);
+                if (targetPlayer != null) Text.send(messages.getAndReplace("commands.generic.enabled-self", "feature", "STAFFCHAT"), targetPlayer);
+                if (targetPlayer != src) Text.send(messages.getAndReplace("commands.generic.enabled-player", "feature", "STAFFCHAT", "player", target.getUsername()), src);
             }
             case "off" -> {
                 target.getSettings().setStaffchat(false);
 
-                if (targetPlayer != null) Text.send(messages.get("commands.staffchat.disabled"), targetPlayer);
-                if (targetPlayer != src) Text.send(messages.getAndReplace("commands.staffchat.disabled-player", "player", target.getUsername()), src);
+                if (targetPlayer != null) Text.send(messages.getAndReplace("commands.generic.disabled-self", "feature", "STAFFCHAT"), targetPlayer);
+                if (targetPlayer != src) Text.send(messages.getAndReplace("commands.generic.disabled-self", "feature", "STAFFCHAT", "player", target.getUsername()), src);
             }
             case "toggle" -> {
                 target.getSettings().setStaffchat(!target.getSettings().hasStaffchat());
 
                 if (target.getSettings().hasStaffchat()) {
-                    if (targetPlayer != null) Text.send(messages.get("commands.staffchat.enabled"), targetPlayer);
-                    if (targetPlayer != src) Text.send(messages.getAndReplace("commands.staffchat.enabled-player", "player", target.getUsername()), src);
+                    if (targetPlayer != null) Text.send(messages.getAndReplace("commands.generic.enabled-self", "feature", "STAFFCHAT"), targetPlayer);
+                    if (targetPlayer != src) Text.send(messages.getAndReplace("commands.generic.enabled-player", "feature", "STAFFCHAT", "player", target.getUsername()), src);
                 } else {
-                    if (targetPlayer != null) Text.send(messages.get("commands.staffchat.disabled"), targetPlayer);
-                    if (targetPlayer != src) Text.send(messages.getAndReplace("commands.staffchat.disabled-player", "player", target.getUsername()), src);
+                    if (targetPlayer != null) Text.send(messages.getAndReplace("commands.generic.disabled-self", "feature", "STAFFCHAT"), targetPlayer);
+                    if (targetPlayer != src) Text.send(messages.getAndReplace("commands.generic.disabled-self", "feature", "STAFFCHAT", "player", target.getUsername()), src);
                 }
             }
         }

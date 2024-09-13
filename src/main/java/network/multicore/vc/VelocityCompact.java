@@ -76,8 +76,8 @@ public class VelocityCompact {
     private WarnRepository warnRepository;
     private boolean premiumVanishSupport;
     private ScheduledTask announcerTask;
+    private boolean loading = false;
 
-    // TODO Check duration suggestions
     // TODO Optimize moderation commands to reduce duplicates
 
     @Inject
@@ -99,6 +99,8 @@ public class VelocityCompact {
     }
 
     public void enable() {
+        loading = true;
+
         try {
             LibraryLoader libLoader = new LibraryLoader(proxy.getPluginManager(), new File(pluginDir, "libraries"), logger);
             libLoader.downloadDependencies();
@@ -119,7 +121,7 @@ public class VelocityCompact {
         try {
             Messages.init(new File(pluginDir, "messages.yml"));
         } catch (IOException e) {
-            logger.error("Failed to load network.multicore.vc.lines", e);
+            logger.error("Failed to load messages", e);
             shutdown();
             return;
         }
@@ -153,6 +155,8 @@ public class VelocityCompact {
         registerCommands();
 
         if (config.getBoolean("modules.announcer", false)) startAnnouncer();
+
+        loading = false;
     }
 
     public void disable() {
@@ -229,6 +233,10 @@ public class VelocityCompact {
 
     public WarnRepository warnRepository() {
         return warnRepository;
+    }
+
+    public boolean isLoading() {
+        return loading;
     }
 
     public void shutdown() {
@@ -373,9 +381,8 @@ public class VelocityCompact {
     }
 
     private void registerCommands() {
-        // TODO Test if it's really recursive
         Reflections reflections = new Reflections(new ConfigurationBuilder()
-                .forPackage(AbstractCommand.class.getPackageName())
+                .forPackages(AbstractCommand.class.getPackageName())
                 .addScanners(Scanners.SubTypes));
 
         reflections.getSubTypesOf(AbstractCommand.class).forEach(clazz -> {
@@ -397,11 +404,11 @@ public class VelocityCompact {
     private void startAnnouncer() {
         List<AnnouncerMessage> messages = new ArrayList<>();
 
-        config.getSection("announcer.lines").getKeys().forEach(key -> {
+        config.getSection("announcer.messages").getKeys().forEach(key -> {
             AnnouncerMessage message = new AnnouncerMessage(
-                    config.getStringList("announcer.lines." + key + ".server-list", List.of()),
-                    config.getBoolean("announcer.lines." + key + ".list-is-whitelist", false),
-                    config.getStringList("announcer.lines." + key + ".lines", List.of())
+                    config.getStringList("announcer.messages." + key + ".server-list", List.of()),
+                    config.getBoolean("announcer.messages." + key + ".list-is-whitelist", false),
+                    config.getStringList("announcer.messages." + key + ".lines", List.of())
             );
             if (!message.lines().isEmpty()) messages.add(message);
         });
@@ -462,6 +469,28 @@ public class VelocityCompact {
                             .filter(server -> !message.servers().contains(server.getServerInfo().getName()))
                             .forEach(server -> Text.broadcast(message.lines(), server));
                 }
+            } else {
+                AnnouncerMessage message = messages.get(index);
+
+                if (message.isWhitelist()) {
+                    message.servers().forEach(serverName -> {
+                        RegisteredServer server = proxy.getServer(serverName).orElse(null);
+                        if (server == null) {
+                            logger.warn("Announcer not sent to server {}. Server not found", serverName);
+                            return;
+                        }
+
+                        Text.broadcast(message.lines(), server);
+                    });
+                } else {
+                    proxy.getAllServers()
+                            .stream()
+                            .filter(server -> !message.servers().contains(server.getServerInfo().getName()))
+                            .forEach(server -> Text.broadcast(message.lines(), server));
+                }
+
+                index++;
+                if (index >= messages.size()) index = 0;
             }
         }
     }

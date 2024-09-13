@@ -21,7 +21,7 @@ public class BanRepository extends EntityRepository<Ban, Long> {
 
     public List<Ban> findAllActiveByUuid(UUID uuid) {
         return entityManager.createQuery("SELECT b FROM Ban b WHERE b.uuid = :uuid AND b.unbanDate IS NULL", Ban.class)
-                .setParameter("uuid", uuid.toString())
+                .setParameter("uuid", uuid)
                 .getResultList();
     }
 
@@ -33,7 +33,7 @@ public class BanRepository extends EntityRepository<Ban, Long> {
 
     public List<Ban> findAllByUuid(UUID uuid) {
         return entityManager.createQuery("SELECT b FROM Ban b WHERE b.uuid = :uuid", Ban.class)
-                .setParameter("uuid", uuid.toString())
+                .setParameter("uuid", uuid)
                 .getResultList();
     }
 }

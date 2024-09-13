@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 public class CensureUtils {
     private static CensureUtils instance;
     private final boolean chatCensorshipEnabled;
+    private final boolean replaceWithAsterisks;
     private final Set<String> censoredWords;
     private final Set<String> censoredRegex;
     private final boolean punishmentEnabled;
@@ -25,6 +26,7 @@ public class CensureUtils {
 
     private CensureUtils(YamlDocument config) {
         this.chatCensorshipEnabled = config.getBoolean("modules.chat-censorship", false) && config.getBoolean("modules.moderation", false);
+        this.replaceWithAsterisks = config.getBoolean("chat-censorship.replace-with-asterisks");
 
         this.censoredWords = config.getStringList("chat-censorship.censored-words")
                 .stream()
@@ -58,7 +60,7 @@ public class CensureUtils {
 
     public CensureResult censure(@NotNull Player player, @NotNull String message) {
         Preconditions.checkNotNull(player, "player");
-        Preconditions.checkNotNull(message, "lines");
+        Preconditions.checkNotNull(message, "message");
 
         if (player.hasPermission(Permission.CHAT_CENSORSHIP_BYPASS.get())) return new CensureResult(false, message, false);
 
@@ -66,14 +68,14 @@ public class CensureUtils {
 
         for (String word : censoredWords) {
             if (message.toLowerCase().contains(word)) {
-                message = message.replaceAll("(?i)" + word, "*".repeat(word.length()));
+                if (replaceWithAsterisks) message = message.replaceAll("(?i)" + word, "*".repeat(word.length()));
                 censored = true;
             }
         }
 
         for (String regex : censoredRegex) {
             if (message.matches(regex)) {
-                message = "*".repeat(message.length());
+                if (replaceWithAsterisks) message = "*".repeat(message.length());
                 censored = true;
             }
         }
@@ -82,7 +84,7 @@ public class CensureUtils {
             ProxyServer proxy = VelocityCompact.getInstance().proxy();
             ConsoleCommandSource console = proxy.getConsoleCommandSource();
             String server = player.getCurrentServer().map(s -> s.getServerInfo().getName()).orElse(null);
-            String silent = punishmentSilent ? "s" : "";
+            String silent = punishmentSilent ? "-s " : "";
 
             if (server == null && punishmentType.equalsIgnoreCase("mute") || punishmentType.equalsIgnoreCase("kick") || punishmentType.equalsIgnoreCase("ban")) {
                 VelocityCompact.getInstance().logger().warn("Player {} was censored for using a censored word, but cannot be punished because they are not on a server.", player.getUsername());
@@ -91,31 +93,31 @@ public class CensureUtils {
 
             return switch (punishmentType.toLowerCase()) {
                 case "warn" -> {
-                    proxy.getCommandManager().executeImmediatelyAsync(console, String.format("%swarn %s %s", silent, player.getUsername(), punishmentReason));
+                    proxy.getCommandManager().executeImmediatelyAsync(console, String.format("warn %s %s%s", player.getUsername(), silent, punishmentReason));
                     yield new CensureResult(true, message, false);
                 }
                 case "mute" -> {
-                    proxy.getCommandManager().executeImmediatelyAsync(console, String.format("%stempmute %s %s %ds %s", silent, player.getUsername(), server, punishmentDuration, punishmentReason));
+                    proxy.getCommandManager().executeImmediatelyAsync(console, String.format("tempmute %s %s %ds %s%s", player.getUsername(), server, punishmentDuration, silent, punishmentReason));
                     yield new CensureResult(true, message, false);
                 }
                 case "gmute" -> {
-                    proxy.getCommandManager().executeImmediatelyAsync(console, String.format("%sgtempmute %s %ds %s", silent, player.getUsername(), punishmentDuration, punishmentReason));
+                    proxy.getCommandManager().executeImmediatelyAsync(console, String.format("gtempmute %s %ds %s%s", player.getUsername(), punishmentDuration, silent, punishmentReason));
                     yield new CensureResult(true, message, false);
                 }
                 case "kick" -> {
-                    proxy.getCommandManager().executeImmediatelyAsync(console, String.format("%skick %s %s %s", silent, player.getUsername(), server, punishmentReason));
+                    proxy.getCommandManager().executeImmediatelyAsync(console, String.format("kick %s %s %s%s", player.getUsername(), server, silent, punishmentReason));
                     yield new CensureResult(true, message, true);
                 }
                 case "gkick" -> {
-                    proxy.getCommandManager().executeImmediatelyAsync(console, String.format("%sgkick %s %s", silent, player.getUsername(), punishmentReason));
+                    proxy.getCommandManager().executeImmediatelyAsync(console, String.format("gkick %s %s%s", player.getUsername(), silent, punishmentReason));
                     yield new CensureResult(true, message, true);
                 }
                 case "ban" -> {
-                    proxy.getCommandManager().executeImmediatelyAsync(console, String.format("%stempban %s %s %ds %s", silent, player.getUsername(), server, punishmentDuration, punishmentReason));
+                    proxy.getCommandManager().executeImmediatelyAsync(console, String.format("tempban %s %s %ds %s%s", player.getUsername(), server, punishmentDuration, silent, punishmentReason));
                     yield new CensureResult(true, message, true);
                 }
                 case "gban" -> {
-                    proxy.getCommandManager().executeImmediatelyAsync(console, String.format("%sgtempban %s %ds %s", silent, player.getUsername(), punishmentDuration, punishmentReason));
+                    proxy.getCommandManager().executeImmediatelyAsync(console, String.format("gtempban %s %ds %s%s", player.getUsername(), punishmentDuration, silent, punishmentReason));
                     yield new CensureResult(true, message, true);
                 }
                 default -> {

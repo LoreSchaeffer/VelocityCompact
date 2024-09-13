@@ -117,7 +117,7 @@ public class User {
     public User setSettings(@NotNull UserSettings settings) {
         Preconditions.checkNotNull(settings, "settings");
 
-        if (settings.getUser().getUniqueId() != this.getUniqueId()) throw new IllegalArgumentException("Settings user UUID does not match user UUID");
+        if (settings.getUniqueId() != this.getUniqueId()) throw new IllegalArgumentException("Settings user UUID does not match user UUID");
         if (this.settings != null) this.settings.update(settings);
         else this.settings = settings;
         return this;

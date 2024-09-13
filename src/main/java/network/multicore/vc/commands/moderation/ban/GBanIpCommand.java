@@ -65,7 +65,7 @@ public class GBanIpCommand extends AbstractCommand {
 
         User staff = src instanceof Player player ? plugin.userRepository().findById(player.getUniqueId()).orElse(null) : null;
         if (staff == null && src instanceof Player) {
-            Text.send(messages.getAndReplace("common.internal-exception", "lines", "Staff user not found"), src);
+            Text.send(messages.getAndReplace("common.internal-exception", "message", "Staff user not found"), src);
             return COMMAND_FAILED;
         }
 
@@ -151,7 +151,7 @@ public class GBanIpCommand extends AbstractCommand {
                                         "reason", ban.getReason() != null ? ban.getReason() : messages.get("no-reason")
                                 )));
                             } else {
-                                Text.send(messages.getAndReplace("moderation.target-lines.ban-ip",
+                                Text.send(messages.getAndReplace("moderation.target-message.ban-ip",
                                         "staff", console ? messages.get("console") : src,
                                         "server", messages.get("global"),
                                         "duration", messages.get("permanent"),

@@ -40,17 +40,19 @@ public class GTempMuteCommand extends AbstractCommand {
                 .requires(src -> src.hasPermission(Permission.GMUTE.get()))
                 .then(BrigadierCommand.requiredArgumentBuilder(PLAYER_ARG, StringArgumentType.word())
                         .suggests(new PlayerSuggestionProvider<>(proxy, PLAYER_ARG))
-                        .executes((ctx) -> execute(ctx.getSource(),
-                                ctx.getArgument(PLAYER_ARG, String.class),
-                                ctx.getArgument(DURATION_ARG, String.class),
-                                null))
-                        .then(BrigadierCommand.requiredArgumentBuilder(REASON_ARG, StringArgumentType.greedyString())
-                                .suggests(new CustomSuggestionProvider<>(REASON_ARG, config.getStringList("moderation.reason-suggestions.mute")))
+                        .then(BrigadierCommand.requiredArgumentBuilder(DURATION_ARG, StringArgumentType.greedyString())
+                                .suggests(new CustomSuggestionProvider<>(DURATION_ARG, config.getStringList("moderation.duration-suggestions")))
                                 .executes((ctx) -> execute(ctx.getSource(),
                                         ctx.getArgument(PLAYER_ARG, String.class),
                                         ctx.getArgument(DURATION_ARG, String.class),
-                                        ctx.getArgument(REASON_ARG, String.class)))
-                                .build()));
+                                        null))
+                                .then(BrigadierCommand.requiredArgumentBuilder(REASON_ARG, StringArgumentType.greedyString())
+                                        .suggests(new CustomSuggestionProvider<>(REASON_ARG, config.getStringList("moderation.reason-suggestions.mute")))
+                                        .executes((ctx) -> execute(ctx.getSource(),
+                                                ctx.getArgument(PLAYER_ARG, String.class),
+                                                ctx.getArgument(DURATION_ARG, String.class),
+                                                ctx.getArgument(REASON_ARG, String.class)))
+                                        .build())));
 
         proxy.getCommandManager().register(buildMeta(), new BrigadierCommand(node.build()));
     }
@@ -87,7 +89,7 @@ public class GTempMuteCommand extends AbstractCommand {
 
         User staff = src instanceof Player player ? plugin.userRepository().findById(player.getUniqueId()).orElse(null) : null;
         if (staff == null && src instanceof Player) {
-            Text.send(messages.getAndReplace("common.internal-exception", "lines", "Staff user not found"), src);
+            Text.send(messages.getAndReplace("common.internal-exception", "message", "Staff user not found"), src);
             return COMMAND_FAILED;
         }
 
@@ -108,7 +110,7 @@ public class GTempMuteCommand extends AbstractCommand {
             plugin.muteRepository().save(mute);
 
             Optional<Player> target = proxy.getPlayer(user.getUniqueId());
-            target.ifPresent(p -> Text.send(messages.getAndReplace("moderation.target-lines.mute",
+            target.ifPresent(p -> Text.send(messages.getAndReplace("moderation.target-message.mute",
                     "staff", console ? messages.get("console") : src,
                     "server", messages.get("global"),
                     "duration", ModerationUtils.getDurationString(end),

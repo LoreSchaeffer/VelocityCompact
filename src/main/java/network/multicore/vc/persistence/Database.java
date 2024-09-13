@@ -26,7 +26,7 @@ public class Database implements Closeable {
 
     private Database(String persistenceUnitName, DataSourceProvider<?> dataSourceProvider, Entities entities, Properties properties, Map<String, Object> configuration) {
         this.emf = PERSISTENCE_PROVIDER.createContainerEntityManagerFactory(
-                new PersistenceUnitInfoImpl(persistenceUnitName, entities.getEntityClassNames(), properties),
+                new PersistenceUnitInfoImpl(persistenceUnitName, entities.getEntityClassNames(), properties).setNonJtaDataSource(dataSourceProvider.getDataSource()),
                 configuration
         );
         this.em = emf.createEntityManager();
@@ -72,6 +72,8 @@ public class Database implements Closeable {
             Preconditions.checkNotNull(dataSourceProvider.getDataSource(), "Data source must not be null");
             Preconditions.checkNotNull(dataSourceProvider.getDriver(), "Data source driver must not be null");
             Preconditions.checkArgument(!dataSourceProvider.getDriver().isBlank(), "Data source driver cannot be empty");
+            Preconditions.checkNotNull(dataSourceProvider.getDialect(), "Data source dialect must not be null");
+            Preconditions.checkArgument(!dataSourceProvider.getDialect().isBlank(), "Data source dialect cannot be empty");
 
             this.dataSourceProvider = dataSourceProvider;
             return this;
@@ -148,6 +150,8 @@ public class Database implements Closeable {
         }
 
         public Database build() {
+            // Not needed
+            // properties.put("hibernate.dialect", dataSourceProvider.getDialect());
             properties.put("hibernate.connection.datasource", dataSourceProvider.getDataSource());
             if (!properties.containsKey("hibernate.hbm2ddl.auto")) {
                 properties.put("hibernate.hbm2ddl.auto", HibernateHbm2DdlAutoMode.VALIDATE.getValue());
@@ -163,6 +167,10 @@ public class Database implements Closeable {
             if (integrator != null && !configuration.containsKey("hibernate.integrator_provider")) {
                 properties.put("hibernate.integrator_provider", (IntegratorProvider) () -> Collections.singletonList(integrator));
             }
+
+            // properties.put("hibernate.show_sql", true);
+            // properties.put("hibernate.format_sql", true);
+            // properties.put("hibernate.use_sql_comments", true);
 
             return new Database(
                     persistenceUnitName.contains(" ") ? persistenceUnitName.replace(" ", "_") : persistenceUnitName,

@@ -58,9 +58,9 @@ public class CommandExecuteListener extends Listener {
                 .collect(Collectors.toSet());
 
         if (config.getBoolean("modules.socialspy", false)) {
-            this.csIgnoredCommands.add("lines");
+            this.csIgnoredCommands.add("message");
             this.csIgnoredCommands.add("reply");
-            this.csIgnoredCommands.addAll(config.getStringList("command-aliases.lines"));
+            this.csIgnoredCommands.addAll(config.getStringList("command-aliases.message"));
             this.csIgnoredCommands.addAll(config.getStringList("command-aliases.reply"));
         }
         this.logger = plugin.logger();
@@ -95,6 +95,9 @@ public class CommandExecuteListener extends Listener {
         if (commandspyEnabled && src instanceof Player player) {
             commandspy(player, command);
         }
+
+        String server = src instanceof Player player ? player.getCurrentServer().map(s -> s.getServerInfo().getName()).orElse(null) : null;
+        logger.info("CMD: [{}] {}: {}", server != null ? server : "unknown", src instanceof Player p ? p.getUsername() : "console", command);
     }
 
     private boolean isCommandBlocked(CommandSource src, String command) {
@@ -121,7 +124,7 @@ public class CommandExecuteListener extends Listener {
                     .stream()
                     .filter(p -> plugin.userRepository().findById(p.getUniqueId())
                             .map(user -> user.getSettings().hasCommandspy())
-                            .orElse(false))
+                            .orElse(false) && player.getUniqueId() != p.getUniqueId())
                     .toList();
 
             if (receivers.isEmpty()) return;

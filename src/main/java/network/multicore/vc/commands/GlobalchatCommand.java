@@ -66,7 +66,7 @@ public class GlobalchatCommand extends AbstractCommand {
         } else {
             target = plugin.userRepository().findById(((Player) src).getUniqueId()).orElse(null);
             if (target == null) {
-                Text.send(messages.getAndReplace("common.internal-exception", "lines", "User executing the command not found in the database"), src);
+                Text.send(messages.getAndReplace("common.internal-exception", "message", "User executing the command not found in the database"), src);
                 return COMMAND_FAILED;
             }
         }
@@ -77,24 +77,24 @@ public class GlobalchatCommand extends AbstractCommand {
             case "on" -> {
                 target.getSettings().setGlobalchat(true);
 
-                if (targetPlayer != null) Text.send(messages.get("commands.globalchat.enabled"), targetPlayer);
-                if (targetPlayer != src) Text.send(messages.getAndReplace("commands.globalchat.enabled-player", "player", target.getUsername()), src);
+                if (targetPlayer != null) Text.send(messages.getAndReplace("commands.generic.enabled-self", "feature", "GLOBALCHAT"), targetPlayer);
+                if (targetPlayer != src) Text.send(messages.getAndReplace("commands.generic.enabled-player", "feature", "GLOBALCHAT", "player", target.getUsername()), src);
             }
             case "off" -> {
                 target.getSettings().setGlobalchat(false);
 
-                if (targetPlayer != null) Text.send(messages.get("commands.globalchat.disabled"), targetPlayer);
-                if (targetPlayer != src) Text.send(messages.getAndReplace("commands.globalchat.disabled-player", "player", target.getUsername()), src);
+                if (targetPlayer != null) Text.send(messages.getAndReplace("commands.generic.disabled-self", "feature", "GLOBALCHAT"), targetPlayer);
+                if (targetPlayer != src) Text.send(messages.getAndReplace("commands.generic.disabled-self", "feature", "GLOBALCHAT", "player", target.getUsername()), src);
             }
             case "toggle" -> {
                 target.getSettings().setGlobalchat(!target.getSettings().hasGlobalchat());
 
                 if (target.getSettings().hasGlobalchat()) {
-                    if (targetPlayer != null) Text.send(messages.get("commands.globalchat.enabled"), targetPlayer);
-                    if (targetPlayer != src) Text.send(messages.getAndReplace("commands.globalchat.enabled-player", "player", target.getUsername()), src);
+                    if (targetPlayer != null) Text.send(messages.getAndReplace("commands.generic.enabled-self", "feature", "GLOBALCHAT"), targetPlayer);
+                    if (targetPlayer != src) Text.send(messages.getAndReplace("commands.generic.enabled-player", "feature", "GLOBALCHAT", "player", target.getUsername()), src);
                 } else {
-                    if (targetPlayer != null) Text.send(messages.get("commands.globalchat.disabled"), targetPlayer);
-                    if (targetPlayer != src) Text.send(messages.getAndReplace("commands.globalchat.disabled-player", "player", target.getUsername()), src);
+                    if (targetPlayer != null) Text.send(messages.getAndReplace("commands.generic.disabled-self", "feature", "GLOBALCHAT"), targetPlayer);
+                    if (targetPlayer != src) Text.send(messages.getAndReplace("commands.generic.disabled-self", "feature", "GLOBALCHAT", "player", target.getUsername()), src);
                 }
             }
         }

@@ -205,7 +205,7 @@ public class LookupIp extends AbstractCommand {
 
                 List<Ban> pageBans = bans.subList((page - 1) * 10, Math.min(page * 10, bans.size()));
 
-                lookup.add(messages.getAndReplace("commands.lookup.header",
+                lookup.add(messages.getAndReplace("moderation.lookup.header",
                         "player", ip,
                         "page", page,
                         "total_pages", pages
@@ -213,7 +213,7 @@ public class LookupIp extends AbstractCommand {
 
                 for (Ban ban : pageBans) {
                     if (ban.getUnbanDate() == null) {
-                        lookup.add(messages.getAndReplace("commands.punishment-lookup.ban-active",
+                        lookup.add(messages.getAndReplace("moderation.punishment-lookup.ban-active",
                                 "date", messages.formatDate(ban.getBeginDate()),
                                 "staff", ban.getStaff() != null ? ban.getStaff().getUsername() : messages.get("console"),
                                 "server", ban.getServer() == null ? messages.get("global") : ban.getServer(),
@@ -221,7 +221,7 @@ public class LookupIp extends AbstractCommand {
                                 "reason", ban.getReason()
                         ));
                     } else {
-                        lookup.add(messages.getAndReplace("commands.punishment-lookup.ban-active",
+                        lookup.add(messages.getAndReplace("moderation.punishment-lookup.ban-active",
                                 new String[]{"date", "staff", "server", "duration", "reason", "revoked_by", "revoked_date", "revoked_reason"},
                                 new Object[]{
                                         messages.formatDate(ban.getBeginDate()),
@@ -237,7 +237,7 @@ public class LookupIp extends AbstractCommand {
                     }
                 }
 
-                lookup.add(messages.getAndReplace("commands.lookup.footer",
+                lookup.add(messages.getAndReplace("moderation.lookup.footer",
                         "player", ip,
                         "page", page,
                         "total_pages", pages
@@ -255,21 +255,21 @@ public class LookupIp extends AbstractCommand {
 
                 List<Kick> pageKicks = kicks.subList((page - 1) * 10, Math.min(page * 10, kicks.size()));
 
-                lookup.add(messages.getAndReplace("commands.lookup.header",
+                lookup.add(messages.getAndReplace("moderation.lookup.header",
                         "player", ip,
                         "page", page,
                         "total_pages", pages
                 ));
 
                 for (Kick kick : pageKicks) {
-                    lookup.add(messages.getAndReplace("commands.punishment-lookup.kick",
+                    lookup.add(messages.getAndReplace("moderation.punishment-lookup.kick",
                             "date", messages.formatDate(kick.getDate()),
                             "staff", kick.getStaff() != null ? kick.getStaff().getUsername() : messages.get("console"),
                             "reason", kick.getReason()
                     ));
                 }
 
-                lookup.add(messages.getAndReplace("commands.lookup.footer",
+                lookup.add(messages.getAndReplace("moderation.lookup.footer",
                         "player", ip,
                         "page", page,
                         "total_pages", pages
@@ -287,7 +287,7 @@ public class LookupIp extends AbstractCommand {
 
                 List<Mute> pageMutes = mutes.subList((page - 1) * 10, Math.min(page * 10, mutes.size()));
 
-                lookup.add(messages.getAndReplace("commands.lookup.header",
+                lookup.add(messages.getAndReplace("moderation.lookup.header",
                         "player", ip,
                         "page", page,
                         "total_pages", pages
@@ -295,7 +295,7 @@ public class LookupIp extends AbstractCommand {
 
                 for (Mute mute : pageMutes) {
                     if (mute.getUnmuteDate() == null) {
-                        lookup.add(messages.getAndReplace("commands.punishment-lookup.mute-active",
+                        lookup.add(messages.getAndReplace("moderation.punishment-lookup.mute-active",
                                 "date", messages.formatDate(mute.getBeginDate()),
                                 "staff", mute.getStaff() != null ? mute.getStaff().getUsername() : messages.get("console"),
                                 "server", mute.getServer() == null ? messages.get("global") : mute.getServer(),
@@ -303,7 +303,7 @@ public class LookupIp extends AbstractCommand {
                                 "reason", mute.getReason()
                         ));
                     } else {
-                        lookup.add(messages.getAndReplace("commands.punishment-lookup.mute-active",
+                        lookup.add(messages.getAndReplace("moderation.punishment-lookup.mute-active",
                                 new String[]{"date", "staff", "server", "duration", "reason", "revoked_by", "revoked_date", "revoked_reason"},
                                 new Object[]{
                                         messages.formatDate(mute.getBeginDate()),
@@ -319,7 +319,7 @@ public class LookupIp extends AbstractCommand {
                     }
                 }
 
-                lookup.add(messages.getAndReplace("commands.lookup.footer",
+                lookup.add(messages.getAndReplace("moderation.lookup.footer",
                         "player", ip,
                         "page", page,
                         "total_pages", pages

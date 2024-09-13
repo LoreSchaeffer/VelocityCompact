@@ -82,7 +82,7 @@ public class UnBanCommand extends AbstractCommand {
 
         User staff = src instanceof Player player ? plugin.userRepository().findById(player.getUniqueId()).orElse(null) : null;
         if (staff == null && src instanceof Player) {
-            Text.send(messages.getAndReplace("common.internal-exception", "lines", "Staff user not found"), src);
+            Text.send(messages.getAndReplace("common.internal-exception", "message", "Staff user not found"), src);
             return COMMAND_FAILED;
         }
 
@@ -110,7 +110,7 @@ public class UnBanCommand extends AbstractCommand {
         plugin.banRepository().save(ban);
 
         Optional<Player> target = proxy.getPlayer(ban.getUniqueId());
-        target.ifPresent(p -> Text.send(messages.getAndReplace("moderation.target-lines.unban",
+        target.ifPresent(p -> Text.send(messages.getAndReplace("moderation.target-message.unban",
                 "staff", console ? messages.get("console") : src,
                 "server", server.getServerInfo().getName(),
                 "reason", ban.getReason() != null ? ban.getReason() : messages.get("no-reason")

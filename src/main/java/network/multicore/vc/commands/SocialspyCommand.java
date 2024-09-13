@@ -66,7 +66,7 @@ public class SocialspyCommand extends AbstractCommand {
         } else {
             target = plugin.userRepository().findById(((Player) src).getUniqueId()).orElse(null);
             if (target == null) {
-                Text.send(messages.getAndReplace("common.internal-exception", "lines", "User executing the command not found in the database"), src);
+                Text.send(messages.getAndReplace("common.internal-exception", "message", "User executing the command not found in the database"), src);
                 return COMMAND_FAILED;
             }
         }
@@ -77,24 +77,24 @@ public class SocialspyCommand extends AbstractCommand {
             case "on" -> {
                 target.getSettings().setSocialspy(true);
 
-                if (targetPlayer != null) Text.send(messages.get("commands.socialspy.enabled"), targetPlayer);
-                if (targetPlayer != src) Text.send(messages.getAndReplace("commands.socialspy.enabled-player", "player", target.getUsername()), src);
+                if (targetPlayer != null) Text.send(messages.getAndReplace("commands.generic.enabled-self", "feature", "SOCIALSPY"), targetPlayer);
+                if (targetPlayer != src) Text.send(messages.getAndReplace("commands.generic.enabled-player", "feature", "SOCIALSPY", "player", target.getUsername()), src);
             }
             case "off" -> {
                 target.getSettings().setSocialspy(false);
 
-                if (targetPlayer != null) Text.send(messages.get("commands.socialspy.disabled"), targetPlayer);
-                if (targetPlayer != src) Text.send(messages.getAndReplace("commands.socialspy.disabled-player", "player", target.getUsername()), src);
+                if (targetPlayer != null) Text.send(messages.getAndReplace("commands.generic.disabled-self", "feature", "SOCIALSPY"), targetPlayer);
+                if (targetPlayer != src) Text.send(messages.getAndReplace("commands.generic.disabled-self", "feature", "SOCIALSPY", "player", target.getUsername()), src);
             }
             case "toggle" -> {
                 target.getSettings().setSocialspy(!target.getSettings().hasSocialspy());
 
                 if (target.getSettings().hasSocialspy()) {
-                    if (targetPlayer != null) Text.send(messages.get("commands.socialspy.enabled"), targetPlayer);
-                    if (targetPlayer != src) Text.send(messages.getAndReplace("commands.socialspy.enabled-player", "player", target.getUsername()), src);
+                    if (targetPlayer != null) Text.send(messages.getAndReplace("commands.generic.enabled-self", "feature", "SOCIALSPY"), targetPlayer);
+                    if (targetPlayer != src) Text.send(messages.getAndReplace("commands.generic.enabled-player", "feature", "SOCIALSPY", "player", target.getUsername()), src);
                 } else {
-                    if (targetPlayer != null) Text.send(messages.get("commands.socialspy.disabled"), targetPlayer);
-                    if (targetPlayer != src) Text.send(messages.getAndReplace("commands.socialspy.disabled-player", "player", target.getUsername()), src);
+                    if (targetPlayer != null) Text.send(messages.getAndReplace("commands.generic.disabled-self", "feature", "SOCIALSPY"), targetPlayer);
+                    if (targetPlayer != src) Text.send(messages.getAndReplace("commands.generic.disabled-self", "feature", "SOCIALSPY", "player", target.getUsername()), src);
                 }
             }
         }

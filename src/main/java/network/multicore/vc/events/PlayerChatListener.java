@@ -7,8 +7,8 @@ import com.velocitypowered.api.proxy.Player;
 import network.multicore.vc.data.Mute;
 import network.multicore.vc.data.MuteRepository;
 import network.multicore.vc.utils.CensureUtils;
-import network.multicore.vc.utils.Permission;
 import network.multicore.vc.utils.ModerationUtils;
+import network.multicore.vc.utils.Permission;
 import network.multicore.vc.utils.Text;
 import org.slf4j.Logger;
 
@@ -57,12 +57,12 @@ public class PlayerChatListener extends Listener {
                         "duration", mute.getEndDate() != null ? ModerationUtils.getDurationString(mute.getEndDate()) : messages.get("permanent"),
                         "reason", mute.getReason() != null ? mute.getReason() : messages.get("no-reason")
                 ), player);
-                Text.broadcast(messages.getAndReplace("moderation.mute.muted-lines-broadcast",
+                Text.broadcast(messages.getAndReplace("moderation.mute.muted-message-broadcast",
                         "server", server != null ? server : messages.get("unknown"),
                         "player", player.getUsername(),
-                        "lines", message
+                        "message", message
                 ), Permission.MUTED_MESSAGE_RECEIVE.get());
-                logger.info("{} tried send a lines to chat, but is muted. Message: {}", player.getUsername(), message);
+                logger.info("{} tried send a message to chat, but is muted. Message: {}", player.getUsername(), message);
                 return;
             }
         }
@@ -83,6 +83,8 @@ public class PlayerChatListener extends Listener {
         if (globalchatEnabled) {
             globalchat(player, message);
         }
+
+        logger.info("CHAT: [{}] {}: {}", server != null ? server : "unknown", player.getUsername(), message);
     }
 
     private void globalchat(Player player, String message) {
@@ -92,14 +94,16 @@ public class PlayerChatListener extends Listener {
             List<Player> receivers = proxy.getAllPlayers()
                     .stream()
                     .filter(p -> plugin.userRepository().findById(p.getUniqueId())
-                            .map(user -> user.getSettings().hasGlobalchat())
+                            .map(user -> {
+                                if (!user.getSettings().hasGlobalchat()) return false;
+                                return !p.getCurrentServer().map(s -> s.getServerInfo().getName()).orElse("unknown").equals(server);
+                            })
                             .orElse(false))
                     .toList();
 
             if (receivers.isEmpty()) return;
 
-            String broadcast = messages.getAndReplace("common.globalchat-broadcast", "server", server, "player", player, "lines", message);
-            Text.send(broadcast, receivers);
+            Text.send(messages.getAndReplace("common.globalchat-broadcast", "server", server, "player", player, "message", message), receivers);
         }).start();
     }
 }

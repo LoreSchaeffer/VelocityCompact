@@ -18,18 +18,18 @@ import java.util.stream.Collectors;
 
 public class MessageCommand extends AbstractCommand {
     private static final String PLAYER_ARG = "player";
-    private static final String MESSAGE_ARG = "lines";
+    private static final String MESSAGE_ARG = "message";
     private final CensureUtils censureUtils;
     private final boolean mutePreventPrivateMessages;
     private final MuteRepository muteRepository;
 
     /**
-     * /lines <target> <lines>
+     * /message <target> <message>
      */
     public MessageCommand() {
-        super("lines");
+        super("message");
         this.censureUtils = CensureUtils.get();
-        this.mutePreventPrivateMessages = config.getBoolean("moderation.mute-prevents-private-lines", false) && config.getBoolean("modules.moderation", false);
+        this.mutePreventPrivateMessages = config.getBoolean("moderation.mute-prevents-private-messages", false) && config.getBoolean("modules.moderation", false);
         this.muteRepository = plugin.muteRepository();
     }
 
@@ -57,7 +57,7 @@ public class MessageCommand extends AbstractCommand {
                     .stream()
                     .filter(p -> plugin.userRepository().findById(p.getUniqueId())
                             .map(user -> user.getSettings().hasSocialspy())
-                            .orElse(false))
+                            .orElse(false) && !sender.getUniqueId().equals(p.getUniqueId()) && !receiver.getUniqueId().equals(p.getUniqueId()))
                     .toList();
 
             if (receivers.isEmpty()) return;
@@ -67,7 +67,7 @@ public class MessageCommand extends AbstractCommand {
                     "sender", sender.getUsername(),
                     "receiver_server", receiverServer,
                     "receiver", receiver.getUsername(),
-                    "lines", message
+                    "message", message
             );
 
             Text.send(broadcast, receivers);
@@ -76,7 +76,7 @@ public class MessageCommand extends AbstractCommand {
 
     @Override
     public void register() {
-        if (!config.getBoolean("modules.lines", false)) return;
+        if (!config.getBoolean("modules.messages", false)) return;
 
         LiteralArgumentBuilder<CommandSource> node = BrigadierCommand
                 .literalArgumentBuilder(command)
@@ -116,10 +116,10 @@ public class MessageCommand extends AbstractCommand {
                             "duration", mute.getEndDate() != null ? ModerationUtils.getDurationString(mute.getEndDate()) : messages.get("permanent"),
                             "reason", mute.getReason() != null ? mute.getReason() : messages.get("no-reason")
                     ), sender);
-                    Text.broadcast(messages.getAndReplace("moderation.mute.muted-lines-broadcast",
+                    Text.broadcast(messages.getAndReplace("moderation.mute.muted-messages-broadcast",
                             "server", senderServer,
                             "player", sender.getUsername(),
-                            "lines", message
+                            "message", message
                     ), Permission.MUTED_MESSAGE_RECEIVE.get());
                     return COMMAND_SUCCESS;
                 }
@@ -138,7 +138,7 @@ public class MessageCommand extends AbstractCommand {
         }
 
         if (receiver.equals(sender)) {
-            Text.send(messages.get("commands.lines.lines-yourself"), sender);
+            Text.send(messages.get("commands.message.message-yourself"), sender);
             return COMMAND_FAILED;
         }
 
@@ -153,12 +153,12 @@ public class MessageCommand extends AbstractCommand {
 
         String receiverServer = receiver.getCurrentServer().map(server -> server.getServerInfo().getName()).orElse(messages.get("unknown"));
 
-        String formattedMessage = messages.getAndReplace("commands.lines.lines-format",
+        String formattedMessage = messages.getAndReplace("commands.message.message-format",
                 "sender_server", senderServer,
                 "sender", sender.getUsername(),
                 "receiver_server", receiverServer,
                 "receiver", receiver.getUsername(),
-                "lines", message
+                "message", message
         );
 
         Text.send(formattedMessage, sender);

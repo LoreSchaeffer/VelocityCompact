@@ -20,7 +20,7 @@ public class MuteRepository extends EntityRepository<Mute, Long> {
 
     public List<Mute> findAllActiveByUuid(UUID uuid) {
         return entityManager.createQuery("SELECT m FROM Mute m WHERE m.uuid = :uuid AND m.unmuteDate IS NULL", Mute.class)
-                .setParameter("uuid", uuid.toString())
+                .setParameter("uuid", uuid)
                 .getResultList();
     }
 
@@ -32,7 +32,7 @@ public class MuteRepository extends EntityRepository<Mute, Long> {
 
     public List<Mute> findAllByUuid(UUID uuid) {
         return entityManager.createQuery("SELECT m FROM Mute m WHERE m.uuid = :uuid", Mute.class)
-                .setParameter("uuid", uuid.toString())
+                .setParameter("uuid", uuid)
                 .getResultList();
     }
 }

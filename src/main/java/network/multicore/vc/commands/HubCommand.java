@@ -105,7 +105,7 @@ public class HubCommand extends AbstractCommand {
                             if (Utils.isVanished(src, p)) return false;
 
                             ServerConnection playerServer = p.getCurrentServer().orElse(null);
-                            return playerServer != null && playerServer.getServer().equals(srcServer);
+                            return playerServer != null && playerServer.getServer().getServerInfo().getName().equals(srcServer.getServerInfo().getName());
                         })
                         .toList()
                 );
@@ -140,13 +140,15 @@ public class HubCommand extends AbstractCommand {
             FallbackConnection connection = new FallbackConnection(target);
             connection.connect().whenComplete((result, throwable) -> {
                 if (throwable != null) {
-                    Text.send(messages.getAndReplace("common.internal-exception", "lines", throwable.getMessage()), src);
+                    Text.send(messages.getAndReplace("common.internal-exception", "message", throwable.getMessage()), src);
                     return;
                 }
 
-                if (result.isSuccessful() && !target.equals(src)) {
-                    Text.send(messages.getAndReplace("commands.hub.sent-to-hub-target", "player", src), target);
-                    Text.send(messages.getAndReplace("commands.hub.sent-to-hub-player", "player", target), src);
+                if (result.isSuccessful()) {
+                    if (!target.equals(src)) {
+                        Text.send(messages.getAndReplace("commands.hub.sent-to-hub-target", "player", src), target);
+                        Text.send(messages.getAndReplace("commands.hub.sent-to-hub-player", "player", target), src);
+                    }
                 } else {
                     Text.send(messages.get("commands.hub.not-sent-to-hub-player"), src);
                 }
@@ -174,7 +176,7 @@ public class HubCommand extends AbstractCommand {
             //TODO To be tested
             allCompleted.whenComplete((result, throwable) -> {
                 if (throwable != null) {
-                    Text.send(messages.getAndReplace("common.internal-exception", "lines", throwable.getMessage()), src);
+                    Text.send(messages.getAndReplace("common.internal-exception", "message", throwable.getMessage()), src);
                     return;
                 }
 

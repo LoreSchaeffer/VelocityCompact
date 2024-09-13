@@ -46,13 +46,14 @@ public class DurationSuggestionProvider<S> implements SuggestionProvider<S> {
         } else {
             try {
                 int val = Integer.parseInt(arg);
-                for (int i = 0; i < 10; i++) builder.suggest(String.valueOf(i));
 
                 String unit = arg.replace(String.valueOf(val), "");
 
                 suggestions.stream()
                         .filter(suggestion -> suggestion.regionMatches(true, 0, unit, 0, unit.length()))
-                        .forEach(builder::suggest);
+                        .forEach(s -> builder.suggest(val + s));
+
+                for (int i = 0; i < 10; i++) builder.suggest(String.valueOf(i));
             } catch (NumberFormatException ignored) {
             }
         }

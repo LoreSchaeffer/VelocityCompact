@@ -66,7 +66,7 @@ public class CommandspyCommand extends AbstractCommand {
         } else {
             target = plugin.userRepository().findById(((Player) src).getUniqueId()).orElse(null);
             if (target == null) {
-                Text.send(messages.getAndReplace("common.internal-exception", "lines", "User executing the command not found in the database"), src);
+                Text.send(messages.getAndReplace("common.internal-exception", "message", "User executing the command not found in the database"), src);
                 return COMMAND_FAILED;
             }
         }
@@ -77,24 +77,24 @@ public class CommandspyCommand extends AbstractCommand {
             case "on" -> {
                 target.getSettings().setCommandspy(true);
 
-                if (targetPlayer != null) Text.send(messages.get("commands.commandspy.enabled"), targetPlayer);
-                if (targetPlayer != src) Text.send(messages.getAndReplace("commands.commandspy.enabled-player", "player", target.getUsername()), src);
+                if (targetPlayer != null) Text.send(messages.getAndReplace("commands.generic.enabled-self", "feature", "COMMANDSPY"), targetPlayer);
+                if (targetPlayer != src) Text.send(messages.getAndReplace("commands.generic.enabled-player", "feature", "COMMANDSPY", "player", target.getUsername()), src);
             }
             case "off" -> {
                 target.getSettings().setCommandspy(false);
 
-                if (targetPlayer != null) Text.send(messages.get("commands.commandspy.disabled"), targetPlayer);
-                if (targetPlayer != src) Text.send(messages.getAndReplace("commands.commandspy.disabled-player", "player", target.getUsername()), src);
+                if (targetPlayer != null) Text.send(messages.getAndReplace("commands.generic.disabled-self", "feature", "COMMANDSPY"), targetPlayer);
+                if (targetPlayer != src) Text.send(messages.getAndReplace("commands.generic.disabled-self", "feature", "COMMANDSPY", "player", target.getUsername()), src);
             }
             case "toggle" -> {
                 target.getSettings().setCommandspy(!target.getSettings().hasCommandspy());
 
                 if (target.getSettings().hasCommandspy()) {
-                    if (targetPlayer != null) Text.send(messages.get("commands.commandspy.enabled"), targetPlayer);
-                    if (targetPlayer != src) Text.send(messages.getAndReplace("commands.commandspy.enabled-player", "player", target.getUsername()), src);
+                    if (targetPlayer != null) Text.send(messages.getAndReplace("commands.generic.enabled-self", "feature", "COMMANDSPY"), targetPlayer);
+                    if (targetPlayer != src) Text.send(messages.getAndReplace("commands.generic.enabled-player", "feature", "COMMANDSPY", "player", target.getUsername()), src);
                 } else {
-                    if (targetPlayer != null) Text.send(messages.get("commands.commandspy.disabled"), targetPlayer);
-                    if (targetPlayer != src) Text.send(messages.getAndReplace("commands.commandspy.disabled-player", "player", target.getUsername()), src);
+                    if (targetPlayer != null) Text.send(messages.getAndReplace("commands.generic.disabled-self", "feature", "COMMANDSPY"), targetPlayer);
+                    if (targetPlayer != src) Text.send(messages.getAndReplace("commands.generic.disabled-self", "feature", "COMMANDSPY", "player", target.getUsername()), src);
                 }
             }
         }

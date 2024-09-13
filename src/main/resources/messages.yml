@@ -8,19 +8,20 @@ too-many-connections: 'too many connections'
 banned: 'banned'
 
 common:
-  internal-exception: '<dark_red>Internal plugin exception: {lines}'
+  internal-exception: '<dark_red>Internal plugin exception: {message}'
   command-blocked: '<red>This command is blocked on this server!'
-  command-blocked-broadcast: '<dark_aqua><b>WARN<blue> {server}<gold>:<blue><b>{player}<dark_aqua> ●<aqua> tried to use the command<yellow> {command}'
-  command-warning-broadcast: '<dark_aqua><b>WARN<blue> {server}<gold>:<blue><b>{player}<dark_aqua> ●<aqua> used the command<yellow> {command}'
-  commandspy-broadcast: '<dark_blue><b>CSPY<blue> {server}<gold>:<blue><b>{player}<dark_aqua> ●<reset> {command}'
-  socialspy-broadcast: '<dark_blue><b>SSPY<blue> {sender_server}<gold>:<blue><b>{sender}<red> »<blue> {receiver_server}<gold>:<blue><b>{receiver}<dark_aqua> ●<reset> {lines}'
-  globalchat-broadcast: '<gold>{server}<red>:<gold><b>{player}<dark_aqua> ●<reset> {lines}'
+  command-blocked-broadcast: '<dark_aqua><b>WARN</b><blue> {server}<gold>:<blue><b>{player}</b><dark_aqua> ●<aqua> tried to use the command<yellow> {command}'
+  command-warning-broadcast: '<dark_aqua><b>WARN</b><blue> {server}<gold>:<blue><b>{player}</b><dark_aqua> ●<aqua> used the command<yellow> {command}'
+  commandspy-broadcast: '<dark_blue><b>CSPY</b><blue> {server}<gold>:<blue><b>{player}</b><dark_aqua> ●<reset> {command}'
+  socialspy-broadcast: '<dark_blue><b>SSPY</b><blue> {sender_server}<gold>:<blue><b>{sender}</b><red> »<blue> {receiver_server}<gold>:<blue><b>{receiver}</b><dark_aqua> ●<reset> {message}'
+  globalchat-broadcast: '<gold>{server}<red>:<gold><b>{player}</b><dark_aqua> ●<reset> {message}'
   same-ip-broadcast: '<gold>[<aqua>{players}<gold>] <yellow>have the same ip address.'
   nickname-not-allowed: '<red>Your nickname is not allowed on this server!'
   too-many-connections: '<red>There are too many connections to the server with your IP address!'
-  join-attempt-failed-broadcast: '<dark_aqua><b>JOIN ATTEMPT<blue> {player}<dark_aqua> ●<aqua> tried to join the proxy but was denied:<yellow> {reason}'
-  join-attempt-failed-broadcast-server: '<dark_aqua><b>JOIN ATTEMPT<blue> {player}<dark_aqua> ●<aqua> tried to join the server {server} but was denied:<yellow> {reason}'
+  join-attempt-failed-broadcast: '<dark_aqua><b>JOIN ATTEMPT</b><blue> {player}<dark_aqua> ●<aqua> tried to join the proxy but was denied:<yellow> {reason}'
+  join-attempt-failed-broadcast-server: '<dark_aqua><b>JOIN ATTEMPT</b><blue> {player}<dark_aqua> ●<aqua> tried to join the server {server} but was denied:<yellow> {reason}'
   used-censored-words: '<red>Used censored words!'
+  server-loading: '<dark_green><b>Server is loading...'
 
 commands:
   generic:
@@ -30,27 +31,17 @@ commands:
     server-not-found: '<red>Server not found!'
     invalid-duration: '<red>The duration you have provided is invalid!'
     invalid-argument: '<red>Invalid argument! The argument {argument} is invalid!'
+    enabled-self: '<dark_green><b>{feature}</b><green> enabled!'
+    disabled-self: '<dark_red><b>{feature}</b><red> disabled!'
+    enabled-player: '<dark_green><b>{feature}</b><green> enabled for <yellow>{player}'
+    disabled-player: '<dark_red><b>{feature}</b><red> disabled for <yellow>{player}'
   velocitycompact:
-    reload: '<dark_green><b>VelocityCompact<green> has been reloaded in <green>{time}<dark_green>!'
-    permissions-dumped: '<dark_green><b>Permissions<green> have been dumped to <green>{file}<dark_green>!'
+    reload: '<dark_green><b>VelocityCompact</b><green> has been reloaded in <green>{time}<dark_green>ms!'
+    permissions-dumped: '<dark_green>Permissions<green> have been dumped to <green>{file}<dark_green>!'
     permissions-dump-failed: '<red>Failed to dump permissions to <yellow>{file}<red>! Check the console for more information.'
   broadcast:
-    format: '<dark_red><b>BROADCAST <dark_aqua>● <yellow>{lines}'
-  commandspy:
-    enabled-self: '<dark_green><b>COMMANDSPY<green> enabled!'
-    disabled-self: '<dark_red><b>COMMANDSPY<red> disabled!'
-    enabled-player: '<dark_green><b>COMMANDSPY<green> enabled for <yellow>{player}'
-    disabled-player: '<dark_red><b>COMMANDSPY<red> disabled for <yellow>{player}'
-  socialspy:
-    enabled-self: '<dark_green><b>SOCIALSPY<green> enabled!'
-    disabled-self: '<dark_red><b>SOCIALSPY<red> disabled!'
-    enabled-player: '<dark_green><b>SOCIALSPY<green> enabled for <yellow>{player}'
-    disabled-player: '<dark_red><b>SOCIALSPY<red> disabled for <yellow>{player}'
-  globalchat:
-    enabled-self: '<dark_green><b>GLOBALCHAT<green> enabled!'
-    disabled-self: '<dark_red><b>GLOBALCHAT<red> disabled!'
-    enabled-player: '<dark_green><b>GLOBALCHAT<green> enabled for <yellow>{player}'
-    disabled-player: '<dark_red><b>GLOBALCHAT<red> disabled for <yellow>{player}'
+    format: '<dark_red><b>BROADCAST</b> <dark_aqua>● <yellow>{message}'
+    feedback: '<dark_green>Broadcast sent to server <green>{server}<dark_green>.'
   hub:
     already-connected-self: '<red>You are already connected to hub!'
     already-connected-player: '<red>This player is already connected to hub!'
@@ -63,16 +54,12 @@ commands:
     not-sent-to-hub-player: '<red>The player cannot be sent to hub!'
     not-sent-to-hub-players: '<red>The players cannot be sent to hub!'
   message:
-    message-yourself: '<red>You cannot send a lines to yourself!'
-    no-receiver: '<red>You don''t have a receiver to send a lines to! Use<yellow> /lines <player> <lines>'
-    receiver-not-online: '<red>The player you are trying to lines is not online!'
-    message-format: '<aqua>{sender_server}<red>:<yellow><b>{sender}<red> »<aqua> {receiver_server}<red>:<yellow><b>{receiver}<dark_aqua> ●<reset> {lines}'
+    message-yourself: '<red>You cannot send a message to yourself!'
+    no-receiver: '<red>You don''t have a receiver to send a message to! Use<yellow> /message <player> <message>'
+    receiver-not-online: '<red>The player you are trying to message is not online!'
+    message-format: '<aqua>{sender_server}<red>:<yellow><b>{sender}</b><red> »<aqua> {receiver_server}<red>:<yellow><b>{receiver}</b><dark_aqua> ●<reset> {message}'
   staffchat:
-    enabled-self: '<dark_green><b>STAFFCHAT<green> enabled!'
-    disabled-self: '<dark_red><b>STAFFCHAT<red> disabled!'
-    enabled-player: '<dark_green><b>STAFFCHAT<green> enabled for <yellow>{player}'
-    disabled-player: '<dark_red><b>STAFFCHAT<red> disabled for <yellow>{player}'
-    format: '<gold><b>STAFF <aqua>{server}<red>:<yellow><b>{player} <dark_aqua>● <reset>{lines}'
+    format: '<gold><b>STAFF</b> <aqua>{server}<red>:<yellow><b>{player}</b> <dark_aqua>● <reset>{message}'
   moderation:
     punish-yourself: '<red>You cannot punish yourself!'
     revoke-yourself: '<red>You cannot revoke your own punishment!'
@@ -107,47 +94,47 @@ commands:
 
 moderation:
   disconnect:
-    ban: '<red>You are banned\n\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red>Server <dark_aqua><b>» <gray>{server}\n<red><b>Duration <dark_aqua><b>» <yellow>{duration}\n<red>Reason <dark_aqua><b>» <gray>{reason}'
-    ban-ip: '<red>You are ip-banned\n\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red>Server <dark_aqua><b>» <gray>{server}\n<red><b>Duration <dark_aqua><b>» <yellow>{duration}\n<red>Reason <dark_aqua><b>» <gray>{reason}'
-    kick: '<red>You have been kicked\n\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red>Server <dark_aqua><b>» <gray>{server}\n<red>Reason <dark_aqua><b>» <gray>{reason}'
-    kick-ip: '<red>You have been kicked\n\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red>Server <dark_aqua><b>» <gray>{server}\n<red>Reason <dark_aqua><b>» <gray>{reason}'
+    ban: '<red>You are banned<br><br><red><b>Staff</b> <dark_aqua><b>»</b> <yellow>{staff}<br><red>Server <dark_aqua><b>»</b> <gray>{server}<br><red><b>Duration</b> <dark_aqua><b>»</b> <yellow>{duration}<br><red>Reason <dark_aqua><b>»</b> <gray>{reason}'
+    ban-ip: '<red>You are ip-banned<br><br><red><b>Staff <dark_aqua><b>»</b> <yellow>{staff}<br><red>Server <dark_aqua><b>»</b> <gray>{server}<br><red><b>Duration</b> <dark_aqua><b>»</b> <yellow>{duration}<br><red>Reason <dark_aqua><b>»</b> <gray>{reason}'
+    kick: '<red>You have been kicked<br><br><red><b>Staff <dark_aqua><b>»</b> <yellow>{staff}<br><red>Server <dark_aqua><b>»</b> <gray>{server}<br><red>Reason <dark_aqua><b>»</b> <gray>{reason}'
+    kick-ip: '<red>You have been kicked<br><br><red><b>Staff <dark_aqua><b>»</b> <yellow>{staff}<br><red>Server <dark_aqua><b>»</b> <gray>{server}<br><red>Reason <dark_aqua><b>»</b> <gray>{reason}'
   mute:
-    reminder: '<red>You are muted!\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red>Server <dark_aqua><b>» <gray>{server}\n<red><b>Duration <dark_aqua><b>» <yellow>{duration}\n<red>Reason <dark_aqua><b>» <gray>{reason}'
-    muted-message-broadcast: '<blue><b>MUTED:<yellow> {server}:{player} > <reset>{lines}'
+    reminder: '<red>You are muted!<br><red><b>Staff</b> <dark_aqua><b>»</b> <yellow>{staff}<br><red>Server <dark_aqua><b>»</b> <gray>{server}<br><red><b>Duration</b> <dark_aqua><b>»</b> <yellow>{duration}<br><red>Reason <dark_aqua><b>»</b> <gray>{reason}'
+    muted-message-broadcast: '<blue><b>MUTED</b>:<yellow> {server}:{player} > <reset>{message}'
   broadcast:
-    ban: '<gold><b>{player} <gray>has been <yellow><i>banned\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Duration <dark_aqua><b>» <yellow>{duration}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}'
-    ban-ip: '<gold><b>{player} <gray>has been <yellow><i>ip-banned\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Duration <dark_aqua><b>» <yellow>{duration}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}'
-    kick: '<gold><b>{player} <gray>has been <yellow><i>kicked\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}'
-    kick-ip: '<gold><b>{player} <gray>has been <yellow><i>ip-kicked\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}'
-    mute: '<gold><b>{player} <gray>has been <yellow><i>muted\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Duration <dark_aqua><b>» <yellow>{duration}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}'
-    mute-ip: '<gold><b>{player} <gray>has been <yellow><i>ip-muted\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Duration <dark_aqua><b>» <yellow>{duration}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}'
-    warn: '<gold><b>{player} <gray>has been <yellow><i>warned\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}'
-    unban: '<gold><b>{player} <gray>has been <yellow><i>unbanned\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}'
-    unban-ip: '<gold><b>{player} <gray>has been <yellow><i>ip-unbanned\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}'
-    unmute: '<gold><b>{player} <gray>has been <yellow><i>unmuted\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}'
-    unmute-ip: '<gold><b>{player} <gray>has been <yellow><i>ip-unmuted\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}'
+    ban: '<gold><b>{player}</b> <gray>has been <yellow><i>banned<br><red><b>Staff</b> <dark_aqua><b>»</b> <yellow>{staff}<br><red><b>Server</b> <dark_aqua><b>»</b> <yellow>{server}<br><red><b>Duration</b> <dark_aqua><b>»</b> <yellow>{duration}<br><red><b>Reason</b> <dark_aqua><b>»</b> <gray>{reason}'
+    ban-ip: '<gold><b>{player}</b> <gray>has been <yellow><i>ip-banned<br><red><b>Staff</b> <dark_aqua><b>»</b> <yellow>{staff}<br><red><b>Server</b> <dark_aqua><b>»</b> <yellow>{server}<br><red><b>Duration</b> <dark_aqua><b>»</b> <yellow>{duration}<br><red><b>Reason</b> <dark_aqua><b>»</b> <gray>{reason}'
+    kick: '<gold><b>{player}</b> <gray>has been <yellow><i>kicked<br><red><b>Staff</b> <dark_aqua><b>»</b> <yellow>{staff}<br><red><b>Server</b> <dark_aqua><b>»</b> <yellow>{server}<br><red><b>Reason</b> <dark_aqua><b>»</b> <gray>{reason}'
+    kick-ip: '<gold><b>{player}</b> <gray>has been <yellow><i>ip-kicked<br><red><b>Staff</b> <dark_aqua><b>»</b> <yellow>{staff}<br><red><b>Server</b> <dark_aqua><b>»</b> <yellow>{server}<br><red><b>Reason</b> <dark_aqua><b>»</b> <gray>{reason}'
+    mute: '<gold><b>{player}</b> <gray>has been <yellow><i>muted<br><red><b>Staff</b> <dark_aqua><b>»</b> <yellow>{staff}<br><red><b>Server</b> <dark_aqua><b>»</b> <yellow>{server}<br><red><b>Duration</b> <dark_aqua><b>»</b> <yellow>{duration}<br><red><b>Reason</b> <dark_aqua><b>»</b> <gray>{reason}'
+    mute-ip: '<gold><b>{player}</b> <gray>has been <yellow><i>ip-muted<br><red><b>Staff</b> <dark_aqua><b>»</b> <yellow>{staff}<br><red><b>Server</b> <dark_aqua><b>»</b> <yellow>{server}<br><red><b>Duration</b> <dark_aqua><b>»</b> <yellow>{duration}<br><red><b>Reason</b> <dark_aqua><b>»</b> <gray>{reason}'
+    warn: '<gold><b>{player}</b> <gray>has been <yellow><i>warned<br><red><b>Staff</b> <dark_aqua><b>»</b> <yellow>{staff}<br><red><b>Server</b> <dark_aqua><b>»</b> <yellow>{server}<br><red><b>Reason</b> <dark_aqua><b>»</b> <gray>{reason}'
+    unban: '<gold><b>{player}</b> <gray>has been <yellow><i>unbanned<br><red><b>Staff</b> <dark_aqua><b>»</b> <yellow>{staff}<br><red><b>Server</b> <dark_aqua><b>»</b> <yellow>{server}<br><red><b>Reason</b> <dark_aqua><b>»</b> <gray>{reason}'
+    unban-ip: '<gold><b>{player}</b> <gray>has been <yellow><i>ip-unbanned<br><red><b>Staff</b> <dark_aqua><b>»</b> <yellow>{staff}<br><red><b>Server</b> <dark_aqua><b>»</b> <yellow>{server}<br><red><b>Reason</b> <dark_aqua><b>»</b> <gray>{reason}'
+    unmute: '<gold><b>{player}</b> <gray>has been <yellow><i>unmuted<br><red><b>Staff</b> <dark_aqua><b>»</b> <yellow>{staff}<br><red><b>Server</b> <dark_aqua><b>»</b> <yellow>{server}<br><red><b>Reason</b> <dark_aqua><b>»</b> <gray>{reason}'
+    unmute-ip: '<gold><b>{player}</b> <gray>has been <yellow><i>ip-unmuted<br><red><b>Staff</b> <dark_aqua><b>»</b> <yellow>{staff}<br><red><b>Server</b> <dark_aqua><b>»</b> <yellow>{server}<br><red><b>Reason</b> <dark_aqua><b>»</b> <gray>{reason}'
   target-message:
-    ban: '<red>You have been <yellow><i>banned\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Duration <dark_aqua><b>» <yellow>{duration}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}'
-    ban-ip: '<red>You have been <yellow><i>ip-banned\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Duration <dark_aqua><b>» <yellow>{duration}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}'
-    kick: '<red>You have been <yellow><i>kicked\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}'
-    kick-ip: '<red>You have been <yellow><i>ip-kicked\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}'
-    mute: '<red>You have been <yellow><i>muted\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Duration <dark_aqua><b>» <yellow>{duration}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}'
-    mute-ip: '<red>You have been <yellow><i>ip-muted\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Duration <dark_aqua><b>» <yellow>{duration}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}'
-    warn: '<red>You have been <yellow><i>warned\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}'
-    unban: '<red>You have been <yellow><i>unbanned\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}'
-    unban-ip: '<red>You have been <yellow><i>ip-unbanned\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}'
-    unmute: '<red>You have been <yellow><i>unmuted\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}'
-    unmute-ip: '<red>You have been <yellow><i>ip-unmuted\n<red><b>Staff <dark_aqua><b>» <yellow>{staff}\n<red><b>Server <dark_aqua><b>» <yellow>{server}\n<red><b>Reason <dark_aqua><b>» <gray>{reason}'
+    ban: '<red>You have been <yellow><i>banned<br><red><b>Staff</b> <dark_aqua><b>»</b> <yellow>{staff}<br><red><b>Server</b> <dark_aqua><b>»</b> <yellow>{server}<br><red><b>Duration</b> <dark_aqua><b>»</b> <yellow>{duration}<br><red><b>Reason</b> <dark_aqua><b>»</b> <gray>{reason}'
+    ban-ip: '<red>You have been <yellow><i>ip-banned<br><red><b>Staff</b> <dark_aqua><b>»</b> <yellow>{staff}<br><red><b>Server</b> <dark_aqua><b>»</b> <yellow>{server}<br><red><b>Duration</b> <dark_aqua><b>»</b> <yellow>{duration}<br><red><b>Reason</b> <dark_aqua><b>»</b> <gray>{reason}'
+    kick: '<red>You have been <yellow><i>kicked<br><red><b>Staff</b> <dark_aqua><b>»</b> <yellow>{staff}<br><red><b>Server</b> <dark_aqua><b>»</b> <yellow>{server}<br><red><b>Reason</b> <dark_aqua><b>»</b> <gray>{reason}'
+    kick-ip: '<red>You have been <yellow><i>ip-kicked<br><red><b>Staff</b> <dark_aqua><b>»</b> <yellow>{staff}<br><red><b>Server</b> <dark_aqua><b>»</b> <yellow>{server}<br><red><b>Reason</b> <dark_aqua><b>»</b> <gray>{reason}'
+    mute: '<red>You have been <yellow><i>muted<br><red><b>Staff</b> <dark_aqua><b>»</b> <yellow>{staff}<br><red><b>Server</b> <dark_aqua><b>»</b> <yellow>{server}<br><red><b>Duration</b> <dark_aqua><b>»</b> <yellow>{duration}<br><red><b>Reason</b> <dark_aqua><b>»</b> <gray>{reason}'
+    mute-ip: '<red>You have been <yellow><i>ip-muted<br><red><b>Staff</b> <dark_aqua><b>»</b> <yellow>{staff}<br><red><b>Server</b> <dark_aqua><b>»</b> <yellow>{server}<br><red><b>Duration</b> <dark_aqua><b>»</b> <yellow>{duration}<br><red><b>Reason</b> <dark_aqua><b>»</b> <gray>{reason}'
+    warn: '<red>You have been <yellow><i>warned<br><red><b>Staff</b> <dark_aqua><b>»</b> <yellow>{staff}<br><red><b>Server</b> <dark_aqua><b>»</b> <yellow>{server}<br><red><b>Reason</b> <dark_aqua><b>»</b> <gray>{reason}'
+    unban: '<red>You have been <yellow><i>unbanned<br><red><b>Staff</b> <dark_aqua><b>»</b> <yellow>{staff}<br><red><b>Server</b> <dark_aqua><b>»</b> <yellow>{server}<br><red><b>Reason</b> <dark_aqua><b>»</b> <gray>{reason}'
+    unban-ip: '<red>You have been <yellow><i>ip-unbanned<br><red><b>Staff</b> <dark_aqua><b>»</b> <yellow>{staff}<br><red><b>Server</b> <dark_aqua><b>»</b> <yellow>{server}<br><red><b>Reason</b> <dark_aqua><b>»</b> <gray>{reason}'
+    unmute: '<red>You have been <yellow><i>unmuted<br><red><b>Staff</b> <dark_aqua><b>»</b> <yellow>{staff}<br><red><b>Server</b> <dark_aqua><b>»</b> <yellow>{server}<br><red><b>Reason</b> <dark_aqua><b>»</b> <gray>{reason}'
+    unmute-ip: '<red>You have been <yellow><i>ip-unmuted<br><red><b>Staff</b> <dark_aqua><b>»</b> <yellow>{staff}<br><red><b>Server</b> <dark_aqua><b>»</b> <yellow>{server}<br><red><b>Reason</b> <dark_aqua><b>»</b> <gray>{reason}'
   reason-suggestions:
     ban: [ ]
     kick: [ ]
     mute: [ ]
     warn: [ ]
   lookup:
-    header: '<blue><st>----<r> <gold>Lookup <yellow>{player} <blue><st>----'
-    footer: '<blue><st>----<r> <gold>Lookup <yellow>{player} <blue><st>----'
-    status-online: '<dark_green><b>Online<r> <gray>on <yellow>{server}'
-    status-offline: '<red><b>Offline'
+    header: '<blue><st>----</st> <gold>Lookup <yellow>{player} <blue><st>----</st>'
+    footer: '<blue><st>----</st> <gold>Lookup <yellow>{player} <blue><st>----</st>'
+    status-online: '<dark_green><b>Online</b> <gray>on <yellow>{server}'
+    status-offline: '<red><b>Offline</b>'
     first-login: '<gray>First login<dark_aqua> ● <yellow>{date}'
     last-login: '<gray>Last login<dark_aqua> ● <yellow>{date}'
     last-ip: '<gray>Last ip<dark_aqua> ● <yellow>{ip}'
@@ -156,11 +143,11 @@ moderation:
     nickname-history-separator: '<gray>, <yellow>'
     punishment-status:
       title: '<gray>Punishment status'
-      not-banned: '  <dark_green><b>Not banned'
-      banned-server: '  <red><b>Banned<gray> in server <red>{server}'
-      banned-global: '  <red><b>Banned<gray> globally'
-      not-muted: '  <dark_green><b>Not muted'
-      muted: '  <red><b>Muted'
+      not-banned: '  <dark_green><b>Not banned</b>'
+      banned-server: '  <red><b>Banned</b><gray> in server <red>{server}'
+      banned-global: '  <red><b>Banned</b><gray> globally'
+      not-muted: '  <dark_green><b>Not muted</b>'
+      muted: '  <red><b>Muted</b>'
       order:
         - ban
         - mute
@@ -187,8 +174,8 @@ moderation:
       - history-status
       - footer
   punishment-lookup:
-    header: '<blue><st>----<r> <gold>Lookup <yellow>{player}<gold> - <yellow>{punishment} {page}<gold>/<yellow>{total_pages} <blue><st>----'
-    footer: '<blue><st>----<r> <gold>Lookup <yellow>{player}<gold> - <yellow>{punishment} {page}<gold>/<yellow>{total_pages} <blue><st>----'
+    header: '<blue><st>----</st> <gold>Lookup <yellow>{player}<gold> - <yellow>{punishment} {page}<gold>/<yellow>{total_pages} <blue><st>----</st>'
+    footer: '<blue><st>----</st> <gold>Lookup <yellow>{player}<gold> - <yellow>{punishment} {page}<gold>/<yellow>{total_pages} <blue><st>----</st>'
     ban-active: '<gray>Date<dark_aqua> ● <yellow>{date} <gray>Staff<dark_aqua> ● <yellow>{staff} <gray>Server<dark_aqua> ● <yellow>{server} <gray>Duration<dark_aqua> ● <yellow>{duration} <gray>Reason<dark_aqua> ● <yellow>{reason}'
     ban-ended: '<gray>Date<dark_aqua> ● <yellow>{date} <gray>Staff<dark_aqua> ● <yellow>{staff} <gray>Server<dark_aqua> ● <yellow>{server} <gray>Duration<dark_aqua> ● <yellow>{duration} <gray>Reason<dark_aqua> ● <yellow>{reason} <gray>Revoked by<dark_aqua> ● <yellow>{revoked_by} <gray>Revoke date<dark_aqua> ● <yellow>{revoked_date} <gray>Reason<dark_aqua> ● <yellow>{revoked_reason}'
     kick: '<gray>Date<dark_aqua> ● <yellow>{date} <gray>Staff<dark_aqua> ● <yellow>{staff} <gray>Server<dark_aqua> ● <yellow>{server} <gray>Reason<dark_aqua> ● <yellow>{reason}'
@@ -196,19 +183,19 @@ moderation:
     mute-ended: '<gray>Date<dark_aqua> ● <yellow>{date} <gray>Staff<dark_aqua> ● <yellow>{staff} <gray>Server<dark_aqua> ● <yellow>{server} <gray>Duration<dark_aqua> ● <yellow>{duration} <gray>Reason<dark_aqua> ● <yellow>{reason} <gray>Revoked by<dark_aqua> ● <yellow>{revoked_by} <gray>Revoke date<dark_aqua> ● <yellow>{revoked_date} <gray>Reason<dark_aqua> ● <yellow>{revoked_reason}'
     warn: '<gray>Date<dark_aqua> ● <yellow>{date} <gray>Staff<dark_aqua> ● <yellow>{staff} <gray>Server<dark_aqua> ● <yellow>{server} <gray>Reason<dark_aqua> ● <yellow>{reason}'
   lookup-ip:
-    header: '<blue><st>----<r> <gold>Lookup <yellow>{ip} <blue><st>----'
-    footer: '<blue><st>----<r> <gold>Lookup <yellow>{ip} <blue><st>----'
+    header: '<blue><st>----</st> <gold>Lookup <yellow>{ip} <blue><st>----</st>'
+    footer: '<blue><st>----</st> <gold>Lookup <yellow>{ip} <blue><st>----</st>'
     players-connected: '<gray>Players connected<dark_aqua> ● <gray>[<yellow>{player}<gray>]'
     players-connected-separator: '<gray>, <yellow>'
     players-with-this-ip: '<gray>Players with this ip<dark_aqua> ● <gray>[<yellow>{player}<gray>]'
     players-with-this-ip-separator: '<gray>, <yellow>'
     punishment-status:
       title: '<gray>Punishment status'
-      not-banned: '  <dark_green><b>Not banned'
-      banned-server: '  <red><b>Banned<gray> in server <red>{server}'
-      banned-global: '  <red><b>Banned<gray> globally'
-      not-muted: '  <dark_green><b>Not muted'
-      muted: '  <red><b>Muted'
+      not-banned: '  <dark_green><b>Not banned</b>'
+      banned-server: '  <red><b>Banned</b><gray> in server <red>{server}'
+      banned-global: '  <red><b>Banned</b><gray> globally'
+      not-muted: '  <dark_green><b>Not muted</b>'
+      muted: '  <red><b>Muted</b>'
       order:
         - ban
         - mute

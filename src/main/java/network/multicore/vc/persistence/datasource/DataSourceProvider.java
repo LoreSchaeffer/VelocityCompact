@@ -21,10 +21,12 @@ public class DataSourceProvider<D extends DataSource> {
 
     private final D dataSource;
     private final String driver;
+    private final String dialect;
 
-    private DataSourceProvider(D dataSource, String driver) {
+    private DataSourceProvider(D dataSource, String driver, String dialect) {
         this.dataSource = dataSource;
         this.driver = driver;
+        this.dialect = dialect;
     }
 
     public D getDataSource() {
@@ -33,6 +35,10 @@ public class DataSourceProvider<D extends DataSource> {
 
     public String getDriver() {
         return driver;
+    }
+
+    public String getDialect() {
+        return dialect;
     }
 
     public static DataSourceProvider<MysqlDataSource> newMysqlDataSourceProvider(@NotNull String host, int port, @NotNull String database, @NotNull String user, String password, Map<String, String> properties) {
@@ -61,7 +67,7 @@ public class DataSourceProvider<D extends DataSource> {
         dataSource.setUser(user);
         dataSource.setPassword(password);
 
-        return new DataSourceProvider<>(dataSource, type.getDriver());
+        return new DataSourceProvider<>(dataSource, type.getDriver(), type.getDialect());
     }
 
     public static DataSourceProvider<MysqlDataSource> newMysqlDataSourceProvider(@NotNull String host, @NotNull String database, @NotNull String user, String password, Map<String, String> properties) {
@@ -83,7 +89,7 @@ public class DataSourceProvider<D extends DataSource> {
         DataSourceProvider<MysqlDataSource> dataSourceProvider = newMysqlDataSourceProvider(host, port, database, user, password, properties);
 
         config.setDataSource(dataSourceProvider.getDataSource());
-        return new DataSourceProvider<>(new HikariDataSource(config), dataSourceProvider.getDriver());
+        return new DataSourceProvider<>(new HikariDataSource(config), dataSourceProvider.getDriver(), dataSourceProvider.getDialect());
     }
 
     public static DataSourceProvider<HikariDataSource> newMysqlHikariDataSourceProvider(@NotNull String host, @NotNull String database, @NotNull String user, String password, Map<String, String> properties, HikariConfig config) {
@@ -129,7 +135,7 @@ public class DataSourceProvider<D extends DataSource> {
             throw new IllegalArgumentException(e);
         }
 
-        return new DataSourceProvider<>(dataSource, type.getDriver());
+        return new DataSourceProvider<>(dataSource, type.getDriver(), type.getDialect());
     }
 
     public static DataSourceProvider<MariaDbDataSource> newMariaDbDataSourceProvider(@NotNull String host, @NotNull String database, @NotNull String user, String password, Map<String, String> properties) {
@@ -151,7 +157,7 @@ public class DataSourceProvider<D extends DataSource> {
         DataSourceProvider<MariaDbDataSource> dataSourceProvider = newMariaDbDataSourceProvider(host, port, database, user, password, properties);
 
         config.setDataSource(dataSourceProvider.getDataSource());
-        return new DataSourceProvider<>(new HikariDataSource(config), dataSourceProvider.getDriver());
+        return new DataSourceProvider<>(new HikariDataSource(config), dataSourceProvider.getDriver(), dataSourceProvider.getDialect());
     }
 
     public static DataSourceProvider<HikariDataSource> newMariaDbHikariDataSourceProvider(@NotNull String host, @NotNull String database, @NotNull String user, String password, Map<String, String> properties, HikariConfig config) {
@@ -186,7 +192,7 @@ public class DataSourceProvider<D extends DataSource> {
 
         dataSource.setUrl(url);
 
-        return new DataSourceProvider<>(dataSource, type.getDriver());
+        return new DataSourceProvider<>(dataSource, type.getDriver(), type.getDialect());
     }
 
     public static DataSourceProvider<SQLiteDataSource> newSQLiteDataSourceProvider(@NotNull File database) {
@@ -200,7 +206,7 @@ public class DataSourceProvider<D extends DataSource> {
         DataSourceProvider<SQLiteDataSource> dataSourceProvider = newSQLiteDataSourceProvider(database, properties);
 
         config.setDataSource(dataSourceProvider.getDataSource());
-        return new DataSourceProvider<>(new HikariDataSource(config), dataSourceProvider.getDriver());
+        return new DataSourceProvider<>(new HikariDataSource(config), dataSourceProvider.getDriver(), dataSourceProvider.getDialect());
     }
 
     public static DataSourceProvider<HikariDataSource> newSQLiteHikariDataSourceProvider(@NotNull File database, HikariConfig config) {
@@ -234,7 +240,7 @@ public class DataSourceProvider<D extends DataSource> {
         dataSource.setUser(user);
         dataSource.setPassword(password);
 
-        return new DataSourceProvider<>(dataSource, type.getDriver());
+        return new DataSourceProvider<>(dataSource, type.getDriver(), type.getDialect());
     }
 
     public static DataSourceProvider<PGSimpleDataSource> newPostgreSqlDataSourceProvider(@NotNull String host, @NotNull String database, @NotNull String user, String password, Map<String, String> properties) {
@@ -256,7 +262,7 @@ public class DataSourceProvider<D extends DataSource> {
         DataSourceProvider<PGSimpleDataSource> dataSourceProvider = newPostgreSqlDataSourceProvider(host, port, database, user, password, properties);
 
         config.setDataSource(dataSourceProvider.getDataSource());
-        return new DataSourceProvider<>(new HikariDataSource(config), dataSourceProvider.getDriver());
+        return new DataSourceProvider<>(new HikariDataSource(config), dataSourceProvider.getDriver(), dataSourceProvider.getDialect());
     }
 
     public static DataSourceProvider<HikariDataSource> newPostgreSqlHikariDataSourceProvider(@NotNull String host, @NotNull String database, @NotNull String user, String password, Map<String, String> properties, HikariConfig config) {
@@ -291,7 +297,7 @@ public class DataSourceProvider<D extends DataSource> {
 
         dataSource.setURL(url);
 
-        return new DataSourceProvider<>(dataSource, type.getDriver());
+        return new DataSourceProvider<>(dataSource, type.getDriver(), type.getDialect());
     }
 
     public static DataSourceProvider<JdbcDataSource> newH2DataSourceProvider(@NotNull File file) {
@@ -305,7 +311,7 @@ public class DataSourceProvider<D extends DataSource> {
         DataSourceProvider<JdbcDataSource> dataSourceProvider = newH2DataSourceProvider(database, properties);
 
         config.setDataSource(dataSourceProvider.getDataSource());
-        return new DataSourceProvider<>(new HikariDataSource(config), dataSourceProvider.getDriver());
+        return new DataSourceProvider<>(new HikariDataSource(config), dataSourceProvider.getDriver(), dataSourceProvider.getDialect());
     }
 
     public static DataSourceProvider<HikariDataSource> newH2HikariDataSourceProvider(@NotNull File database, HikariConfig config) {

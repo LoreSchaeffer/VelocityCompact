@@ -79,6 +79,7 @@ public class PlayerLoginListener extends Listener {
         User user = userRepository.findById(e.getPlayer().getUniqueId()).orElse(null);
         if (user == null) {
             userRepository.save(new User(player));
+            logger.info("{} joined the proxy for the first time.", player.getUsername());
         } else {
             if (!Objects.equals(user.getUsername(), player.getUsername())) user.setUsername(player.getUsername());
 
@@ -88,6 +89,7 @@ public class PlayerLoginListener extends Listener {
                     .setClientBrand(player.getClientBrand());
 
             userRepository.save(user);
+            logger.info("{} joined the proxy.", player.getUsername());
         }
 
         if (moderationEnabled) {
@@ -119,7 +121,7 @@ public class PlayerLoginListener extends Listener {
             new Thread(() -> {
                 List<User> users = userRepository.findAllByIp(player.getRemoteAddress().getHostString());
                 users.removeIf(u -> sameIpBroadcastIgnoredPlayers.contains(u.getUsername().toLowerCase()));
-                if (users.isEmpty()) return;
+                if (users.size() < 2) return;
 
                 Text.broadcast(messages.getAndReplace(
                         "common.same-ip-broadcast",

@@ -32,6 +32,11 @@ public class PlayerPreLoginListener extends Listener {
 
     @Subscribe(order = PostOrder.FIRST)
     public void onPlayerPreLogin(PreLoginEvent e) {
+        if (plugin.isLoading()) {
+            e.setResult(PreLoginEvent.PreLoginComponentResult.denied(Text.deserialize(messages.get("common.server-loading"))));
+            return;
+        }
+
         if (!e.getResult().isAllowed()) return;
 
         String ip = e.getConnection().getRemoteAddress().getHostString();

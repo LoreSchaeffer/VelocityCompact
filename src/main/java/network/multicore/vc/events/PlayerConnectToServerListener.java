@@ -89,5 +89,7 @@ public class PlayerConnectToServerListener extends Listener {
                 }
             }
         }
+
+        logger.info("Player {} connected to server {}", e.getPlayer().getUsername(), e.getServer().getServerInfo().getName());
     }
 }

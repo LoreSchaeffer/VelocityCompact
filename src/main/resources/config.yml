@@ -82,8 +82,10 @@ announcer:
         - "<blue>Enjoy your stay!"
 
 # Chat censorship settings
-# This includes both chat lines and private lines
+# This includes both chat messages and private messages
 chat-censorship:
+  # Should the plugin censor chat messages?
+  replace-with-asterisks: true
   # The words in this list will be censored.
   # This list is case-insensitive.
   censored-words: [ ]
@@ -129,8 +131,8 @@ blocked-commands:
   - "bukkit:?"
   - "icanhasbukkit"
 
-# The commands in this list will trigger a warning lines when executed.
-# Commands in the 'blocked-commands' list will already trigger a warning lines.
+# The commands in this list will trigger a warning message when executed.
+# Commands in the 'blocked-commands' list will already trigger a warning message.
 command-warning: [ ]
 
 # Globalchat settings
@@ -158,7 +160,7 @@ moderation:
   punishment-needs-reason: true
   # Should staff members provide a reason when revoking a punishment?
   revoke-needs-reason: false
-  # If this is set to true and a player is muted, they can't send private lines to other players.
+  # If this is set to true and a player is muted, they can't send private messages to other players.
   mute-prevents-private-messages: true
   # If this is set to true a server punishment (the one without the g) will be broadcast only in that server.
   broadcast-server-punishment-only-in-server: false

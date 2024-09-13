@@ -29,7 +29,7 @@ public class PlayerSuggestionProvider<S> implements SuggestionProvider<S> {
 
         proxy.getAllPlayers()
                 .stream()
-                .filter(player -> Utils.isVanished((CommandSource) ctx.getSource(), player))
+                .filter(player -> !Utils.isVanished((CommandSource) ctx.getSource(), player))
                 .map(Player::getUsername)
                 .filter(playerName -> playerName.regionMatches(true, 0, arg, 0, arg.length()))
                 .forEach(builder::suggest);

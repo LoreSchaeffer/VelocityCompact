@@ -75,7 +75,7 @@ public class GMuteCommand extends AbstractCommand {
 
         User staff = src instanceof Player player ? plugin.userRepository().findById(player.getUniqueId()).orElse(null) : null;
         if (staff == null && src instanceof Player) {
-            Text.send(messages.getAndReplace("common.internal-exception", "lines", "Staff user not found"), src);
+            Text.send(messages.getAndReplace("common.internal-exception", "message", "Staff user not found"), src);
             return COMMAND_FAILED;
         }
 
@@ -96,7 +96,7 @@ public class GMuteCommand extends AbstractCommand {
             plugin.muteRepository().save(mute);
 
             Optional<Player> target = proxy.getPlayer(user.getUniqueId());
-            target.ifPresent(p -> Text.send(messages.getAndReplace("moderation.target-lines.mute",
+            target.ifPresent(p -> Text.send(messages.getAndReplace("moderation.target-message.mute",
                     "staff", console ? messages.get("console") : src,
                     "server", messages.get("global"),
                     "duration", messages.get("permanent"),
